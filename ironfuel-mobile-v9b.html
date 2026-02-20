@@ -2434,33 +2434,41 @@ input.set-rpe-input { color: var(--textSub); }
 
       <!-- Agent feed -->
       <div class="section-label">Agent Feed</div>
-      <div id="home-agent-feed">
 
-        <!-- Macro Engine card injected here by runMacroEngine() -->
-
-        <div class="feed-item" id="feed-strength-sentinel">
-          <div class="feed-header">
-            <div class="feed-agent-dot" style="background:var(--blue)"></div>
-            <span class="feed-agent-name" style="color:var(--blue)">Strength Sentinel</span>
-            <span class="feed-time">8:47</span>
-          </div>
-          <div class="feed-text">🏆 New deadlift PR — <strong>365 × 3</strong>, est 1RM <strong>401 lb</strong>. All compounds holding. Retention score updated to 94%.</div>
+      <div class="feed-item">
+        <div class="feed-header">
+          <div class="feed-agent-dot" style="background:var(--lime)"></div>
+          <span class="feed-agent-name" style="color:var(--lime)">Macro Engine</span>
+          <span class="feed-time">9:14</span>
         </div>
-
-        <div class="feed-item">
-          <div class="feed-header">
-            <div class="feed-agent-dot" style="background:var(--orange)"></div>
-            <span class="feed-agent-name" style="color:var(--orange)">Nutrition Coach</span>
-            <span class="feed-time">3:02</span>
-          </div>
-          <div class="feed-text">At 3pm you had only 88g protein. Suggested: <strong>Chicken Power Bowl</strong> from Vault — 52g protein, 10 min.</div>
-          <div class="feed-actions">
-            <button class="feed-btn-primary" onclick="switchScreen('recipes')">Open Recipe</button>
-            <button class="feed-btn-ghost">Dismiss</button>
-          </div>
+        <div class="feed-text">Your 7-day trend is <strong>0.8%/wk</strong> — perfectly on target. No calorie change needed. Holding at 2,100 kcal.</div>
+        <div class="feed-actions">
+          <button class="feed-btn-primary" onclick="showToast('✓', 'Calorie targets locked at 2,100 kcal')">Confirm Hold</button>
+          <button class="feed-btn-ghost">Details</button>
         </div>
+      </div>
 
-      </div><!-- /#home-agent-feed -->
+      <div class="feed-item">
+        <div class="feed-header">
+          <div class="feed-agent-dot" style="background:var(--blue)"></div>
+          <span class="feed-agent-name" style="color:var(--blue)">Strength Sentinel</span>
+          <span class="feed-time">8:47</span>
+        </div>
+        <div class="feed-text">🏆 New deadlift PR — <strong>365 × 3</strong>, est 1RM <strong>401 lb</strong>. All compounds holding. Retention score updated to 94%.</div>
+      </div>
+
+      <div class="feed-item">
+        <div class="feed-header">
+          <div class="feed-agent-dot" style="background:var(--orange)"></div>
+          <span class="feed-agent-name" style="color:var(--orange)">Nutrition Coach</span>
+          <span class="feed-time">3:02</span>
+        </div>
+        <div class="feed-text">At 3pm you had only 88g protein. Suggested: <strong>Chicken Power Bowl</strong> from Vault — 52g protein, 10 min.</div>
+        <div class="feed-actions">
+          <button class="feed-btn-primary" onclick="switchScreen('recipes')">Open Recipe</button>
+          <button class="feed-btn-ghost">Dismiss</button>
+        </div>
+      </div>
 
       <!-- Today's lifts -->
       <div class="section-label" style="margin-top:6px;">Today's Lifts</div>
@@ -3572,12 +3580,6 @@ input.set-rpe-input { color: var(--textSub); }
             <div class="sr-label">Rate IronFuel</div>
             <div class="sr-arrow">›</div>
           </div>
-          <div class="settings-row" onclick="runMacroEngine(true);closeSettings();" style="border:1px solid rgba(212,255,63,0.2);">
-            <div class="sr-icon">⚙️</div>
-            <div class="sr-label" style="color:var(--lime);">Run Macro Engine Now</div>
-            <div class="sr-value" style="color:var(--lime);">Force</div>
-            <div class="sr-arrow" style="color:var(--lime);">›</div>
-          </div>
           <div class="settings-row" onclick="confirmResetOnboarding()">
             <div class="sr-icon">🔄</div>
             <div class="sr-label">Reset & Re-run Onboarding</div>
@@ -4118,7 +4120,6 @@ let currentScreen = 'home';
 
 function switchScreen(screenId, btn) {
   if (screenId === currentScreen) return;
-  const fromScreen = currentScreen;
 
   // Pause timer if leaving lift screen
   if (currentScreen === 'lift' && timerRunning) {
@@ -4155,21 +4156,13 @@ function switchScreen(screenId, btn) {
 
   currentScreen = screenId;
 
-  // Screen-specific bar animations
+  // Screen-specific actions
   if (screenId === 'nutrition') {
     setTimeout(() => {
       animateBar('calorie-bar-fill', '72%');
       animateBar('pp-fill', '94%');
     }, 300);
   }
-
-  // Execute all registered screen hooks
-  const hooks = (window._screenHooks || {})[screenId] || [];
-  hooks.forEach(fn => { try { fn(); } catch(e) {} });
-
-  // Execute post-switch hooks (slide transitions etc.)
-  const postHooks = window._switchPostHooks || [];
-  postHooks.forEach(fn => { try { fn(screenId, fromScreen, btn); } catch(e) {} });
 }
 
 // Init: show home, hide rest
@@ -5190,16 +5183,19 @@ function initDeadliftChart() {
   });
 }
 
-// Register chart init as a hook (called from master switchScreen below)
-window._screenHooks = window._screenHooks || {};
-window._screenHooks.progress = window._screenHooks.progress || [];
-window._screenHooks.progress.push(function() {
-  setTimeout(() => {
-    initWeightChart('8W');
-    initDeadliftChart();
-    updateProgressFromStorage();
-  }, 100);
-});
+// Init charts when Progress screen is shown
+const origSwitchScreen = switchScreen;
+function switchScreen(screenId, btn) {
+  origSwitchScreen(screenId, btn);
+  if (screenId === 'progress') {
+    setTimeout(() => {
+      initWeightChart('8W');
+      initDeadliftChart();
+      updateProgressFromStorage();
+    }, 100);
+  }
+}
+// Also init if progress is first screen somehow
 if (currentScreen === 'progress') { initWeightChart(); initDeadliftChart(); }
 
 // Update weight chart on period button click
@@ -5380,10 +5376,12 @@ function updateMacroRing() {
 
 // Run on load and whenever nutrition data changes
 updateMacroRing();
-// Register home hook for macro ring
-window._screenHooks = window._screenHooks || {};
-window._screenHooks.home = window._screenHooks.home || [];
-window._screenHooks.home.push(function() { setTimeout(updateMacroRing, 100); });
+// Re-run every time home screen is shown
+const _patchedSwitch = switchScreen;
+function switchScreen(screenId, btn) {
+  _patchedSwitch(screenId, btn);
+  if (screenId === 'home') setTimeout(updateMacroRing, 100);
+}
 
 // ═══════════════════════════════════════════════
 // POST-WORKOUT LOG BUTTON
@@ -6064,28 +6062,34 @@ function sendChip(message) {
 }
 
 // ═══════════════════════════════════════════════
-// SCREEN TRANSITIONS — Slide animation (hook)
+// SCREEN TRANSITIONS — Slide animation
 // ═══════════════════════════════════════════════
 const SCREEN_ORDER = ['home', 'nutrition', 'lift', 'recipes', 'coach', 'progress'];
+let _prevScreenIdx = 0;
 
-// Register as a post-switch hook via a global array
-window._switchPostHooks = window._switchPostHooks || [];
-window._switchPostHooks.push(function(screenId, fromId, btn) {
-  const fromIdx = SCREEN_ORDER.indexOf(fromId);
-  const toIdx   = SCREEN_ORDER.indexOf(screenId);
-  if (fromIdx === toIdx || fromIdx < 0 || toIdx < 0) return;
-  const toEl = document.getElementById('screen-' + screenId);
-  if (!toEl) return;
-  const dir = toIdx > fromIdx ? 'slide-in-right' : 'slide-in-left';
-  toEl.classList.remove('slide-in-right', 'slide-in-left');
-  void toEl.offsetWidth;
-  toEl.classList.add(dir);
-  setTimeout(() => toEl.classList.remove(dir), 300);
-  if (btn) {
-    btn.classList.add('just-tapped');
-    setTimeout(() => btn.classList.remove('just-tapped'), 400);
-  }
-});
+// Patch switchScreen to add slide animations
+(function() {
+  const _baseSwitchScreen = window.switchScreen || function(){};
+  window.switchScreen = function(screenId, btn) {
+    const fromIdx = SCREEN_ORDER.indexOf(currentScreen);
+    const toIdx   = SCREEN_ORDER.indexOf(screenId);
+    _baseSwitchScreen(screenId, btn);
+    if (fromIdx === toIdx) return;
+    const toEl = document.getElementById('screen-' + screenId);
+    if (!toEl) return;
+    const dir = toIdx > fromIdx ? 'slide-in-right' : 'slide-in-left';
+    toEl.classList.remove('slide-in-right', 'slide-in-left');
+    void toEl.offsetWidth; // force reflow
+    toEl.classList.add(dir);
+    setTimeout(() => toEl.classList.remove(dir), 300);
+
+    // Nav pulse
+    if (btn) {
+      btn.classList.add('just-tapped');
+      setTimeout(() => btn.classList.remove('just-tapped'), 400);
+    }
+  };
+})();
 
 // ═══════════════════════════════════════════════
 // PROGRESS SCREEN — Animated stat counters
@@ -6184,15 +6188,19 @@ syncProfileTargets();
 // ═══════════════════════════════════════════════
 window._liftSessionStart = window._liftSessionStart || null;
 
-// Register lift timer as a screen hook
-window._screenHooks = window._screenHooks || {};
-window._screenHooks.lift = window._screenHooks.lift || [];
-window._screenHooks.lift.push(function() {
-  if (!window._liftSessionStart) {
-    window._liftSessionStart = Date.now();
-    startElapsedTimer();
-  }
-});
+// Start elapsed timer when entering lift screen
+(function() {
+  const origSwitch = window.switchScreen;
+  window.switchScreen = function(screenId, btn) {
+    origSwitch(screenId, btn);
+    if (screenId === 'lift') {
+      if (!window._liftSessionStart) {
+        window._liftSessionStart = Date.now();
+        startElapsedTimer();
+      }
+    }
+  };
+})();
 
 function startElapsedTimer() {
   const chip = document.getElementById('session-time-chip');
@@ -6315,22 +6323,27 @@ document.addEventListener('keydown', function(e) {
 }, true);
 
 // ═══════════════════════════════════════════════
-// MACRO DONUT — Init on nutrition screen (hook)
+// MACRO DONUT — Init on nutrition screen
 // ═══════════════════════════════════════════════
-window._screenHooks = window._screenHooks || {};
-window._screenHooks.nutrition = window._screenHooks.nutrition || [];
-window._screenHooks.nutrition.push(function() {
-  setTimeout(() => {
-    const vals = document.querySelectorAll('.macro-tape-card .mtc-val');
-    const protein  = parseInt((vals[1]?.textContent || '198').replace(/[^\d]/g,'')) || 198;
-    const carbs    = parseInt((vals[2]?.textContent || '180').replace(/[^\d]/g,'')) || 180;
-    const fat      = parseInt((vals[3]?.textContent || '52').replace(/[^\d]/g,'')) || 52;
-    const consumed = parseInt((vals[0]?.textContent || '1880').replace(/[^\d,]/g,'').replace(',','')) || 1880;
-    const profile  = JSON.parse(localStorage.getItem('ironfuel_profile') || '{}');
-    const target   = profile.calories || 2100;
-    initMacroDonut(protein, carbs, fat, consumed, target);
-  }, 200);
-});
+(function() {
+  const origSwitch = window.switchScreen;
+  window.switchScreen = function(screenId, btn) {
+    origSwitch(screenId, btn);
+    if (screenId === 'nutrition') {
+      setTimeout(() => {
+        // Get current macro values from tape
+        const vals = document.querySelectorAll('.macro-tape-card .mtc-val');
+        const protein  = parseInt((vals[1]?.textContent || '198').replace(/[^\d]/g,'')) || 198;
+        const carbs    = parseInt((vals[2]?.textContent || '180').replace(/[^\d]/g,'')) || 180;
+        const fat      = parseInt((vals[3]?.textContent || '52').replace(/[^\d]/g,'')) || 52;
+        const consumed = parseInt((vals[0]?.textContent || '1880').replace(/[^\d,]/g,'').replace(',','')) || 1880;
+        const profile  = JSON.parse(localStorage.getItem('ironfuel_profile') || '{}');
+        const target   = profile.calories || 2100;
+        initMacroDonut(protein, carbs, fat, consumed, target);
+      }, 200);
+    }
+  };
+})();
 
 // Init donut if already on nutrition screen
 if (document.querySelector('#screen-nutrition.active')) {
@@ -6450,32 +6463,42 @@ function submitWeeklyCheckin(modal) {
 }
 
 // ═══════════════════════════════════════════════
-// PROGRESS SCREEN — Animate counters on entry (hook)
+// PROGRESS SCREEN — Animate counters on entry
 // ═══════════════════════════════════════════════
 let _progressAnimated = false;
 
-window._screenHooks = window._screenHooks || {};
-window._screenHooks.progress = window._screenHooks.progress || [];
-window._screenHooks.progress.push(function() {
-  if (_progressAnimated) return;
-  _progressAnimated = true;
-  setTimeout(() => {
-    const phVal = document.querySelector('.ph-val');
-    if (phVal) animateCounter(phVal, 201.4, 189.4, '', 1200);
-    const scVals = document.querySelectorAll('.sc-val');
-    const targets = [94, 91, 0.8, 87];
-    const suffixes = ['%','%','%','%'];
-    scVals.forEach((el, i) => {
-      setTimeout(() => animateCounter(el, 0, targets[i], suffixes[i], 900), i * 120);
-    });
-    const statVals = document.querySelectorAll('.scm-val');
-    const statTargets = [401, 323, 14, 0.8];
-    statVals.forEach((el, i) => {
-      setTimeout(() => animateCounter(el, 0, statTargets[i], '', 800), 400 + i * 100);
-    });
-    updateBodyComposition();
-  }, 300);
-});
+(function() {
+  const origSwitch = window.switchScreen;
+  window.switchScreen = function(screenId, btn) {
+    origSwitch(screenId, btn);
+    if (screenId === 'progress' && !_progressAnimated) {
+      _progressAnimated = true;
+      setTimeout(() => {
+        // Animate the main weight display
+        const phVal = document.querySelector('.ph-val');
+        if (phVal) animateCounter(phVal, 201.4, 189.4, '', 1200);
+
+        // Animate score card values
+        const scVals = document.querySelectorAll('.sc-val');
+        const targets = [94, 91, 0.8, 87];
+        const suffixes = ['%','%','%','%'];
+        scVals.forEach((el, i) => {
+          setTimeout(() => animateCounter(el, 0, targets[i], suffixes[i], 900), i * 120);
+        });
+
+        // Animate stat cards
+        const statVals = document.querySelectorAll('.scm-val');
+        const statTargets = [401, 323, 14, 0.8];
+        statVals.forEach((el, i) => {
+          setTimeout(() => animateCounter(el, 0, statTargets[i], '', 800), 400 + i * 100);
+        });
+
+        // Update body composition from profile
+        updateBodyComposition();
+      }, 300);
+    }
+  };
+})();
 
 function updateBodyComposition() {
   try {
@@ -6563,479 +6586,6 @@ document.addEventListener('keydown', function(e) {
   if (map[e.key]) switchScreen(map[e.key]);
   if (e.key === 'Escape') { closeModal(); closeRecipeModal(); closeWeighInModal(); closeFoodSearch(); }
 });
-
-// ═══════════════════════════════════════════════
-// MACRO ENGINE
-// ═══════════════════════════════════════════════
-
-function getCurrentWeekNum() {
-  const now = new Date();
-  const start = new Date(now.getFullYear(), 0, 1);
-  return Math.ceil(((now - start) / 86400000 + start.getDay() + 1) / 7);
-}
-
-function _meanWeight(entries) {
-  if (!entries.length) return 0;
-  return entries.reduce((s, e) => s + parseFloat(e.weight || 0), 0) / entries.length;
-}
-
-function runMacroEngine(force) {
-  // ── TRIGGER GUARD ──────────────────────────────
-  if (!force) {
-    const now = Date.now();
-    const isRootDay = new Date().getDay() === 0; // Sunday
-    let lastRun = 0;
-    try {
-      const prev = JSON.parse(localStorage.getItem('ironfuel_pending_suggestion') || 'null');
-      if (prev) lastRun = prev.generatedAt || 0;
-    } catch(e) {}
-    const daysSinceLast = (now - lastRun) / 86400000;
-    if (!isRootDay && daysSinceLast < 6 && lastRun > 0) {
-      // Not yet time — just render whatever is pending
-      renderMacroSuggestionCard();
-      return null;
-    }
-  }
-
-  // ── STEP 1: DATA VALIDATION ────────────────────
-  let weights = [];
-  try { weights = JSON.parse(localStorage.getItem('ironfuel_weights') || '[]'); } catch(e) {}
-
-  const now = Date.now();
-  const DAY = 86400000;
-
-  const thisWeekEntries = weights.filter(w => {
-    const age = (now - new Date(w.date).getTime()) / DAY;
-    return age >= 0 && age <= 7;
-  });
-
-  if (thisWeekEntries.length < 4) {
-    showToast('⚖️', 'Log 4+ weigh-ins this week to run the engine');
-    // Still render any existing pending suggestion
-    renderMacroSuggestionCard();
-    return null;
-  }
-
-  // ── STEP 2: ROLLING AVERAGE ────────────────────
-  const priorWeekEntries = weights.filter(w => {
-    const age = (now - new Date(w.date).getTime()) / DAY;
-    return age > 7 && age <= 14;
-  });
-
-  const priorEntries = priorWeekEntries.length >= 3
-    ? priorWeekEntries
-    : weights.filter(w => {
-        const age = (now - new Date(w.date).getTime()) / DAY;
-        return age > 7;
-      });
-
-  if (!priorEntries.length) {
-    showToast('📊', 'Need prior week data — log for 2 weeks to activate');
-    renderMacroSuggestionCard();
-    return null;
-  }
-
-  const currentAvg = _meanWeight(thisWeekEntries);
-  const priorAvg   = _meanWeight(priorEntries);
-  const roc = ((priorAvg - currentAvg) / priorAvg) * 100; // positive = losing
-
-  // ── STEP 3: CALORIE DECISION ───────────────────
-  let delta = 0;
-  let reason = '';
-
-  if (roc > 1.2) {
-    delta = +100;
-    reason = 'You lost ' + roc.toFixed(1) + '% this week — faster than optimal. Adding 100 kcal to protect your strength.';
-  } else if (roc < 0.3) {
-    delta = -100;
-    reason = 'Weight held flat this week. Reducing 100 kcal to restart the deficit.';
-  } else {
-    delta = 0;
-    reason = 'Rate of loss is ' + roc.toFixed(1) + '% — right in the target zone. Holding targets.';
-  }
-
-  // ── STEP 4: STRENGTH CHECK ─────────────────────
-  let workouts = [];
-  try { workouts = JSON.parse(localStorage.getItem('ironfuel_workouts') || '[]'); } catch(e) {}
-
-  const KEY_LIFTS = ['Bench Press', 'Squat', 'Deadlift', 'Overhead Press'];
-  let declineCount = 0;
-
-  KEY_LIFTS.forEach(lift => {
-    const thisWeekSessions = workouts.filter(s => {
-      const age = (now - new Date(s.date).getTime()) / DAY;
-      return age >= 0 && age <= 7;
-    });
-    const lastWeekSessions = workouts.filter(s => {
-      const age = (now - new Date(s.date).getTime()) / DAY;
-      return age > 7 && age <= 14;
-    });
-
-    const bestE1RM = (sessions) => {
-      let best = 0;
-      sessions.forEach(s => {
-        (s.exercises || []).forEach(ex => {
-          if (ex.name !== lift) return;
-          (ex.sets || []).filter(st => st.completed).forEach(st => {
-            const e = calcE1RM(parseFloat(st.weight) || 0, parseInt(st.reps) || 0);
-            if (e > best) best = e;
-          });
-        });
-      });
-      return best;
-    };
-
-    const thisE1RM = bestE1RM(thisWeekSessions);
-    const lastE1RM = bestE1RM(lastWeekSessions);
-
-    if (thisE1RM > 0 && lastE1RM > 0 && thisE1RM < lastE1RM * 0.97) {
-      declineCount++;
-    }
-  });
-
-  if (declineCount >= 2) {
-    delta += 75;
-    reason += ' Two lifts declined this week — adding 75 kcal buffer.';
-  }
-
-  // ── STEP 5: SAFETY CONSTRAINTS ─────────────────
-  let profile = {};
-  try { profile = JSON.parse(localStorage.getItem('ironfuel_profile') || '{}'); } catch(e) {}
-
-  delta = Math.max(-200, Math.min(200, delta));
-
-  const baseCalories = profile.calories || 2100;
-  const newCalories  = Math.max(1400, baseCalories + delta);
-  const protein      = profile.protein || Math.round((profile.weight || 190) * 1.0);
-
-  const currentCarbs = profile.carbs || Math.round((baseCalories * 0.35) / 4);
-  const currentFat   = profile.fat   || Math.round((baseCalories * 0.30) / 9);
-  const newCarbs     = Math.round(currentCarbs + (delta * 0.6) / 4);
-  const newFat       = Math.round(currentFat   + (delta * 0.4) / 9);
-
-  // ── STEP 6: SAVE SUGGESTION ────────────────────
-  const suggestion = {
-    calories:    newCalories,
-    protein:     protein,
-    carbs:       newCarbs,
-    fat:         newFat,
-    delta:       delta,
-    roc:         parseFloat(roc.toFixed(2)),
-    reason:      reason,
-    generatedAt: Date.now(),
-    status:      'pending',
-    week:        getCurrentWeekNum(),
-    // Store before/after for breakdown modal
-    prevCalories: baseCalories,
-    prevCarbs:    currentCarbs,
-    prevFat:      currentFat,
-    prevProtein:  protein,
-    declineCount: declineCount,
-    currentAvg:   parseFloat(currentAvg.toFixed(1)),
-    priorAvg:     parseFloat(priorAvg.toFixed(1))
-  };
-  localStorage.setItem('ironfuel_pending_suggestion', JSON.stringify(suggestion));
-
-  // ── STEP 7: SHOW ON HOME SCREEN ────────────────
-  renderMacroSuggestionCard();
-
-  return suggestion;
-}
-
-// ─────────────────────────────────────────────────
-function renderMacroSuggestionCard() {
-  const feed = document.getElementById('home-agent-feed');
-  if (!feed) return;
-
-  // Remove any previous engine card
-  const old = document.getElementById('macro-engine-card');
-  if (old) old.remove();
-
-  let suggestion = null;
-  try { suggestion = JSON.parse(localStorage.getItem('ironfuel_pending_suggestion') || 'null'); } catch(e) {}
-
-  if (!suggestion || suggestion.status !== 'pending') return;
-
-  const { delta, reason, calories, week, roc } = suggestion;
-
-  // Delta display
-  let deltaLabel, deltaColor;
-  if (delta > 0) {
-    deltaLabel = '+' + delta + ' kcal';
-    deltaColor = 'var(--lime)';
-  } else if (delta < 0) {
-    deltaLabel = delta + ' kcal';
-    deltaColor = 'var(--orange)';
-  } else {
-    deltaLabel = 'Hold Targets';
-    deltaColor = 'var(--green)';
-  }
-
-  const card = document.createElement('div');
-  card.id = 'macro-engine-card';
-  card.className = 'feed-item';
-  card.style.cssText = 'border-color:rgba(212,255,63,0.25);background:linear-gradient(135deg,rgba(212,255,63,0.04),transparent);';
-  card.innerHTML = `
-    <div class="feed-header">
-      <div class="feed-agent-dot" style="background:var(--lime);box-shadow:0 0 8px rgba(212,255,63,0.5);"></div>
-      <span class="feed-agent-name" style="color:var(--lime)">Macro Engine</span>
-      <span class="feed-time">Week ${week}</span>
-    </div>
-    <div style="margin:10px 0 6px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:${deltaColor};line-height:1;letter-spacing:0.03em;">${deltaLabel}</div>
-      <div style="font-size:11px;color:var(--textSub);margin-top:3px;">→ ${calories.toLocaleString()} kcal/day · Rate of loss: ${roc.toFixed(1)}%/wk</div>
-    </div>
-    <div class="feed-text" style="margin-bottom:12px;">${reason}</div>
-    <div class="feed-actions">
-      <button class="feed-btn-primary" onclick="approveMacroSuggestion()">Apply Targets</button>
-      <button class="feed-btn-ghost" onclick="showMacroBreakdown()">See Breakdown</button>
-    </div>
-  `;
-
-  // Insert at top of feed
-  feed.insertBefore(card, feed.firstChild);
-}
-
-// ─────────────────────────────────────────────────
-function approveMacroSuggestion() {
-  let suggestion = null;
-  try { suggestion = JSON.parse(localStorage.getItem('ironfuel_pending_suggestion') || 'null'); } catch(e) {}
-  if (!suggestion) { showToast('⚠', 'No pending suggestion found'); return; }
-
-  let profile = {};
-  try { profile = JSON.parse(localStorage.getItem('ironfuel_profile') || '{}'); } catch(e) {}
-
-  profile.calories = suggestion.calories;
-  profile.protein  = suggestion.protein;
-  profile.carbs    = suggestion.carbs;
-  profile.fat      = suggestion.fat;
-  localStorage.setItem('ironfuel_profile', JSON.stringify(profile));
-
-  suggestion.status = 'approved';
-  localStorage.setItem('ironfuel_pending_suggestion', JSON.stringify(suggestion));
-
-  showToast('✓', 'Targets updated — Week ' + suggestion.week + ' locked in');
-
-  // Remove the card
-  const card = document.getElementById('macro-engine-card');
-  if (card) {
-    card.style.transition = 'opacity 0.4s, max-height 0.5s';
-    card.style.opacity = '0';
-    card.style.overflow = 'hidden';
-    card.style.maxHeight = card.offsetHeight + 'px';
-    setTimeout(() => { card.style.maxHeight = '0'; card.style.marginBottom = '0'; }, 400);
-    setTimeout(() => card.remove(), 900);
-  }
-
-  // Update all displays
-  syncProfileTargets();
-}
-
-// ─────────────────────────────────────────────────
-function showMacroBreakdown() {
-  let suggestion = null;
-  try { suggestion = JSON.parse(localStorage.getItem('ironfuel_pending_suggestion') || 'null'); } catch(e) {}
-  if (!suggestion) { showToast('⚠', 'No pending suggestion'); return; }
-
-  const existing = document.getElementById('macro-breakdown-modal');
-  if (existing) existing.remove();
-
-  const { prevCalories, calories, prevProtein, protein, prevCarbs, carbs, prevFat, fat,
-          delta, roc, currentAvg, priorAvg, declineCount, week } = suggestion;
-
-  const arrow = delta > 0 ? '↑' : delta < 0 ? '↓' : '→';
-  const arrowColor = delta > 0 ? 'var(--lime)' : delta < 0 ? 'var(--orange)' : 'var(--green)';
-
-  function row(label, before, after, unit, color) {
-    const changed = before !== after;
-    return `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
-        <span style="font-size:12px;color:var(--textSub);min-width:72px;">${label}</span>
-        <span style="font-size:13px;color:var(--textDim);font-family:'DM Mono',monospace;">${before}${unit}</span>
-        <span style="font-size:16px;color:${arrowColor};margin:0 6px;">${arrow}</span>
-        <span style="font-size:13px;font-weight:700;color:${changed ? color : 'var(--textSub)'};font-family:'DM Mono',monospace;">${after}${unit}</span>
-      </div>`;
-  }
-
-  const modal = document.createElement('div');
-  modal.id = 'macro-breakdown-modal';
-  modal.className = 'modal-overlay open';
-  modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
-  modal.innerHTML = `
-    <div class="modal-sheet">
-      <div class="modal-handle"></div>
-      <div class="modal-title">Week ${week} Breakdown</div>
-      <div class="modal-sub" style="margin-bottom:16px;">Macro Engine analysis</div>
-
-      <div style="background:var(--surface2);border-radius:14px;padding:14px 16px;margin-bottom:16px;">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--textDim);margin-bottom:10px;">Weight Data</div>
-        <div style="display:flex;justify-content:space-around;text-align:center;">
-          <div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--textSub);">${priorAvg}</div>
-            <div style="font-size:10px;color:var(--textDim);">Prior avg (lb)</div>
-          </div>
-          <div style="font-size:24px;color:var(--textDim);align-self:center;">→</div>
-          <div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--lime);">${currentAvg}</div>
-            <div style="font-size:10px;color:var(--textDim);">This week (lb)</div>
-          </div>
-          <div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:${roc >= 0.3 && roc <= 1.2 ? 'var(--green)' : 'var(--orange)'};">${roc.toFixed(1)}%</div>
-            <div style="font-size:10px;color:var(--textDim);">Rate of loss</div>
-          </div>
-        </div>
-      </div>
-
-      ${declineCount >= 2 ? `
-      <div style="background:var(--redSoft);border:1px solid rgba(255,63,63,0.2);border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--red);">
-        ⚠ ${declineCount} compound lifts declined this week (+75 kcal buffer added)
-      </div>` : ''}
-
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--textDim);margin-bottom:6px;">Target Changes</div>
-      <div style="margin-bottom:20px;">
-        ${row('Calories', prevCalories, calories, ' kcal', 'var(--lime)')}
-        ${row('Protein',  prevProtein,  protein,  'g',     'var(--green)')}
-        ${row('Carbs',    prevCarbs,    carbs,    'g',     'var(--blue)')}
-        ${row('Fat',      prevFat,      fat,      'g',     'var(--orange)')}
-      </div>
-
-      <button class="btn-primary" onclick="approveMacroSuggestion();document.getElementById('macro-breakdown-modal')?.remove();">Apply These Targets</button>
-      <button class="btn-ghost" style="width:100%;margin-top:10px;" onclick="document.getElementById('macro-breakdown-modal').remove()">Dismiss</button>
-    </div>
-  `;
-  document.getElementById('app').appendChild(modal);
-}
-
-// ─────────────────────────────────────────────────
-// TRIGGER: Run engine on home screen load
-// Register as a home screen hook
-window._screenHooks = window._screenHooks || {};
-window._screenHooks.home = window._screenHooks.home || [];
-window._screenHooks.home.push(function() {
-  // Small delay so screen is painted first
-  setTimeout(() => runMacroEngine(false), 600);
-});
-
-// ─────────────────────────────────────────────────
-// SEED DEMO DATA — populate weights + workouts if empty
-// so Macro Engine can run on first open
-// ─────────────────────────────────────────────────
-(function ensureDemoProfile() {
-  // If no profile exists AND onboarding is hidden (was dismissed without completing),
-  // create a sensible default so the app is never broken
-  const existing = (() => { try { return JSON.parse(localStorage.getItem('ironfuel_profile') || 'null'); } catch(e) { return null; } })();
-  if (!existing) {
-    const demo = {
-      name: 'Athlete',
-      email: '',
-      gender: 'm',
-      age: 28,
-      heightFt: 5, heightIn: 10,
-      weight: 191,
-      goalWeight: 175,
-      activityMult: 1.55,
-      goal: 'cut',
-      plan: 'free',
-      calories: 2100,
-      protein: 191,
-      carbs: 184,
-      fat: 70,
-      createdAt: new Date().toISOString()
-    };
-    // Only write if onboarding overlay is already hidden
-    const overlay = document.getElementById('onboarding-overlay');
-    if (!overlay || overlay.classList.contains('hidden')) {
-      localStorage.setItem('ironfuel_profile', JSON.stringify(demo));
-    }
-  }
-})();
-
-(function seedDemoDataIfEmpty() {
-  const existingWeights = (() => {
-    try { return JSON.parse(localStorage.getItem('ironfuel_weights') || '[]'); } catch(e) { return []; }
-  })();
-
-  if (existingWeights.length < 8) {
-    // Seed 14 days of realistic weight data (slight downward trend, natural variance)
-    const baseWeight = 191.4;
-    const now = Date.now();
-    const DAY = 86400000;
-    const seeded = [];
-    // 14 entries: two full weeks, ~0.7%/wk loss
-    const weeklyLoss = 0.007;
-    for (let i = 13; i >= 0; i--) {
-      const daysAgo = i;
-      const trend = baseWeight - (baseWeight * weeklyLoss * ((13 - i) / 7));
-      const noise = (Math.random() - 0.5) * 0.6; // ±0.3 lb variance
-      const w = Math.round((trend + noise) * 10) / 10;
-      seeded.push({
-        date: new Date(now - daysAgo * DAY).toISOString(),
-        weight: w
-      });
-    }
-    localStorage.setItem('ironfuel_weights', JSON.stringify(seeded));
-  }
-
-  // Seed demo workouts if empty
-  const existingWorkouts = (() => {
-    try { return JSON.parse(localStorage.getItem('ironfuel_workouts') || '[]'); } catch(e) { return []; }
-  })();
-
-  if (existingWorkouts.length < 4) {
-    const now = Date.now();
-    const DAY = 86400000;
-    const demoWorkouts = [
-      {
-        name: 'Push Day A', date: new Date(now - 12 * DAY).toISOString(),
-        exercises: [
-          { name: 'Bench Press', sets: [
-            { weight: 200, reps: 5, completed: true }, { weight: 200, reps: 5, completed: true }, { weight: 200, reps: 4, completed: true }
-          ]},
-          { name: 'Overhead Press', sets: [
-            { weight: 140, reps: 5, completed: true }, { weight: 140, reps: 5, completed: true }
-          ]}
-        ]
-      },
-      {
-        name: 'Push Day B', date: new Date(now - 5 * DAY).toISOString(),
-        exercises: [
-          { name: 'Bench Press', sets: [
-            { weight: 205, reps: 5, completed: true }, { weight: 205, reps: 5, completed: true }, { weight: 205, reps: 5, completed: true }
-          ]},
-          { name: 'Overhead Press', sets: [
-            { weight: 145, reps: 5, completed: true }, { weight: 145, reps: 4, completed: true }
-          ]}
-        ]
-      },
-      {
-        name: 'Leg Day', date: new Date(now - 10 * DAY).toISOString(),
-        exercises: [
-          { name: 'Squat', sets: [
-            { weight: 275, reps: 5, completed: true }, { weight: 275, reps: 5, completed: true }, { weight: 275, reps: 5, completed: true }
-          ]},
-          { name: 'Romanian Deadlift', sets: [
-            { weight: 195, reps: 8, completed: true }, { weight: 195, reps: 8, completed: true }
-          ]}
-        ]
-      },
-      {
-        name: 'Pull Day', date: new Date(now - 3 * DAY).toISOString(),
-        exercises: [
-          { name: 'Deadlift', sets: [
-            { weight: 355, reps: 3, completed: true }, { weight: 365, reps: 3, completed: true }
-          ]},
-          { name: 'Barbell Row', sets: [
-            { weight: 185, reps: 6, completed: true }, { weight: 185, reps: 6, completed: true }
-          ]}
-        ]
-      }
-    ];
-    localStorage.setItem('ironfuel_workouts', JSON.stringify(demoWorkouts));
-  }
-})();
-
-// Also run on very first page load (home is default screen)
-setTimeout(() => runMacroEngine(false), 1200);
 
 // ═══════════════════════════════════════════════
 // INIT DISPLAY

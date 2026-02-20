@@ -1674,299 +1674,6 @@ input.set-rpe-input { color: var(--textSub); }
 }
 .coach-message-ai .cm-text { font-size:14px; line-height:1.6; color:var(--text); }
 
-/* ─── FOOD ENTRY — Delete on swipe ─── */
-.food-entry {
-  position: relative;
-  overflow: hidden;
-}
-.food-entry-delete {
-  position: absolute;
-  right: 0; top: 0; bottom: 0;
-  background: var(--red);
-  color: #fff;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 0 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform: translateX(100%);
-  transition: transform 0.2s;
-  cursor: pointer;
-  border-radius: 0 var(--rSm) var(--rSm) 0;
-  white-space: nowrap;
-}
-.food-entry.swiped .food-entry-delete { transform: translateX(0); }
-.food-entry.swiped .food-entry-name,
-.food-entry.swiped .food-entry-qty,
-.food-entry.swiped .food-entry-cals { transform: translateX(-60px); }
-.food-entry-name, .food-entry-qty, .food-entry-cals { transition: transform 0.2s; }
-
-/* ─── MACRO DONUT ─── */
-.macro-donut-wrap {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  padding: 4px 20px 12px;
-}
-.macro-donut-canvas-wrap {
-  position: relative;
-  width: 110px; height: 110px;
-  flex-shrink: 0;
-}
-.macro-donut-center {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-}
-.macro-donut-center-val {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 26px;
-  color: var(--lime);
-  line-height: 1;
-}
-.macro-donut-center-lbl {
-  font-size: 9px;
-  color: var(--textDim);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-top: 2px;
-}
-.macro-donut-legend {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.macro-legend-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-}
-.macro-legend-dot {
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.macro-legend-name { color: var(--textSub); min-width: 52px; }
-.macro-legend-val { color: var(--text); font-weight: 600; margin-left: auto; }
-
-/* ─── EXERCISE LIBRARY MODAL ─── */
-.exlib-search-bar {
-  display: flex;
-  align-items: center;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 10px 14px;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-.exlib-search-input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  color: var(--text);
-}
-.exlib-search-input::placeholder { color: var(--textDim); }
-.exlib-category-scroll {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  margin-bottom: 14px;
-  padding-bottom: 2px;
-}
-.exlib-category-scroll::-webkit-scrollbar { display: none; }
-.exlib-cat-pill {
-  flex-shrink: 0;
-  padding: 5px 12px;
-  border-radius: 20px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--textSub);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.2s;
-}
-.exlib-cat-pill.active {
-  background: var(--limeSoft);
-  border-color: rgba(212,255,63,0.3);
-  color: var(--lime);
-}
-.exlib-list { display: flex; flex-direction: column; gap: 6px; max-height: 280px; overflow-y: auto; scrollbar-width: none; }
-.exlib-list::-webkit-scrollbar { display: none; }
-.exlib-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.exlib-row:active { background: var(--surface3); transform: scale(0.99); }
-.exlib-row.selected { border-color: var(--lime); background: var(--limeSoft); }
-.exlib-row-icon { font-size: 22px; flex-shrink: 0; }
-.exlib-row-name { font-size: 13px; font-weight: 600; color: var(--text); }
-.exlib-row-muscle { font-size: 11px; color: var(--textSub); margin-top: 2px; }
-.exlib-row-add {
-  margin-left: auto;
-  width: 28px; height: 28px;
-  background: var(--limeSoft);
-  border: 1px solid rgba(212,255,63,0.25);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  color: var(--lime);
-  flex-shrink: 0;
-}
-
-/* ─── WORKOUT PLAN CHIP ─── */
-.plan-selector-row {
-  display: flex;
-  gap: 8px;
-  padding: 0 20px 12px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.plan-selector-row::-webkit-scrollbar { display: none; }
-.plan-chip {
-  flex-shrink: 0;
-  padding: 6px 14px;
-  border-radius: 20px;
-  background: var(--surface2);
-  border: 1.5px solid var(--border);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--textSub);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.2s;
-}
-.plan-chip.active {
-  background: var(--limeSoft);
-  border-color: rgba(212,255,63,0.4);
-  color: var(--lime);
-}
-
-/* ─── EXERCISE HISTORY MINI TABLE ─── */
-.ex-history-sheet {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  margin: 8px 16px;
-  padding: 12px 14px;
-}
-.ex-history-title {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--textDim);
-  margin-bottom: 10px;
-}
-.ex-history-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 5px 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 12px;
-}
-.ex-history-row:last-child { border-bottom: none; }
-.ex-history-date { color: var(--textSub); }
-.ex-history-sets { color: var(--text); font-family: 'DM Mono', monospace; }
-.ex-history-e1rm { color: var(--lime); font-weight: 600; }
-
-/* ─── ANIMATED COUNTER ─── */
-@keyframes countUp {
-  from { opacity: 0; transform: translateY(4px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.count-animated { animation: countUp 0.5s ease forwards; }
-
-/* ─── SCREEN SLIDE TRANSITIONS ─── */
-@keyframes slideInRight {
-  from { opacity: 0; transform: translateX(18px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-@keyframes slideInLeft {
-  from { opacity: 0; transform: translateX(-18px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-.screen.slide-in-right { animation: slideInRight 0.28s cubic-bezier(0.16,1,0.3,1) forwards; }
-.screen.slide-in-left  { animation: slideInLeft  0.28s cubic-bezier(0.16,1,0.3,1) forwards; }
-
-/* ─── NAV active pulse ─── */
-@keyframes navPulse {
-  0% { transform: scale(1); }
-  40% { transform: scale(1.18); }
-  100% { transform: scale(1); }
-}
-.nav-btn.just-tapped .nav-icon { animation: navPulse 0.35s ease; }
-
-/* ─── COACH context chips — interactive ─── */
-.ctx-chip {
-  transition: all 0.15s;
-}
-.ctx-chip:active {
-  background: var(--limeSoft);
-  border-color: rgba(212,255,63,0.35);
-  color: var(--lime);
-  transform: scale(0.97);
-}
-
-/* ─── SCORE CARD — tap feedback ─── */
-.score-card {
-  transition: transform 0.15s, box-shadow 0.15s;
-  cursor: pointer;
-}
-.score-card:active { transform: scale(0.97); }
-
-/* ─── STAT CARD PULSE ─── */
-@keyframes statPulse {
-  0% { background: var(--surface2); }
-  50% { background: var(--limeSoft); }
-  100% { background: var(--surface2); }
-}
-.stat-card-sm.pulsing { animation: statPulse 0.8s ease; }
-
-/* ─── SETTINGS ROWS ─── */
-.settings-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 13px 14px;
-  background: var(--surface2);
-  border-radius: 12px;
-  cursor: pointer;
-  transition: background 0.15s;
-  color: var(--text);
-  font-size: 14px;
-  font-weight: 500;
-}
-.settings-row:active { background: var(--surface3); }
-.settings-row + .settings-row { margin-top: 2px; }
-.sr-icon { font-size: 18px; flex-shrink: 0; width: 24px; text-align: center; }
-.sr-label { flex: 1; }
-.sr-value { font-size: 12px; color: var(--textSub); }
-.sr-arrow { font-size: 18px; color: var(--textDim); margin-left: 4px; }
-
 /* ═══════════════════════════════════════════
    ONBOARDING OVERLAY
 ═══════════════════════════════════════════ */
@@ -2339,13 +2046,8 @@ input.set-rpe-input { color: var(--textSub); }
 
       <!-- Hero -->
       <div class="hero-banner">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
-          <div>
-            <div class="hero-greeting">Good morning,</div>
-            <div class="hero-name" style="margin-bottom:0;">MARCUS K.</div>
-          </div>
-          <div onclick="openSettings()" style="width:38px;height:38px;background:rgba(255,255,255,0.07);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;border:1px solid rgba(255,255,255,0.1);flex-shrink:0;margin-top:2px;" title="Profile & Settings">👤</div>
-        </div>
+        <div class="hero-greeting">Good morning,</div>
+        <div class="hero-name">MARCUS K.</div>
         <div class="hero-stats">
           <div class="hero-stat">
             <div class="hero-stat-val lime">94<span style="font-size:16px">%</span></div>
@@ -2434,33 +2136,41 @@ input.set-rpe-input { color: var(--textSub); }
 
       <!-- Agent feed -->
       <div class="section-label">Agent Feed</div>
-      <div id="home-agent-feed">
 
-        <!-- Macro Engine card injected here by runMacroEngine() -->
-
-        <div class="feed-item" id="feed-strength-sentinel">
-          <div class="feed-header">
-            <div class="feed-agent-dot" style="background:var(--blue)"></div>
-            <span class="feed-agent-name" style="color:var(--blue)">Strength Sentinel</span>
-            <span class="feed-time">8:47</span>
-          </div>
-          <div class="feed-text">🏆 New deadlift PR — <strong>365 × 3</strong>, est 1RM <strong>401 lb</strong>. All compounds holding. Retention score updated to 94%.</div>
+      <div class="feed-item">
+        <div class="feed-header">
+          <div class="feed-agent-dot" style="background:var(--lime)"></div>
+          <span class="feed-agent-name" style="color:var(--lime)">Macro Engine</span>
+          <span class="feed-time">9:14</span>
         </div>
-
-        <div class="feed-item">
-          <div class="feed-header">
-            <div class="feed-agent-dot" style="background:var(--orange)"></div>
-            <span class="feed-agent-name" style="color:var(--orange)">Nutrition Coach</span>
-            <span class="feed-time">3:02</span>
-          </div>
-          <div class="feed-text">At 3pm you had only 88g protein. Suggested: <strong>Chicken Power Bowl</strong> from Vault — 52g protein, 10 min.</div>
-          <div class="feed-actions">
-            <button class="feed-btn-primary" onclick="switchScreen('recipes')">Open Recipe</button>
-            <button class="feed-btn-ghost">Dismiss</button>
-          </div>
+        <div class="feed-text">Your 7-day trend is <strong>0.8%/wk</strong> — perfectly on target. No calorie change needed. Holding at 2,100 kcal.</div>
+        <div class="feed-actions">
+          <button class="feed-btn-primary" onclick="showToast('✓', 'Targets confirmed for this week')">Confirm Hold</button>
+          <button class="feed-btn-ghost">Details</button>
         </div>
+      </div>
 
-      </div><!-- /#home-agent-feed -->
+      <div class="feed-item">
+        <div class="feed-header">
+          <div class="feed-agent-dot" style="background:var(--blue)"></div>
+          <span class="feed-agent-name" style="color:var(--blue)">Strength Sentinel</span>
+          <span class="feed-time">8:47</span>
+        </div>
+        <div class="feed-text">🏆 New deadlift PR — <strong>365 × 3</strong>, est 1RM <strong>401 lb</strong>. All compounds holding. Retention score updated to 94%.</div>
+      </div>
+
+      <div class="feed-item">
+        <div class="feed-header">
+          <div class="feed-agent-dot" style="background:var(--orange)"></div>
+          <span class="feed-agent-name" style="color:var(--orange)">Nutrition Coach</span>
+          <span class="feed-time">3:02</span>
+        </div>
+        <div class="feed-text">At 3pm you had only 88g protein. Suggested: <strong>Chicken Power Bowl</strong> from Vault — 52g protein, 10 min.</div>
+        <div class="feed-actions">
+          <button class="feed-btn-primary" onclick="switchScreen('recipes')">Open Recipe</button>
+          <button class="feed-btn-ghost">Dismiss</button>
+        </div>
+      </div>
 
       <!-- Today's lifts -->
       <div class="section-label" style="margin-top:6px;">Today's Lifts</div>
@@ -2540,40 +2250,7 @@ input.set-rpe-input { color: var(--textSub); }
 
       <div class="section-gap-sm"></div>
       <div class="calorie-bar-wrap">
-        <div class="calorie-bar-fill" id="calorie-bar-fill" style="width:89.5%"></div>
-      </div>
-
-      <!-- Macro Donut Chart -->
-      <div class="macro-donut-wrap">
-        <div class="macro-donut-canvas-wrap">
-          <canvas id="macro-donut-chart" width="110" height="110"></canvas>
-          <div class="macro-donut-center">
-            <div class="macro-donut-center-val" id="donut-center-val">89%</div>
-            <div class="macro-donut-center-lbl">of goal</div>
-          </div>
-        </div>
-        <div class="macro-donut-legend">
-          <div class="macro-legend-row">
-            <div class="macro-legend-dot" style="background:var(--green)"></div>
-            <div class="macro-legend-name">Protein</div>
-            <div class="macro-legend-val" id="legend-protein">198g</div>
-          </div>
-          <div class="macro-legend-row">
-            <div class="macro-legend-dot" style="background:var(--blue)"></div>
-            <div class="macro-legend-name">Carbs</div>
-            <div class="macro-legend-val" id="legend-carbs">180g</div>
-          </div>
-          <div class="macro-legend-row">
-            <div class="macro-legend-dot" style="background:var(--orange)"></div>
-            <div class="macro-legend-name">Fat</div>
-            <div class="macro-legend-val" id="legend-fat">52g</div>
-          </div>
-          <div class="macro-legend-row">
-            <div class="macro-legend-dot" style="background:var(--lime)"></div>
-            <div class="macro-legend-name">Calories</div>
-            <div class="macro-legend-val" id="legend-calories">1,880</div>
-          </div>
-        </div>
+        <div class="calorie-bar-fill" style="width:89.5%"></div>
       </div>
 
       <!-- Protein progress -->
@@ -2598,146 +2275,109 @@ input.set-rpe-input { color: var(--textSub); }
       </div>
 
       <!-- Meal slots -->
-      <div class="section-label" style="display:flex;align-items:center;justify-content:space-between;">
-        <span>Meal Log</span>
-        <span style="font-size:11px;color:var(--textDim);font-weight:400;letter-spacing:0;">Swipe entry to delete</span>
-      </div>
+      <div class="section-label">Meal Log</div>
 
-      <div class="meal-slot" id="meal-breakfast">
-        <div class="meal-slot-header" onclick="toggleMealSlot('meal-breakfast')">
+      <div class="meal-slot">
+        <div class="meal-slot-header">
           <div class="meal-slot-icon" style="background:rgba(255,200,63,0.1)">🌅</div>
-          <div style="flex:1;">
+          <div>
             <div class="meal-slot-title">Breakfast</div>
           </div>
-          <div class="meal-slot-cals" id="breakfast-cals">480 kcal</div>
-          <div class="meal-slot-add" onclick="event.stopPropagation();openFoodSearch('breakfast')">+</div>
+          <div class="meal-slot-cals">480 kcal</div>
+          <div class="meal-slot-add" onclick="openFoodSearch('breakfast')">+</div>
         </div>
-        <div class="meal-slot-body">
-          <div class="food-entry" ontouchstart="feTouchStart(event)" ontouchmove="feTouchMove(event)" ontouchend="feTouchEnd(event)">
-            <div class="food-entry-name">Greek Yogurt, 2% Fage</div>
-            <div class="food-entry-qty">227g</div>
-            <div class="food-entry-cals">150</div>
-            <div class="food-entry-delete" onclick="deleteFoodEntry(this)">🗑 Delete</div>
-          </div>
-          <div class="food-entry" ontouchstart="feTouchStart(event)" ontouchmove="feTouchMove(event)" ontouchend="feTouchEnd(event)">
-            <div class="food-entry-name">Eggs, large, scrambled</div>
-            <div class="food-entry-qty">3 eggs</div>
-            <div class="food-entry-cals">210</div>
-            <div class="food-entry-delete" onclick="deleteFoodEntry(this)">🗑 Delete</div>
-          </div>
-          <div class="food-entry" ontouchstart="feTouchStart(event)" ontouchmove="feTouchMove(event)" ontouchend="feTouchEnd(event)">
-            <div class="food-entry-name">Oats, dry rolled</div>
-            <div class="food-entry-qty">50g</div>
-            <div class="food-entry-cals">190</div>
-            <div class="food-entry-delete" onclick="deleteFoodEntry(this)">🗑 Delete</div>
-          </div>
+        <div class="food-entry">
+          <div class="food-entry-name">Greek Yogurt, 2% Fage</div>
+          <div class="food-entry-qty">227g</div>
+          <div class="food-entry-cals">150</div>
+        </div>
+        <div class="food-entry">
+          <div class="food-entry-name">Eggs, large, scrambled</div>
+          <div class="food-entry-qty">3 eggs</div>
+          <div class="food-entry-cals">210</div>
+        </div>
+        <div class="food-entry">
+          <div class="food-entry-name">Oats, dry rolled</div>
+          <div class="food-entry-qty">50g</div>
+          <div class="food-entry-cals">190</div>
         </div>
       </div>
 
-      <div class="meal-slot" id="meal-lunch">
-        <div class="meal-slot-header" onclick="toggleMealSlot('meal-lunch')">
+      <div class="meal-slot">
+        <div class="meal-slot-header">
           <div class="meal-slot-icon" style="background:rgba(63,255,143,0.1)">☀️</div>
-          <div style="flex:1;">
+          <div>
             <div class="meal-slot-title">Lunch</div>
           </div>
-          <div class="meal-slot-cals" id="lunch-cals">620 kcal</div>
-          <div class="meal-slot-add" onclick="event.stopPropagation();openFoodSearch('lunch')">+</div>
+          <div class="meal-slot-cals">620 kcal</div>
+          <div class="meal-slot-add" onclick="openFoodSearch('lunch')">+</div>
         </div>
-        <div class="meal-slot-body">
-          <div class="food-entry" ontouchstart="feTouchStart(event)" ontouchmove="feTouchMove(event)" ontouchend="feTouchEnd(event)">
-            <div class="food-entry-name">Chicken Breast, grilled</div>
-            <div class="food-entry-qty">220g</div>
-            <div class="food-entry-cals">330</div>
-            <div class="food-entry-delete" onclick="deleteFoodEntry(this)">🗑 Delete</div>
-          </div>
-          <div class="food-entry" ontouchstart="feTouchStart(event)" ontouchmove="feTouchMove(event)" ontouchend="feTouchEnd(event)">
-            <div class="food-entry-name">Brown Rice, cooked</div>
-            <div class="food-entry-qty">200g</div>
-            <div class="food-entry-cals">216</div>
-            <div class="food-entry-delete" onclick="deleteFoodEntry(this)">🗑 Delete</div>
-          </div>
-          <div class="food-entry" ontouchstart="feTouchStart(event)" ontouchmove="feTouchMove(event)" ontouchend="feTouchEnd(event)">
-            <div class="food-entry-name">Broccoli, steamed</div>
-            <div class="food-entry-qty">150g</div>
-            <div class="food-entry-cals">52</div>
-            <div class="food-entry-delete" onclick="deleteFoodEntry(this)">🗑 Delete</div>
-          </div>
+        <div class="food-entry">
+          <div class="food-entry-name">Chicken Breast, grilled</div>
+          <div class="food-entry-qty">220g</div>
+          <div class="food-entry-cals">330</div>
+        </div>
+        <div class="food-entry">
+          <div class="food-entry-name">Brown Rice, cooked</div>
+          <div class="food-entry-qty">200g</div>
+          <div class="food-entry-cals">216</div>
+        </div>
+        <div class="food-entry">
+          <div class="food-entry-name">Broccoli, steamed</div>
+          <div class="food-entry-qty">150g</div>
+          <div class="food-entry-cals">52</div>
         </div>
       </div>
 
-      <div class="meal-slot" id="meal-preworkout">
-        <div class="meal-slot-header" onclick="toggleMealSlot('meal-preworkout')">
-          <div class="meal-slot-icon" style="background:rgba(63,191,255,0.1)">⚡</div>
-          <div style="flex:1;">
+      <div class="meal-slot">
+        <div class="meal-slot-header">
+          <div class="meal-slot-icon" style="background:rgba(63,191,255,0.1)">🌙</div>
+          <div>
             <div class="meal-slot-title">Pre-Workout</div>
           </div>
-          <div class="meal-slot-cals" id="preworkout-cals">380 kcal</div>
-          <div class="meal-slot-add" onclick="event.stopPropagation();openFoodSearch('pre-workout')">+</div>
+          <div class="meal-slot-cals">380 kcal</div>
+          <div class="meal-slot-add" onclick="openFoodSearch('pre-workout')">+</div>
         </div>
-        <div class="meal-slot-body">
-          <div class="food-entry" ontouchstart="feTouchStart(event)" ontouchmove="feTouchMove(event)" ontouchend="feTouchEnd(event)">
-            <div class="food-entry-name">Whey Protein Shake</div>
-            <div class="food-entry-qty">1 scoop</div>
-            <div class="food-entry-cals">130</div>
-            <div class="food-entry-delete" onclick="deleteFoodEntry(this)">🗑 Delete</div>
-          </div>
-          <div class="food-entry" ontouchstart="feTouchStart(event)" ontouchmove="feTouchMove(event)" ontouchend="feTouchEnd(event)">
-            <div class="food-entry-name">Banana, medium</div>
-            <div class="food-entry-qty">1 ea (120g)</div>
-            <div class="food-entry-cals">107</div>
-            <div class="food-entry-delete" onclick="deleteFoodEntry(this)">🗑 Delete</div>
-          </div>
-          <div class="food-entry" ontouchstart="feTouchStart(event)" ontouchmove="feTouchMove(event)" ontouchend="feTouchEnd(event)">
-            <div class="food-entry-name">Peanut Butter, natural</div>
-            <div class="food-entry-qty">2 tbsp</div>
-            <div class="food-entry-cals">188</div>
-            <div class="food-entry-delete" onclick="deleteFoodEntry(this)">🗑 Delete</div>
-          </div>
+        <div class="food-entry">
+          <div class="food-entry-name">Whey Protein Shake</div>
+          <div class="food-entry-qty">1 scoop</div>
+          <div class="food-entry-cals">130</div>
+        </div>
+        <div class="food-entry">
+          <div class="food-entry-name">Banana, medium</div>
+          <div class="food-entry-qty">1 ea (120g)</div>
+          <div class="food-entry-cals">107</div>
+        </div>
+        <div class="food-entry">
+          <div class="food-entry-name">Peanut Butter, natural</div>
+          <div class="food-entry-qty">2 tbsp</div>
+          <div class="food-entry-cals">188</div>
         </div>
       </div>
 
-      <div class="meal-slot" id="meal-dinner">
-        <div class="meal-slot-header" onclick="toggleMealSlot('meal-dinner')">
-          <div class="meal-slot-icon" style="background:rgba(255,159,63,0.1)">🌙</div>
-          <div style="flex:1;">
+      <div class="meal-slot">
+        <div class="meal-slot-header">
+          <div class="meal-slot-icon" style="background:rgba(255,159,63,0.1)">🍽</div>
+          <div>
             <div class="meal-slot-title">Dinner</div>
           </div>
-          <div class="meal-slot-cals" id="dinner-cals">400 kcal</div>
-          <div class="meal-slot-add" onclick="event.stopPropagation();openFoodSearch('dinner')">+</div>
+          <div class="meal-slot-cals">400 kcal</div>
+          <div class="meal-slot-add" onclick="openFoodSearch('dinner')">+</div>
         </div>
-        <div class="meal-slot-body">
-          <div class="food-entry" ontouchstart="feTouchStart(event)" ontouchmove="feTouchMove(event)" ontouchend="feTouchEnd(event)">
-            <div class="food-entry-name">Salmon, Atlantic (wild)</div>
-            <div class="food-entry-qty">180g</div>
-            <div class="food-entry-cals">352</div>
-            <div class="food-entry-delete" onclick="deleteFoodEntry(this)">🗑 Delete</div>
-          </div>
-          <div class="food-entry" ontouchstart="feTouchStart(event)" ontouchmove="feTouchMove(event)" ontouchend="feTouchEnd(event)">
-            <div class="food-entry-name">Asparagus, roasted</div>
-            <div class="food-entry-qty">120g</div>
-            <div class="food-entry-cals">27</div>
-            <div class="food-entry-delete" onclick="deleteFoodEntry(this)">🗑 Delete</div>
-          </div>
+        <div class="food-entry">
+          <div class="food-entry-name">Salmon, Atlantic (wild)</div>
+          <div class="food-entry-qty">180g</div>
+          <div class="food-entry-cals">352</div>
+        </div>
+        <div class="food-entry">
+          <div class="food-entry-name">Asparagus, roasted</div>
+          <div class="food-entry-qty">120g</div>
+          <div class="food-entry-cals">27</div>
         </div>
       </div>
 
-      <!-- Post-workout slot -->
-      <div class="meal-slot" id="meal-postworkout" style="display:none;">
-        <div class="meal-slot-header" onclick="toggleMealSlot('meal-postworkout')">
-          <div class="meal-slot-icon" style="background:rgba(212,255,63,0.1)">💪</div>
-          <div style="flex:1;">
-            <div class="meal-slot-title">Post-Workout</div>
-          </div>
-          <div class="meal-slot-cals" id="postworkout-cals">0 kcal</div>
-          <div class="meal-slot-add" onclick="event.stopPropagation();openFoodSearch('post-workout')">+</div>
-        </div>
-        <div class="meal-slot-body" id="postworkout-body">
-          <div style="padding:10px 14px;font-size:12px;color:var(--textDim);">Tap + to add post-workout foods</div>
-        </div>
-      </div>
-
-      <div style="padding: 12px 20px;">
-        <button class="btn-ghost" style="width:100%;border-radius:var(--r);" onclick="document.getElementById('meal-postworkout').style.display='block';openFoodSearch('post-workout')">+ Log Post-Workout Meal</button>
+      <div style="padding: 16px 20px;">
+        <button class="btn-primary" onclick="showToast('🍽', 'Post-workout meal logged!')">+ Log Post-Workout</button>
       </div>
 
       <div class="section-gap"></div>
@@ -2752,28 +2392,19 @@ input.set-rpe-input { color: var(--textSub); }
           <div class="page-sub">Push Day · Fri Feb 21</div>
         </div>
         <div style="display:flex;gap:8px;">
-          <div class="chip chip-lime" style="cursor:pointer;" onclick="timerSeconds=90;updateTimerDisplay();if(!timerRunning)toggleTimer();showToast('⏱','Rest timer: 90s')">⏱ Timer</div>
-          <div class="chip chip-dim" style="cursor:pointer;" id="finish-session-chip" onclick="document.querySelector('#screen-lift .btn-primary').click()">✓ Finish</div>
+          <div class="chip chip-lime" style="cursor:pointer;" onclick="showToast('⏱','Rest timer started: 90s')">⏱ Timer</div>
+          <div class="chip chip-dim" style="cursor:pointer;">✓ Finish</div>
         </div>
-      </div>
-
-      <!-- Workout Plan Selector -->
-      <div class="plan-selector-row" id="plan-selector-row">
-        <div class="plan-chip active" onclick="selectWorkoutPlan('PPL',this)">💪 PPL</div>
-        <div class="plan-chip" onclick="selectWorkoutPlan('5x5',this)">🏋️ 5×5</div>
-        <div class="plan-chip" onclick="selectWorkoutPlan('PHUL',this)">⚡ PHUL</div>
-        <div class="plan-chip" onclick="selectWorkoutPlan('nSuns',this)">🔥 nSuns</div>
-        <div class="plan-chip" onclick="selectWorkoutPlan('Custom',this)">✏️ Custom</div>
       </div>
 
       <!-- Session overview -->
       <div class="session-card">
-        <div class="session-day" id="session-day-label">Push Day · Week 8</div>
-        <div class="session-name" id="session-block-label">STRENGTH BLOCK</div>
+        <div class="session-day">Push Day · Week 8</div>
+        <div class="session-name">STRENGTH BLOCK</div>
         <div class="session-chips">
-          <div class="chip chip-lime" id="session-progress-chip">3/5 Exercises</div>
-          <div class="chip chip-blue" id="session-volume-chip">Volume ↑ 4%</div>
-          <div class="chip chip-dim" id="session-time-chip">0 min</div>
+          <div class="chip chip-lime">3/5 Exercises</div>
+          <div class="chip chip-blue">Volume ↑ 4%</div>
+          <div class="chip chip-dim">48 min</div>
         </div>
       </div>
 
@@ -2822,26 +2453,7 @@ input.set-rpe-input { color: var(--textSub); }
         </div>
         <div style="padding: 10px 16px; border-top: 1px solid var(--border); display:flex; gap:8px;">
           <button class="add-set-btn" style="flex:1;background:var(--surface3);border:none;border-radius:10px;padding:8px;font-size:12px;color:var(--textSub);cursor:pointer;font-family:'DM Sans',sans-serif;">+ Add Set</button>
-          <button style="flex:1;background:var(--surface3);border:none;border-radius:10px;padding:8px;font-size:12px;color:var(--textSub);cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="toggleExHistory(this,'Bench Press')">📈 History</button>
-        </div>
-        <!-- Exercise history (hidden by default) -->
-        <div class="ex-history-sheet" style="display:none;" id="ex-history-Bench Press">
-          <div class="ex-history-title">Bench Press — Last 3 Sessions</div>
-          <div class="ex-history-row">
-            <span class="ex-history-date">Feb 18</span>
-            <span class="ex-history-sets">3×5 @ 205 lb</span>
-            <span class="ex-history-e1rm">e1RM 239</span>
-          </div>
-          <div class="ex-history-row">
-            <span class="ex-history-date">Feb 14</span>
-            <span class="ex-history-sets">3×5 @ 200 lb</span>
-            <span class="ex-history-e1rm">e1RM 233</span>
-          </div>
-          <div class="ex-history-row">
-            <span class="ex-history-date">Feb 10</span>
-            <span class="ex-history-sets">3×4 @ 205 lb</span>
-            <span class="ex-history-e1rm">e1RM 230</span>
-          </div>
+          <button style="flex:1;background:var(--surface3);border:none;border-radius:10px;padding:8px;font-size:12px;color:var(--textSub);cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="showToast('📈','History coming soon')">📈 History</button>
         </div>
       </div>
 
@@ -2868,7 +2480,7 @@ input.set-rpe-input { color: var(--textSub); }
 
       <!-- Add exercise -->
       <div style="margin: 0 20px 10px;">
-        <button class="btn-ghost" style="width:100%;border-radius:var(--r);padding:16px;" onclick="openExerciseLibrary()">
+        <button class="btn-ghost" style="width:100%;border-radius:var(--r);padding:16px;" onclick="showToast('+','Exercise added to session')">
           + Add Exercise
         </button>
       </div>
@@ -2907,7 +2519,7 @@ input.set-rpe-input { color: var(--textSub); }
           <div class="page-title">Recipe Vault</div>
           <div class="page-sub">94 original high-protein recipes</div>
         </div>
-        <div style="font-size:20px;cursor:pointer;padding:4px;" onclick="openRecipeSearch()">🔍</div>
+        <div style="font-size:20px;cursor:pointer;" onclick="showToast('🔍','Search recipes...')">🔍</div>
       </div>
 
       <!-- Filters -->
@@ -3074,13 +2686,11 @@ input.set-rpe-input { color: var(--textSub); }
 
       <!-- Context chips -->
       <div class="context-chips">
-        <div class="ctx-chip" onclick="sendChip('Why no calorie change this week?')">Why no change?</div>
-        <div class="ctx-chip" onclick="sendChip('Why is my bench press stalling?')">Bench stalling?</div>
-        <div class="ctx-chip" onclick="sendChip('Am I in too deep a deficit?')">Too deep?</div>
-        <div class="ctx-chip" onclick="sendChip('Optimize my protein timing')">Protein timing</div>
-        <div class="ctx-chip" onclick="sendChip('How can I improve my recovery?')">Recovery tips</div>
-        <div class="ctx-chip" onclick="sendChip('Should I take a deload week?')">Deload?</div>
-        <div class="ctx-chip" onclick="sendChip('What supplements should I take?')">Supplements</div>
+        <div class="ctx-chip" onclick="showToast('🧠','Why no calorie change?')">Why no change?</div>
+        <div class="ctx-chip" onclick="showToast('💪','Bench stall analysis...')">Why is bench stalling?</div>
+        <div class="ctx-chip" onclick="showToast('📉','Deficit safety check...')">Am I in too deep?</div>
+        <div class="ctx-chip" onclick="showToast('🍖','Protein timing advice...')">Protein timing</div>
+        <div class="ctx-chip" onclick="showToast('😴','Recovery optimization...')">Recovery tips</div>
       </div>
 
       <div class="section-gap-sm"></div>
@@ -3095,7 +2705,7 @@ input.set-rpe-input { color: var(--textSub); }
         <div class="cm-type">→ Macro Status</div>
         <div class="cm-text">Rate of loss at <em>0.8%/week</em> is ideal — right in the 0.5–1.0% zone. Protein at 91% adherence is solid. No adjustment this week. Next suggested check-in: <em>Sunday 9am</em>.</div>
         <div class="feed-actions">
-          <button class="feed-btn-primary" onclick="showToast('✓','Week 9 targets locked — 2,100 kcal · 185g protein')">Confirm Targets</button>
+          <button class="feed-btn-primary" onclick="showToast('✓','Targets locked for Week 9')">Confirm Targets</button>
           <button class="feed-btn-ghost">View Details</button>
         </div>
       </div>
@@ -3243,60 +2853,6 @@ input.set-rpe-input { color: var(--textSub); }
         </div>
       </div>
 
-      <!-- Body Composition Estimate -->
-      <div class="section-label">Body Composition</div>
-      <div class="card" style="margin: 0 20px 16px; padding: 16px;">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
-          <div style="background:var(--surface2);border-radius:12px;padding:12px;">
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--textDim);margin-bottom:4px;">Est. Body Fat</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--blue);line-height:1;" id="prog-bf">16.2<span style="font-size:14px">%</span></div>
-            <div style="font-size:10px;color:var(--textSub);margin-top:2px;">↓ 2.1% since start</div>
-          </div>
-          <div style="background:var(--surface2);border-radius:12px;padding:12px;">
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--textDim);margin-bottom:4px;">Lean Mass</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--green);line-height:1;" id="prog-lm">158.9<span style="font-size:14px">lb</span></div>
-            <div style="font-size:10px;color:var(--textSub);margin-top:2px;">↑ Maintained cut</div>
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          <div style="background:var(--surface2);border-radius:12px;padding:12px;">
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--textDim);margin-bottom:4px;">BMI</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--lime);line-height:1;" id="prog-bmi">25.7</div>
-            <div style="font-size:10px;color:var(--textSub);margin-top:2px;">Normal range</div>
-          </div>
-          <div style="background:var(--surface2);border-radius:12px;padding:12px;">
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--textDim);margin-bottom:4px;">TDEE Est.</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--orange);line-height:1;" id="prog-tdee">2,630</div>
-            <div style="font-size:10px;color:var(--textSub);margin-top:2px;">kcal/day</div>
-          </div>
-        </div>
-        <div style="font-size:10px;color:var(--textDim);margin-top:10px;line-height:1.5;text-align:center;">Body fat estimated via weight + strength metrics. Tap <strong style="color:var(--textSub)">+ Weigh-In</strong> for most accurate tracking.</div>
-        <button style="width:100%;background:var(--surface3);border:none;border-radius:12px;padding:10px;font-size:12px;color:var(--textSub);cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:10px;" onclick="openWeighInModal()">📊 Log Today's Weight</button>
-      </div>
-
-      <!-- Weekly Check-In -->
-      <div class="section-label">Weekly Check-In</div>
-      <div style="margin: 0 20px 16px; background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:16px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <div style="font-size:13px;font-weight:600;color:var(--text);">Week 8 Review</div>
-          <div style="font-size:11px;color:var(--lime);font-weight:600;cursor:pointer;" onclick="openWeeklyCheckin()">Complete ›</div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;">
-            <span style="color:var(--textSub);">Average sleep</span>
-            <span style="color:var(--text);font-weight:600;" id="checkin-sleep">7.2 hrs</span>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;">
-            <span style="color:var(--textSub);">Workout compliance</span>
-            <span style="color:var(--lime);font-weight:600;">5/5 sessions ✓</span>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;">
-            <span style="color:var(--textSub);">Stress level</span>
-            <span style="color:var(--orange);font-weight:600;">Moderate</span>
-          </div>
-        </div>
-      </div>
-
       <!-- Share card -->
       <div style="margin: 0 20px 16px; background: linear-gradient(135deg, #0f0f18, #0d0d14); border: 1px solid rgba(212,255,63,0.15); border-radius: var(--r); padding: 16px; display:flex; align-items:center; gap:12px;" onclick="shareProgress()">
         <div style="flex:1">
@@ -3410,31 +2966,6 @@ input.set-rpe-input { color: var(--textSub); }
       </div>
     </div>
 
-    <!-- Exercise Library Modal -->
-    <div class="modal-overlay" id="exercise-library-modal" onclick="closeExLibIfBg(event)">
-      <div class="modal-sheet" style="padding-bottom:20px;">
-        <div class="modal-handle"></div>
-        <div class="modal-title">Exercise Library</div>
-        <div class="modal-sub">900+ exercises — tap to add to session</div>
-        <div class="exlib-search-bar">
-          <span style="font-size:16px;">🔍</span>
-          <input type="text" class="exlib-search-input" id="exlib-search" placeholder="Search (bench press, squat...)" autocomplete="off" />
-        </div>
-        <div class="exlib-category-scroll" id="exlib-cats">
-          <div class="exlib-cat-pill active" onclick="filterExLib('all',this)">All</div>
-          <div class="exlib-cat-pill" onclick="filterExLib('chest',this)">💪 Chest</div>
-          <div class="exlib-cat-pill" onclick="filterExLib('back',this)">🔙 Back</div>
-          <div class="exlib-cat-pill" onclick="filterExLib('legs',this)">🦵 Legs</div>
-          <div class="exlib-cat-pill" onclick="filterExLib('shoulders',this)">🏋️ Shoulders</div>
-          <div class="exlib-cat-pill" onclick="filterExLib('arms',this)">💪 Arms</div>
-          <div class="exlib-cat-pill" onclick="filterExLib('core',this)">🔥 Core</div>
-          <div class="exlib-cat-pill" onclick="filterExLib('cardio',this)">🏃 Cardio</div>
-        </div>
-        <div class="exlib-list" id="exlib-list"></div>
-        <button class="btn-ghost" style="width:100%;margin-top:12px;" onclick="closeExLib()">Close</button>
-      </div>
-    </div>
-
     <!-- Food Search Modal -->
     <div class="modal-overlay" id="food-search-modal" onclick="closeFoodSearchIfBg(event)">
       <div class="modal-sheet" style="padding-bottom:20px;">
@@ -3452,145 +2983,6 @@ input.set-rpe-input { color: var(--textSub); }
           <div id="food-common-list"></div>
         </div>
         <button class="btn-ghost" style="width:100%;margin-top:12px;" onclick="closeFoodSearch()">Cancel</button>
-      </div>
-    </div>
-
-    <!-- Settings / Profile Modal -->
-    <div class="modal-overlay" id="settings-modal" onclick="closeSettingsIfBg(event)">
-      <div class="modal-sheet" style="max-height:88%;overflow-y:auto;scrollbar-width:none;">
-        <div class="modal-handle"></div>
-
-        <!-- Profile Header -->
-        <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
-          <div style="width:56px;height:56px;background:var(--limeSoft);border:2px solid rgba(212,255,63,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;">👤</div>
-          <div style="flex:1;">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--text);line-height:1;" id="settings-display-name">MARCUS K.</div>
-            <div style="font-size:12px;color:var(--textSub);margin-top:2px;" id="settings-display-email">marcus@example.com</div>
-            <div style="font-size:11px;color:var(--lime);margin-top:2px;font-weight:600;" id="settings-plan-badge">Pro Plan · Active</div>
-          </div>
-          <div style="font-size:20px;cursor:pointer;" onclick="closeSettings()">✕</div>
-        </div>
-
-        <!-- Stats Summary -->
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:20px;">
-          <div style="background:var(--surface2);border-radius:12px;padding:12px 8px;text-align:center;">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--lime);" id="settings-weight">190</div>
-            <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--textDim);">lbs</div>
-          </div>
-          <div style="background:var(--surface2);border-radius:12px;padding:12px 8px;text-align:center;">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--blue);" id="settings-calories">2,100</div>
-            <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--textDim);">kcal/day</div>
-          </div>
-          <div style="background:var(--surface2);border-radius:12px;padding:12px 8px;text-align:center;">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--green);" id="settings-protein">190</div>
-            <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--textDim);">protein g</div>
-          </div>
-        </div>
-
-        <!-- Editable Profile -->
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--textDim);margin-bottom:10px;">Edit Profile</div>
-        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px;">
-          <input type="text"   id="settings-name"        class="ob-input" placeholder="Full name" />
-          <input type="email"  id="settings-email"       class="ob-input" placeholder="Email" />
-          <div style="display:flex;gap:8px;">
-            <input type="number" id="settings-age"       class="ob-input" placeholder="Age" min="14" max="80" style="flex:1;" />
-            <input type="number" id="settings-wt"        class="ob-input" placeholder="Weight (lbs)" min="80" max="500" step="0.1" style="flex:2;" />
-          </div>
-          <div style="display:flex;gap:8px;">
-            <input type="number" id="settings-goal-wt"  class="ob-input" placeholder="Goal weight (lbs)" min="80" max="500" step="0.1" style="flex:1;" />
-            <input type="number" id="settings-cal-target" class="ob-input" placeholder="Calorie target" min="1000" max="6000" style="flex:1;" />
-          </div>
-        </div>
-
-        <button class="btn-primary" onclick="saveProfileSettings()" style="margin-bottom:10px;">Save Changes</button>
-
-        <!-- Settings sections -->
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--textDim);margin-bottom:10px;margin-top:4px;">Preferences</div>
-        <div style="display:flex;flex-direction:column;gap:2px;margin-bottom:16px;">
-          <div class="settings-row" onclick="showToast('🔔','Notifications configured')">
-            <div class="sr-icon">🔔</div>
-            <div class="sr-label">Notifications</div>
-            <div class="sr-value">On</div>
-            <div class="sr-arrow">›</div>
-          </div>
-          <div class="settings-row" onclick="showToast('🌙','Dark mode is always on!')">
-            <div class="sr-icon">🌙</div>
-            <div class="sr-label">Theme</div>
-            <div class="sr-value">Dark</div>
-            <div class="sr-arrow">›</div>
-          </div>
-          <div class="settings-row" onclick="showToast('⚖️','Units updated')">
-            <div class="sr-icon">⚖️</div>
-            <div class="sr-label">Units</div>
-            <div class="sr-value">Imperial</div>
-            <div class="sr-arrow">›</div>
-          </div>
-          <div class="settings-row" onclick="openWeighInModal();closeSettings()">
-            <div class="sr-icon">📊</div>
-            <div class="sr-label">Log Weight</div>
-            <div class="sr-value">Weigh-In</div>
-            <div class="sr-arrow">›</div>
-          </div>
-          <div class="settings-row" onclick="showToast('🔑','API key settings')">
-            <div class="sr-icon">🔑</div>
-            <div class="sr-label">API Connections</div>
-            <div class="sr-value">Manage</div>
-            <div class="sr-arrow">›</div>
-          </div>
-          <div class="settings-row" onclick="showToast('☁️','Sync: up to date')">
-            <div class="sr-icon">☁️</div>
-            <div class="sr-label">Cloud Sync</div>
-            <div class="sr-value" style="color:var(--green);">Synced</div>
-            <div class="sr-arrow">›</div>
-          </div>
-        </div>
-
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--textDim);margin-bottom:10px;">Subscription</div>
-        <div style="background:var(--limeSoft);border:1px solid rgba(212,255,63,0.2);border-radius:14px;padding:14px 16px;margin-bottom:16px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <div>
-              <div style="font-size:14px;font-weight:700;color:var(--lime);">IronFuel Pro</div>
-              <div style="font-size:11px;color:var(--textSub);margin-top:2px;">$4.99/mo · Renews Mar 19, 2026</div>
-            </div>
-            <div style="font-size:11px;color:var(--textDim);cursor:pointer;border:1px solid var(--border);padding:6px 12px;border-radius:10px;" onclick="showToast('💳','Manage billing')">Manage</div>
-          </div>
-        </div>
-
-        <div style="display:flex;flex-direction:column;gap:2px;margin-bottom:20px;">
-          <div class="settings-row" onclick="showToast('📤','Exporting your data...')">
-            <div class="sr-icon">📤</div>
-            <div class="sr-label">Export Data (CSV)</div>
-            <div class="sr-arrow">›</div>
-          </div>
-          <div class="settings-row" onclick="showToast('❓','Help center opening...')">
-            <div class="sr-icon">❓</div>
-            <div class="sr-label">Help & Support</div>
-            <div class="sr-arrow">›</div>
-          </div>
-          <div class="settings-row" onclick="showToast('⭐','Thank you for the review!')">
-            <div class="sr-icon">⭐</div>
-            <div class="sr-label">Rate IronFuel</div>
-            <div class="sr-arrow">›</div>
-          </div>
-          <div class="settings-row" onclick="runMacroEngine(true);closeSettings();" style="border:1px solid rgba(212,255,63,0.2);">
-            <div class="sr-icon">⚙️</div>
-            <div class="sr-label" style="color:var(--lime);">Run Macro Engine Now</div>
-            <div class="sr-value" style="color:var(--lime);">Force</div>
-            <div class="sr-arrow" style="color:var(--lime);">›</div>
-          </div>
-          <div class="settings-row" onclick="confirmResetOnboarding()">
-            <div class="sr-icon">🔄</div>
-            <div class="sr-label">Reset & Re-run Onboarding</div>
-            <div class="sr-arrow">›</div>
-          </div>
-          <div class="settings-row" style="color:var(--red);" onclick="confirmSignOut()">
-            <div class="sr-icon">🚪</div>
-            <div class="sr-label" style="color:var(--red);">Sign Out</div>
-            <div class="sr-arrow" style="color:var(--red);">›</div>
-          </div>
-        </div>
-
-        <div style="text-align:center;font-size:10px;color:var(--textDim);padding-bottom:4px;">IronFuel v2.0 · Built with ❤️ for athletes</div>
       </div>
     </div>
 
@@ -4118,7 +3510,6 @@ let currentScreen = 'home';
 
 function switchScreen(screenId, btn) {
   if (screenId === currentScreen) return;
-  const fromScreen = currentScreen;
 
   // Pause timer if leaving lift screen
   if (currentScreen === 'lift' && timerRunning) {
@@ -4155,21 +3546,13 @@ function switchScreen(screenId, btn) {
 
   currentScreen = screenId;
 
-  // Screen-specific bar animations
+  // Screen-specific actions
   if (screenId === 'nutrition') {
     setTimeout(() => {
       animateBar('calorie-bar-fill', '72%');
       animateBar('pp-fill', '94%');
     }, 300);
   }
-
-  // Execute all registered screen hooks
-  const hooks = (window._screenHooks || {})[screenId] || [];
-  hooks.forEach(fn => { try { fn(); } catch(e) {} });
-
-  // Execute post-switch hooks (slide transitions etc.)
-  const postHooks = window._switchPostHooks || [];
-  postHooks.forEach(fn => { try { fn(screenId, fromScreen, btn); } catch(e) {} });
 }
 
 // Init: show home, hide rest
@@ -5190,16 +4573,19 @@ function initDeadliftChart() {
   });
 }
 
-// Register chart init as a hook (called from master switchScreen below)
-window._screenHooks = window._screenHooks || {};
-window._screenHooks.progress = window._screenHooks.progress || [];
-window._screenHooks.progress.push(function() {
-  setTimeout(() => {
-    initWeightChart('8W');
-    initDeadliftChart();
-    updateProgressFromStorage();
-  }, 100);
-});
+// Init charts when Progress screen is shown
+const origSwitchScreen = switchScreen;
+function switchScreen(screenId, btn) {
+  origSwitchScreen(screenId, btn);
+  if (screenId === 'progress') {
+    setTimeout(() => {
+      initWeightChart('8W');
+      initDeadliftChart();
+      updateProgressFromStorage();
+    }, 100);
+  }
+}
+// Also init if progress is first screen somehow
 if (currentScreen === 'progress') { initWeightChart(); initDeadliftChart(); }
 
 // Update weight chart on period button click
@@ -5380,10 +4766,12 @@ function updateMacroRing() {
 
 // Run on load and whenever nutrition data changes
 updateMacroRing();
-// Register home hook for macro ring
-window._screenHooks = window._screenHooks || {};
-window._screenHooks.home = window._screenHooks.home || [];
-window._screenHooks.home.push(function() { setTimeout(updateMacroRing, 100); });
+// Re-run every time home screen is shown
+const _patchedSwitch = switchScreen;
+function switchScreen(screenId, btn) {
+  _patchedSwitch(screenId, btn);
+  if (screenId === 'home') setTimeout(updateMacroRing, 100);
+}
 
 // ═══════════════════════════════════════════════
 // POST-WORKOUT LOG BUTTON
@@ -5697,647 +5085,6 @@ function updateWorkoutBanner() {
 updateWorkoutBanner();
 
 // ═══════════════════════════════════════════════
-// MACRO DONUT CHART
-// ═══════════════════════════════════════════════
-function initMacroDonut(protein, carbs, fat, caloriesConsumed, caloriesTarget) {
-  const canvas = document.getElementById('macro-donut-chart');
-  if (!canvas || typeof Chart === 'undefined') return;
-
-  // Destroy existing chart
-  if (window._macroDonutChart) { window._macroDonutChart.destroy(); }
-
-  const ctx = canvas.getContext('2d');
-  window._macroDonutChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Protein', 'Carbs', 'Fat', 'Remaining'],
-      datasets: [{
-        data: [
-          protein * 4,
-          carbs * 4,
-          fat * 9,
-          Math.max(0, caloriesTarget - caloriesConsumed)
-        ],
-        backgroundColor: [
-          'rgba(63,255,143,0.85)',
-          'rgba(63,191,255,0.85)',
-          'rgba(255,159,63,0.85)',
-          'rgba(255,255,255,0.06)'
-        ],
-        borderWidth: 0,
-        hoverOffset: 4
-      }]
-    },
-    options: {
-      cutout: '68%',
-      plugins: { legend: { display: false }, tooltip: {
-        callbacks: {
-          label: function(ctx) {
-            if (ctx.label === 'Remaining') return ctx.label + ': ' + ctx.raw + ' kcal left';
-            return ctx.label + ': ' + ctx.raw + ' kcal';
-          }
-        }
-      }},
-      animation: { duration: 700, easing: 'easeInOutQuart' },
-      responsive: true,
-      maintainAspectRatio: true
-    }
-  });
-
-  // Update center value
-  const pct = caloriesTarget > 0 ? Math.round(caloriesConsumed / caloriesTarget * 100) : 0;
-  const centerVal = document.getElementById('donut-center-val');
-  if (centerVal) centerVal.textContent = pct + '%';
-
-  // Update legend
-  const lp = document.getElementById('legend-protein'); if (lp) lp.textContent = protein + 'g';
-  const lc = document.getElementById('legend-carbs');   if (lc) lc.textContent = carbs + 'g';
-  const lf = document.getElementById('legend-fat');     if (lf) lf.textContent = fat + 'g';
-  const lk = document.getElementById('legend-calories');if (lk) lk.textContent = caloriesConsumed.toLocaleString();
-}
-
-// ═══════════════════════════════════════════════
-// MEAL SLOT — Collapse/Expand
-// ═══════════════════════════════════════════════
-function toggleMealSlot(id) {
-  const slot = document.getElementById(id);
-  if (!slot) return;
-  const body = slot.querySelector('.meal-slot-body');
-  if (!body) return;
-  const isCollapsed = body.style.display === 'none';
-  body.style.display = isCollapsed ? '' : 'none';
-  const icon = slot.querySelector('.meal-slot-icon');
-  if (icon) icon.style.opacity = isCollapsed ? '1' : '0.45';
-}
-
-// ═══════════════════════════════════════════════
-// FOOD ENTRY — Swipe to delete
-// ═══════════════════════════════════════════════
-let feSwipeStartX = 0;
-
-function feTouchStart(e) {
-  feSwipeStartX = e.touches[0].clientX;
-}
-function feTouchMove(e) {
-  const dx = e.touches[0].clientX - feSwipeStartX;
-  const entry = e.currentTarget;
-  if (dx < -30) {
-    // Swiping left — reveal delete
-    e.currentTarget.classList.add('swiped');
-  } else if (dx > 10) {
-    e.currentTarget.classList.remove('swiped');
-  }
-}
-function feTouchEnd(e) {
-  // leave state as-is until user taps delete or swipes right
-}
-
-function deleteFoodEntry(deleteBtn) {
-  const entry = deleteBtn.closest('.food-entry');
-  if (!entry) return;
-  entry.style.transition = 'opacity 0.25s, transform 0.25s, max-height 0.3s';
-  entry.style.opacity = '0';
-  entry.style.transform = 'translateX(30px)';
-  entry.style.maxHeight = entry.offsetHeight + 'px';
-  setTimeout(() => {
-    entry.style.maxHeight = '0';
-    entry.style.overflow = 'hidden';
-    entry.style.marginTop = '0';
-    entry.style.paddingTop = '0';
-    entry.style.paddingBottom = '0';
-  }, 250);
-  setTimeout(() => {
-    entry.remove();
-    recalculateMealCalories();
-  }, 550);
-  showToast('🗑', 'Entry removed');
-}
-
-function recalculateMealCalories() {
-  // Recalculate calorie total per meal slot
-  const meals = ['breakfast', 'lunch', 'preworkout', 'dinner', 'postworkout'];
-  let grandTotal = 0;
-  meals.forEach(mealId => {
-    const slot = document.getElementById('meal-' + mealId);
-    if (!slot) return;
-    const entries = slot.querySelectorAll('.food-entry-cals');
-    let total = 0;
-    entries.forEach(el => { total += parseInt(el.textContent) || 0; });
-    const calEl = document.getElementById(mealId + '-cals');
-    if (calEl) calEl.textContent = total + ' kcal';
-    grandTotal += total;
-  });
-  // Update top tape
-  const consumed = document.querySelector('.macro-tape-card:first-child .mtc-val');
-  if (consumed) consumed.textContent = grandTotal.toLocaleString();
-  const remaining = document.querySelector('.macro-tape-card:first-child .mtc-sub');
-  const target = parseInt(document.querySelector('.page-sub')?.textContent?.match(/[\d,]+/)?.[0]?.replace(',','') || '2100');
-  if (remaining) remaining.textContent = Math.max(0, target - grandTotal) + ' remaining';
-}
-
-// ═══════════════════════════════════════════════
-// WORKOUT PLAN SELECTOR
-// ═══════════════════════════════════════════════
-const WORKOUT_PLANS = {
-  'PPL': {
-    days: ['Push A', 'Pull A', 'Legs A', 'Push B', 'Pull B', 'Legs B'],
-    desc: 'Push / Pull / Legs — 6 day split'
-  },
-  '5x5': {
-    days: ['Squat+Bench+Row', 'Squat+OHP+Deadlift'],
-    desc: 'StrongLifts 5×5 — 3 day A/B'
-  },
-  'PHUL': {
-    days: ['Upper Power', 'Lower Power', 'Upper Hypertrophy', 'Lower Hypertrophy'],
-    desc: 'Power Hypertrophy Upper Lower — 4 day'
-  },
-  'nSuns': {
-    days: ['Bench+Squat', 'OHP+Deadlift', 'Bench+Rows', 'Squat+OHP', 'Deadlift+Bench'],
-    desc: 'nSuns 531 — 5 day'
-  },
-  'Custom': {
-    days: ['Custom Day 1'],
-    desc: 'Custom — build your own'
-  }
-};
-
-let activePlan = 'PPL';
-
-function selectWorkoutPlan(plan, el) {
-  activePlan = plan;
-  document.querySelectorAll('.plan-chip').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  const planData = WORKOUT_PLANS[plan] || WORKOUT_PLANS['PPL'];
-  const dayLabel = document.getElementById('session-day-label');
-  const blockLabel = document.getElementById('session-block-label');
-  if (dayLabel) dayLabel.textContent = planData.days[0] + ' · Week 8';
-  if (blockLabel) blockLabel.textContent = planData.desc.toUpperCase().slice(0, 20);
-  showToast('💪', plan + ' selected — ' + planData.days.length + ' day split');
-  localStorage.setItem('ironfuel_plan', plan);
-}
-
-// ═══════════════════════════════════════════════
-// EXERCISE HISTORY TOGGLE
-// ═══════════════════════════════════════════════
-function toggleExHistory(btn, exerciseName) {
-  const safeId = 'ex-history-' + exerciseName;
-  const panel = document.getElementById(safeId);
-  if (!panel) {
-    // Generate from localStorage
-    const newPanel = document.createElement('div');
-    newPanel.id = safeId;
-    newPanel.className = 'ex-history-sheet';
-    const sessions = JSON.parse(localStorage.getItem('ironfuel_workouts') || '[]');
-    const prevSessions = sessions
-      .filter(s => s.exercises && s.exercises.some(ex => ex.name === exerciseName))
-      .slice(-3).reverse();
-    if (prevSessions.length === 0) {
-      newPanel.innerHTML = `<div class="ex-history-title">${exerciseName} — History</div><div style="font-size:12px;color:var(--textDim);padding:4px 0;">No logged sessions yet</div>`;
-    } else {
-      newPanel.innerHTML = `<div class="ex-history-title">${exerciseName} — Last ${prevSessions.length} Sessions</div>` +
-        prevSessions.map(s => {
-          const ex = s.exercises.find(e => e.name === exerciseName);
-          const done = ex.sets.filter(st => st.completed);
-          if (!done.length) return '';
-          const best = done.reduce((b,st) => Math.max(b, calcE1RM(st.weight, st.reps)), 0);
-          const dateStr = new Date(s.date).toLocaleDateString('en-US',{month:'short',day:'numeric'});
-          return `<div class="ex-history-row"><span class="ex-history-date">${dateStr}</span><span class="ex-history-sets">${done.length}×${done[0].reps} @ ${done[0].weight} lb</span><span class="ex-history-e1rm">e1RM ${best}</span></div>`;
-        }).join('')
-      ;
-    }
-    btn.closest('.exercise-block').appendChild(newPanel);
-  } else {
-    panel.style.display = panel.style.display === 'none' ? '' : 'none';
-  }
-}
-
-// ═══════════════════════════════════════════════
-// EXERCISE LIBRARY
-// ═══════════════════════════════════════════════
-const EXERCISE_DB = [
-  { name: 'Bench Press', muscle: 'Chest · Triceps', icon: '🏋️', category: 'chest' },
-  { name: 'Incline Dumbbell Press', muscle: 'Upper Chest · Shoulders', icon: '💪', category: 'chest' },
-  { name: 'Cable Fly', muscle: 'Chest · Isolation', icon: '🔄', category: 'chest' },
-  { name: 'Dips', muscle: 'Chest · Triceps', icon: '💪', category: 'chest' },
-  { name: 'Push-Up', muscle: 'Chest · Core', icon: '⬆️', category: 'chest' },
-  { name: 'Overhead Press', muscle: 'Shoulders · Triceps', icon: '🏋️', category: 'shoulders' },
-  { name: 'Lateral Raise', muscle: 'Side Delts', icon: '🔀', category: 'shoulders' },
-  { name: 'Front Raise', muscle: 'Front Delts', icon: '⬆️', category: 'shoulders' },
-  { name: 'Face Pull', muscle: 'Rear Delt · Rotator Cuff', icon: '🔄', category: 'shoulders' },
-  { name: 'Deadlift', muscle: 'Back · Glutes · Hamstrings', icon: '🏋️', category: 'back' },
-  { name: 'Pull-Up', muscle: 'Lats · Biceps', icon: '⬆️', category: 'back' },
-  { name: 'Barbell Row', muscle: 'Back · Biceps', icon: '💪', category: 'back' },
-  { name: 'Seated Cable Row', muscle: 'Mid Back · Lats', icon: '🔄', category: 'back' },
-  { name: 'Lat Pulldown', muscle: 'Lats · Biceps', icon: '⬇️', category: 'back' },
-  { name: 'Squat', muscle: 'Quads · Glutes · Core', icon: '🏋️', category: 'legs' },
-  { name: 'Romanian Deadlift', muscle: 'Hamstrings · Glutes', icon: '🦵', category: 'legs' },
-  { name: 'Leg Press', muscle: 'Quads · Glutes', icon: '🦵', category: 'legs' },
-  { name: 'Bulgarian Split Squat', muscle: 'Quads · Glutes', icon: '🦵', category: 'legs' },
-  { name: 'Leg Curl', muscle: 'Hamstrings', icon: '🔄', category: 'legs' },
-  { name: 'Calf Raise', muscle: 'Calves', icon: '⬆️', category: 'legs' },
-  { name: 'Barbell Curl', muscle: 'Biceps', icon: '💪', category: 'arms' },
-  { name: 'Hammer Curl', muscle: 'Biceps · Brachialis', icon: '🔨', category: 'arms' },
-  { name: 'Skull Crusher', muscle: 'Triceps', icon: '💀', category: 'arms' },
-  { name: 'Tricep Pushdown', muscle: 'Triceps', icon: '⬇️', category: 'arms' },
-  { name: 'Plank', muscle: 'Core · Stability', icon: '🔥', category: 'core' },
-  { name: 'Ab Wheel', muscle: 'Core · Lower Back', icon: '⚙️', category: 'core' },
-  { name: 'Cable Crunch', muscle: 'Abs', icon: '⬇️', category: 'core' },
-  { name: 'Hanging Leg Raise', muscle: 'Lower Abs', icon: '⬆️', category: 'core' },
-  { name: 'Treadmill Run', muscle: 'Cardio · Full Body', icon: '🏃', category: 'cardio' },
-  { name: 'Rowing Machine', muscle: 'Cardio · Back', icon: '🚣', category: 'cardio' },
-  { name: 'Stairmaster', muscle: 'Cardio · Legs', icon: '🪜', category: 'cardio' },
-];
-
-let exLibFilter = 'all';
-
-function openExerciseLibrary() {
-  const modal = document.getElementById('exercise-library-modal');
-  if (modal) {
-    modal.classList.add('open');
-    renderExLib(exLibFilter, '');
-    setTimeout(() => document.getElementById('exlib-search')?.focus(), 200);
-  }
-}
-function closeExLib() {
-  const modal = document.getElementById('exercise-library-modal');
-  if (modal) modal.classList.remove('open');
-}
-function closeExLibIfBg(e) {
-  if (e.target === document.getElementById('exercise-library-modal')) closeExLib();
-}
-
-function filterExLib(category, el) {
-  exLibFilter = category;
-  document.querySelectorAll('.exlib-cat-pill').forEach(p => p.classList.remove('active'));
-  if (el) el.classList.add('active');
-  renderExLib(category, document.getElementById('exlib-search')?.value || '');
-}
-
-function renderExLib(category, query) {
-  const list = document.getElementById('exlib-list');
-  if (!list) return;
-  const q = (query || '').toLowerCase().trim();
-  const filtered = EXERCISE_DB.filter(ex => {
-    const matchCat = category === 'all' || ex.category === category;
-    const matchQ   = !q || ex.name.toLowerCase().includes(q) || ex.muscle.toLowerCase().includes(q);
-    return matchCat && matchQ;
-  });
-  if (filtered.length === 0) {
-    list.innerHTML = '<div style="padding:16px;text-align:center;color:var(--textDim);font-size:13px;">No exercises found</div>';
-    return;
-  }
-  list.innerHTML = filtered.map(ex => `
-    <div class="exlib-row" onclick="addExerciseToSession('${ex.name}','${ex.muscle}','${ex.icon}')">
-      <div class="exlib-row-icon">${ex.icon}</div>
-      <div>
-        <div class="exlib-row-name">${ex.name}</div>
-        <div class="exlib-row-muscle">${ex.muscle}</div>
-      </div>
-      <div class="exlib-row-add">+</div>
-    </div>
-  `).join('');
-}
-
-function addExerciseToSession(name, muscle, icon) {
-  // Insert a new exercise block before the "Add Exercise" button
-  const addBtn = document.querySelector('#screen-lift [onclick="openExerciseLibrary()"]');
-  if (!addBtn) { closeExLib(); showToast(icon, name + ' added'); return; }
-  const parent = addBtn.parentElement;
-  const block = document.createElement('div');
-  block.className = 'exercise-block';
-  block.innerHTML = `
-    <div class="exercise-header">
-      <div class="exercise-name">${icon} ${name}</div>
-      <div style="font-size:11px;color:var(--textSub);">${muscle}</div>
-    </div>
-    <div style="display:grid;grid-template-columns:32px 1fr 1fr 1fr 40px;gap:8px;padding:8px 16px 4px;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--textDim);">
-      <div>#</div><div style="text-align:center">WEIGHT</div><div style="text-align:center">REPS</div><div style="text-align:center">RPE</div><div></div>
-    </div>
-    <div class="set-row">
-      <div class="set-num">1</div>
-      <div><input type="number" class="set-input" value="135" min="0" max="9999" step="2.5"><div class="set-label">lb</div></div>
-      <div><input type="number" class="set-input" value="8" min="1" max="99" step="1"><div class="set-label">reps</div></div>
-      <div><input type="number" class="set-input set-rpe-input" value="7" min="1" max="10" step="0.5"><div class="set-label">RPE</div></div>
-      <div class="set-check" onclick="logSet(this)">○</div>
-    </div>
-    <div style="padding:10px 16px;border-top:1px solid var(--border);display:flex;gap:8px;">
-      <button class="add-set-btn" style="flex:1;background:var(--surface3);border:none;border-radius:10px;padding:8px;font-size:12px;color:var(--textSub);cursor:pointer;font-family:'DM Sans',sans-serif;">+ Add Set</button>
-      <button style="flex:1;background:var(--surface3);border:none;border-radius:10px;padding:8px;font-size:12px;color:var(--textSub);cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="toggleExHistory(this,'${name}')">📈 History</button>
-    </div>
-  `;
-  parent.insertBefore(block, addBtn.parentElement);
-  closeExLib();
-  showToast(icon, name + ' added to session');
-
-  // Animate new block
-  block.style.opacity = '0';
-  block.style.transform = 'translateY(-8px)';
-  requestAnimationFrame(() => {
-    block.style.transition = 'opacity 0.3s, transform 0.3s';
-    block.style.opacity = '1';
-    block.style.transform = '';
-  });
-
-  // Update session chip
-  const allBlocks = document.querySelectorAll('#screen-lift .exercise-block');
-  const progressChip = document.getElementById('session-progress-chip');
-  if (progressChip) progressChip.textContent = allBlocks.length + ' Exercises';
-}
-
-// Wire exlib search input
-document.addEventListener('input', function(e) {
-  if (e.target.id === 'exlib-search') {
-    renderExLib(exLibFilter, e.target.value);
-  }
-});
-
-// ═══════════════════════════════════════════════
-// COACH — Chip quick-send
-// ═══════════════════════════════════════════════
-function sendChip(message) {
-  const input = document.getElementById('coach-chat-input');
-  if (input) input.value = message;
-  sendCoachMessage();
-  // Scroll coach messages into view
-  const screen = document.getElementById('screen-coach');
-  if (screen) setTimeout(() => { screen.scrollTop = screen.scrollHeight; }, 400);
-}
-
-// ═══════════════════════════════════════════════
-// SCREEN TRANSITIONS — Slide animation (hook)
-// ═══════════════════════════════════════════════
-const SCREEN_ORDER = ['home', 'nutrition', 'lift', 'recipes', 'coach', 'progress'];
-
-// Register as a post-switch hook via a global array
-window._switchPostHooks = window._switchPostHooks || [];
-window._switchPostHooks.push(function(screenId, fromId, btn) {
-  const fromIdx = SCREEN_ORDER.indexOf(fromId);
-  const toIdx   = SCREEN_ORDER.indexOf(screenId);
-  if (fromIdx === toIdx || fromIdx < 0 || toIdx < 0) return;
-  const toEl = document.getElementById('screen-' + screenId);
-  if (!toEl) return;
-  const dir = toIdx > fromIdx ? 'slide-in-right' : 'slide-in-left';
-  toEl.classList.remove('slide-in-right', 'slide-in-left');
-  void toEl.offsetWidth;
-  toEl.classList.add(dir);
-  setTimeout(() => toEl.classList.remove(dir), 300);
-  if (btn) {
-    btn.classList.add('just-tapped');
-    setTimeout(() => btn.classList.remove('just-tapped'), 400);
-  }
-});
-
-// ═══════════════════════════════════════════════
-// PROGRESS SCREEN — Animated stat counters
-// ═══════════════════════════════════════════════
-function animateCounter(el, from, to, suffix, duration) {
-  if (!el) return;
-  const start = performance.now();
-  function step(now) {
-    const pct = Math.min(1, (now - start) / duration);
-    const ease = 1 - Math.pow(1 - pct, 3);
-    const val = from + (to - from) * ease;
-    el.textContent = (Number.isInteger(to) ? Math.round(val) : val.toFixed(1)) + suffix;
-    if (pct < 1) requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-  el.classList.add('count-animated');
-}
-
-// Score cards — tap to show tooltip
-document.querySelectorAll('.score-card').forEach(card => {
-  card.addEventListener('click', function() {
-    const label = this.querySelector('.sc-label')?.textContent || 'Metric';
-    const val   = this.querySelector('.sc-val')?.textContent   || '';
-    const delta = this.querySelector('.sc-delta')?.textContent || '';
-    showToast('📊', label + ': ' + val + ' · ' + delta);
-    this.classList.add('pulsing');
-    setTimeout(() => this.classList.remove('pulsing'), 800);
-  });
-});
-
-// Stat cards pulse on progress screen visit
-document.querySelectorAll('.stat-card-sm').forEach((card, i) => {
-  card.style.cursor = 'pointer';
-  card.addEventListener('click', function() {
-    const label = this.querySelector('.scm-label')?.textContent || '';
-    const val   = this.querySelector('.scm-val')?.textContent   || '';
-    const sub   = this.querySelector('.scm-sub')?.textContent   || '';
-    showToast('📈', label + ': ' + val + ' · ' + sub);
-    this.classList.add('pulsing');
-    setTimeout(() => this.classList.remove('pulsing'), 800);
-  });
-});
-
-// ═══════════════════════════════════════════════
-// PROFILE → TARGETS SYNC
-// ═══════════════════════════════════════════════
-function syncProfileTargets() {
-  try {
-    const profile = JSON.parse(localStorage.getItem('ironfuel_profile') || 'null');
-    if (!profile) return;
-
-    // Update nutrition page subtitle
-    const nutritionSub = document.querySelector('#screen-nutrition .page-sub');
-    if (nutritionSub && profile.calories) {
-      const now = new Date();
-      const dayName = now.toLocaleDateString('en-US',{weekday:'long'});
-      const dateStr = now.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-      nutritionSub.textContent = dayName + ', ' + dateStr + ' · ' + profile.calories.toLocaleString() + ' kcal target';
-    }
-
-    // Update macro tape targets
-    const macroCards = document.querySelectorAll('.macro-tape-card');
-    if (macroCards.length >= 4 && profile.calories) {
-      // protein target = profile.protein (1g per lb bodyweight)
-      const pTarget = profile.protein || Math.round((profile.weight || 190) * 1.0);
-      const cTarget = Math.round((profile.calories * 0.4) / 4);  // 40% carbs
-      const fTarget = Math.round((profile.calories * 0.25) / 9); // 25% fat
-      // Update sub labels with targets
-      const pCard = macroCards[1];
-      const cCard = macroCards[2];
-      const fCard = macroCards[3];
-      if (pCard) pCard.querySelector('.mtc-sub').textContent = 'Target: ' + pTarget + 'g';
-      if (cCard) cCard.querySelector('.mtc-sub').textContent = 'Target: ' + cTarget + 'g';
-      if (fCard) fCard.querySelector('.mtc-sub').textContent = 'Target: ' + fTarget + 'g';
-    }
-
-    // Update progress screen start weight
-    const phContext = document.querySelector('.ph-context');
-    if (phContext && profile.weight && profile.goalWeight) {
-      phContext.textContent = 'Started ' + profile.weight + ' lb · Target: ' + profile.goalWeight + ' lb';
-    }
-
-    // Update coach screen sub (plan status)
-    const coachSub = document.querySelector('#screen-coach .page-sub');
-    if (coachSub && profile.plan) {
-      coachSub.textContent = profile.plan === 'free'
-        ? 'Free Plan · Limited Queries'
-        : 'Pro Plan · Unlimited · Powered by GPT-4o';
-    }
-  } catch(e) {}
-}
-syncProfileTargets();
-
-// ═══════════════════════════════════════════════
-// SESSION TIMER — Live elapsed time on lift screen
-// ═══════════════════════════════════════════════
-window._liftSessionStart = window._liftSessionStart || null;
-
-// Register lift timer as a screen hook
-window._screenHooks = window._screenHooks || {};
-window._screenHooks.lift = window._screenHooks.lift || [];
-window._screenHooks.lift.push(function() {
-  if (!window._liftSessionStart) {
-    window._liftSessionStart = Date.now();
-    startElapsedTimer();
-  }
-});
-
-function startElapsedTimer() {
-  const chip = document.getElementById('session-time-chip');
-  if (!chip) return;
-  if (window._elapsedInterval) clearInterval(window._elapsedInterval);
-  window._elapsedInterval = setInterval(() => {
-    const elapsed = Math.round((Date.now() - window._liftSessionStart) / 60000);
-    if (chip) chip.textContent = elapsed + ' min';
-  }, 15000); // update every 15s
-}
-
-// ═══════════════════════════════════════════════
-// SETTINGS / PROFILE MODAL
-// ═══════════════════════════════════════════════
-function openSettings() {
-  const modal = document.getElementById('settings-modal');
-  if (!modal) return;
-  // Pre-fill from saved profile
-  try {
-    const profile = JSON.parse(localStorage.getItem('ironfuel_profile') || 'null');
-    if (profile) {
-      const n = profile.name || '';
-      document.getElementById('settings-display-name').textContent = n.toUpperCase();
-      document.getElementById('settings-display-email').textContent = profile.email || '';
-      document.getElementById('settings-plan-badge').textContent =
-        profile.plan === 'free' ? 'Free Plan · Upgrade' : 'Pro Plan · Active';
-      document.getElementById('settings-plan-badge').style.color =
-        profile.plan === 'free' ? 'var(--orange)' : 'var(--lime)';
-      document.getElementById('settings-weight').textContent = profile.weight || '—';
-      document.getElementById('settings-calories').textContent =
-        (profile.calories || 2100).toLocaleString();
-      document.getElementById('settings-protein').textContent = profile.protein || '—';
-      // Fill editable inputs
-      const fn = document.getElementById('settings-name');
-      const fe = document.getElementById('settings-email');
-      const fa = document.getElementById('settings-age');
-      const fw = document.getElementById('settings-wt');
-      const fg = document.getElementById('settings-goal-wt');
-      const fc = document.getElementById('settings-cal-target');
-      if (fn) fn.value = profile.name || '';
-      if (fe) fe.value = profile.email || '';
-      if (fa) fa.value = profile.age || '';
-      if (fw) fw.value = profile.weight || '';
-      if (fg) fg.value = profile.goalWeight || '';
-      if (fc) fc.value = profile.calories || 2100;
-    }
-  } catch(e) {}
-  modal.classList.add('open');
-}
-
-function closeSettings() {
-  const modal = document.getElementById('settings-modal');
-  if (modal) modal.classList.remove('open');
-}
-function closeSettingsIfBg(e) {
-  if (e.target === document.getElementById('settings-modal')) closeSettings();
-}
-
-function saveProfileSettings() {
-  try {
-    const existing = JSON.parse(localStorage.getItem('ironfuel_profile') || '{}');
-    const name = document.getElementById('settings-name')?.value.trim() || existing.name;
-    const email = document.getElementById('settings-email')?.value.trim() || existing.email;
-    const age = parseInt(document.getElementById('settings-age')?.value) || existing.age;
-    const weight = parseFloat(document.getElementById('settings-wt')?.value) || existing.weight;
-    const goalWeight = parseFloat(document.getElementById('settings-goal-wt')?.value) || existing.goalWeight;
-    const calories = parseInt(document.getElementById('settings-cal-target')?.value) || existing.calories;
-    const protein = Math.round(weight * 1.0);
-
-    const updated = { ...existing, name, email, age, weight, goalWeight, calories, protein };
-    localStorage.setItem('ironfuel_profile', JSON.stringify(updated));
-
-    // Update hero
-    const heroName = document.querySelector('.hero-name');
-    if (heroName && name) {
-      const parts = name.split(' ');
-      heroName.textContent = parts.length > 1
-        ? parts[0].toUpperCase() + ' ' + parts[1][0].toUpperCase() + '.'
-        : name.toUpperCase();
-    }
-
-    // Sync display in settings header
-    document.getElementById('settings-display-name').textContent = name.toUpperCase();
-    document.getElementById('settings-display-email').textContent = email;
-    document.getElementById('settings-weight').textContent = weight;
-    document.getElementById('settings-calories').textContent = calories.toLocaleString();
-    document.getElementById('settings-protein').textContent = protein;
-
-    syncProfileTargets();
-    showToast('✓', 'Profile saved!');
-    setTimeout(() => closeSettings(), 800);
-  } catch(e) {
-    showToast('⚠', 'Could not save — try again');
-  }
-}
-
-function confirmResetOnboarding() {
-  if (confirm('Reset onboarding? You will go through setup again on next reload.')) {
-    localStorage.removeItem('ironfuel_profile');
-    showToast('🔄', 'Onboarding will run on next open');
-    closeSettings();
-  }
-}
-
-function confirmSignOut() {
-  if (confirm('Sign out? Your local data will be preserved.')) {
-    showToast('👋', 'Signed out — see you soon!');
-    closeSettings();
-    setTimeout(() => {
-      localStorage.removeItem('ironfuel_profile');
-      window.location.reload();
-    }, 1200);
-  }
-}
-
-// Also open settings from the profile icon in Keyboard shortcuts
-document.addEventListener('keydown', function(e) {
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-  if (e.key === 'p' || e.key === 'P') openSettings();
-}, true);
-
-// ═══════════════════════════════════════════════
-// MACRO DONUT — Init on nutrition screen (hook)
-// ═══════════════════════════════════════════════
-window._screenHooks = window._screenHooks || {};
-window._screenHooks.nutrition = window._screenHooks.nutrition || [];
-window._screenHooks.nutrition.push(function() {
-  setTimeout(() => {
-    const vals = document.querySelectorAll('.macro-tape-card .mtc-val');
-    const protein  = parseInt((vals[1]?.textContent || '198').replace(/[^\d]/g,'')) || 198;
-    const carbs    = parseInt((vals[2]?.textContent || '180').replace(/[^\d]/g,'')) || 180;
-    const fat      = parseInt((vals[3]?.textContent || '52').replace(/[^\d]/g,'')) || 52;
-    const consumed = parseInt((vals[0]?.textContent || '1880').replace(/[^\d,]/g,'').replace(',','')) || 1880;
-    const profile  = JSON.parse(localStorage.getItem('ironfuel_profile') || '{}');
-    const target   = profile.calories || 2100;
-    initMacroDonut(protein, carbs, fat, consumed, target);
-  }, 200);
-});
-
-// Init donut if already on nutrition screen
-if (document.querySelector('#screen-nutrition.active')) {
-  setTimeout(() => initMacroDonut(198, 180, 52, 1880, 2100), 500);
-}
-
-// ═══════════════════════════════════════════════
 // FEED CARDS — Tappable expand/collapse
 // ═══════════════════════════════════════════════
 document.querySelectorAll('.feed-item').forEach(item => {
@@ -6361,176 +5108,6 @@ document.querySelectorAll('.feed-item').forEach(item => {
     });
   }
 });
-
-// ═══════════════════════════════════════════════
-// RECIPE SEARCH
-// ═══════════════════════════════════════════════
-function openRecipeSearch() {
-  // Create a quick search overlay in the recipes screen
-  const existing = document.getElementById('recipe-search-overlay');
-  if (existing) { existing.remove(); return; }
-  const wrap = document.getElementById('screen-recipes');
-  if (!wrap) return;
-  const overlay = document.createElement('div');
-  overlay.id = 'recipe-search-overlay';
-  overlay.style.cssText = 'position:sticky;top:0;z-index:20;background:var(--bg);padding:12px 20px 10px;';
-  overlay.innerHTML = `
-    <div style="display:flex;align-items:center;background:var(--surface2);border:1px solid var(--lime);border-radius:14px;padding:10px 14px;gap:10px;">
-      <span>🔍</span>
-      <input id="recipe-live-search" type="text" placeholder="Search recipes..."
-        style="flex:1;background:transparent;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);" autocomplete="off" autofocus />
-      <span style="color:var(--textDim);cursor:pointer;font-size:16px;" onclick="document.getElementById('recipe-search-overlay').remove();document.querySelectorAll('#screen-recipes .recipe-card-full').forEach(c=>c.classList.remove('recipe-hidden'))">✕</span>
-    </div>
-  `;
-  wrap.insertBefore(overlay, wrap.children[1]);
-  setTimeout(() => document.getElementById('recipe-live-search')?.focus(), 100);
-
-  document.getElementById('recipe-live-search').addEventListener('input', function() {
-    const q = this.value.toLowerCase().trim();
-    document.querySelectorAll('#screen-recipes .recipe-card-full').forEach(card => {
-      const text = card.textContent.toLowerCase();
-      card.classList.toggle('recipe-hidden', q.length > 0 && !text.includes(q));
-    });
-  });
-}
-
-// ═══════════════════════════════════════════════
-// WEEKLY CHECK-IN MODAL
-// ═══════════════════════════════════════════════
-function openWeeklyCheckin() {
-  const existing = document.getElementById('checkin-modal');
-  if (existing) { existing.remove(); return; }
-
-  const modal = document.createElement('div');
-  modal.id = 'checkin-modal';
-  modal.className = 'modal-overlay open';
-  modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
-  modal.innerHTML = `
-    <div class="modal-sheet">
-      <div class="modal-handle"></div>
-      <div class="modal-title">Weekly Check-In</div>
-      <div class="modal-sub" style="margin-bottom:18px;">Week 8 — How did it go?</div>
-
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--textDim);margin-bottom:8px;">Average Sleep</div>
-      <div style="display:flex;gap:8px;margin-bottom:14px;">
-        ${['<6 hrs','6 hrs','7 hrs','8 hrs','8+ hrs'].map((lbl,i) =>
-          `<div style="flex:1;text-align:center;padding:8px 4px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;font-size:12px;color:var(--textSub);cursor:pointer;" onclick="this.parentElement.querySelectorAll('div').forEach(d=>d.style.borderColor='');this.style.borderColor='var(--lime)';this.style.color='var(--lime)';document.getElementById('checkin-sleep').textContent='${lbl}';">${lbl}</div>`
-        ).join('')}
-      </div>
-
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--textDim);margin-bottom:8px;">Stress Level</div>
-      <div style="display:flex;gap:8px;margin-bottom:14px;">
-        ${['Low','Moderate','High','Extreme'].map((lbl,i) => {
-          const colors = ['var(--green)','var(--lime)','var(--orange)','var(--red)'];
-          return `<div style="flex:1;text-align:center;padding:8px 4px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;font-size:12px;color:var(--textSub);cursor:pointer;" onclick="this.parentElement.querySelectorAll('div').forEach(d=>d.style.borderColor='');this.style.borderColor='${colors[i]}';this.style.color='${colors[i]}';">${lbl}</div>`;
-        }).join('')}
-      </div>
-
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--textDim);margin-bottom:8px;">Energy During Workouts</div>
-      <div style="display:flex;gap:8px;margin-bottom:18px;">
-        ${['Low','Medium','High','Beast'].map((lbl,i) =>
-          `<div style="flex:1;text-align:center;padding:8px 4px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;font-size:12px;color:var(--textSub);cursor:pointer;" onclick="this.parentElement.querySelectorAll('div').forEach(d=>d.style.borderColor='');this.style.borderColor='var(--lime)';this.style.color='var(--lime)';">${lbl}</div>`
-        ).join('')}
-      </div>
-
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--textDim);margin-bottom:8px;">Optional Notes</div>
-      <textarea placeholder="How was this week? Anything to flag..." style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);resize:none;height:72px;outline:none;margin-bottom:14px;" onfocus="this.style.borderColor='var(--lime)'" onblur="this.style.borderColor=''"></textarea>
-
-      <button class="btn-primary" onclick="submitWeeklyCheckin(this.closest('.modal-overlay'))">Submit Check-In ✓</button>
-      <button class="btn-ghost" style="width:100%;margin-top:8px;" onclick="this.closest('.modal-overlay').remove()">Skip for Now</button>
-    </div>
-  `;
-  document.getElementById('app').appendChild(modal);
-}
-
-function submitWeeklyCheckin(modal) {
-  if (modal) modal.remove();
-  showToast('✓', 'Week 8 check-in logged — AI brief updating...');
-  setTimeout(() => showToast('🧠', 'AI Coach noted your check-in. Brief updated.'), 2500);
-}
-
-// ═══════════════════════════════════════════════
-// PROGRESS SCREEN — Animate counters on entry (hook)
-// ═══════════════════════════════════════════════
-let _progressAnimated = false;
-
-window._screenHooks = window._screenHooks || {};
-window._screenHooks.progress = window._screenHooks.progress || [];
-window._screenHooks.progress.push(function() {
-  if (_progressAnimated) return;
-  _progressAnimated = true;
-  setTimeout(() => {
-    const phVal = document.querySelector('.ph-val');
-    if (phVal) animateCounter(phVal, 201.4, 189.4, '', 1200);
-    const scVals = document.querySelectorAll('.sc-val');
-    const targets = [94, 91, 0.8, 87];
-    const suffixes = ['%','%','%','%'];
-    scVals.forEach((el, i) => {
-      setTimeout(() => animateCounter(el, 0, targets[i], suffixes[i], 900), i * 120);
-    });
-    const statVals = document.querySelectorAll('.scm-val');
-    const statTargets = [401, 323, 14, 0.8];
-    statVals.forEach((el, i) => {
-      setTimeout(() => animateCounter(el, 0, statTargets[i], '', 800), 400 + i * 100);
-    });
-    updateBodyComposition();
-  }, 300);
-});
-
-function updateBodyComposition() {
-  try {
-    const profile = JSON.parse(localStorage.getItem('ironfuel_profile') || 'null');
-    if (!profile) return;
-    const w = profile.weight || 190;
-    const h = (profile.heightFt || 5) * 30.48 + (profile.heightIn || 10) * 2.54;
-    const hM = h / 100;
-    const bmi = Math.round((w * 0.453592) / (hM * hM) * 10) / 10;
-    const bmiEl = document.getElementById('prog-bmi');
-    if (bmiEl) bmiEl.textContent = bmi;
-
-    // Est. TDEE
-    const tdeeEl = document.getElementById('prog-tdee');
-    if (tdeeEl && profile.calories) {
-      const estimatedTDEE = Math.round(profile.calories / 0.8); // assumes 20% deficit
-      tdeeEl.textContent = estimatedTDEE.toLocaleString();
-    }
-
-    // Est. body fat (rough: Navy formula proxy)
-    const bfEl = document.getElementById('prog-bf');
-    if (bfEl && profile.gender) {
-      // Very rough estimate based on BMI
-      const bf = profile.gender === 'm'
-        ? Math.max(5, Math.round((1.20 * bmi + 0.23 * (profile.age || 28) - 16.2) * 10) / 10)
-        : Math.max(10, Math.round((1.20 * bmi + 0.23 * (profile.age || 28) - 5.4) * 10) / 10);
-      bfEl.innerHTML = bf + '<span style="font-size:14px">%</span>';
-    }
-  } catch(e) {}
-}
-
-// ═══════════════════════════════════════════════
-// STARTUP CONTEXTUAL REMINDERS
-// ═══════════════════════════════════════════════
-(function() {
-  const hour = new Date().getHours();
-  const profile = (() => { try { return JSON.parse(localStorage.getItem('ironfuel_profile') || 'null'); } catch(e) { return null; } })();
-  if (!profile) return; // Skip if onboarding not done
-
-  const reminders = [];
-  if (hour >= 7 && hour <= 9) reminders.push(['🌅', 'Good morning! Don\'t forget to log breakfast.']);
-  if (hour >= 12 && hour <= 13) reminders.push(['☀️', 'Lunchtime — log your meal to hit protein goals.']);
-  if (hour >= 17 && hour <= 19) reminders.push(['💪', 'Time to hit the gym! Your Push Day awaits.']);
-  if (hour >= 21 && hour <= 23) reminders.push(['📊', 'Before bed: log today\'s weight for best accuracy.']);
-
-  // Check if they logged weight today
-  const weights = (() => { try { return JSON.parse(localStorage.getItem('ironfuel_weights') || '[]'); } catch(e) { return []; } })();
-  const loggedToday = weights.some(w => new Date(w.date).toDateString() === new Date().toDateString());
-  if (!loggedToday && hour > 9) reminders.push(['⚖️', 'Weight not logged today — tap + to weigh in.']);
-
-  if (reminders.length > 0) {
-    const [icon, msg] = reminders[Math.floor(Math.random() * reminders.length)];
-    setTimeout(() => showToast(icon, msg), 3000);
-  }
-})();
 
 // ═══════════════════════════════════════════════
 // PROFILE — Apply saved profile on load
@@ -6563,479 +5140,6 @@ document.addEventListener('keydown', function(e) {
   if (map[e.key]) switchScreen(map[e.key]);
   if (e.key === 'Escape') { closeModal(); closeRecipeModal(); closeWeighInModal(); closeFoodSearch(); }
 });
-
-// ═══════════════════════════════════════════════
-// MACRO ENGINE
-// ═══════════════════════════════════════════════
-
-function getCurrentWeekNum() {
-  const now = new Date();
-  const start = new Date(now.getFullYear(), 0, 1);
-  return Math.ceil(((now - start) / 86400000 + start.getDay() + 1) / 7);
-}
-
-function _meanWeight(entries) {
-  if (!entries.length) return 0;
-  return entries.reduce((s, e) => s + parseFloat(e.weight || 0), 0) / entries.length;
-}
-
-function runMacroEngine(force) {
-  // ── TRIGGER GUARD ──────────────────────────────
-  if (!force) {
-    const now = Date.now();
-    const isRootDay = new Date().getDay() === 0; // Sunday
-    let lastRun = 0;
-    try {
-      const prev = JSON.parse(localStorage.getItem('ironfuel_pending_suggestion') || 'null');
-      if (prev) lastRun = prev.generatedAt || 0;
-    } catch(e) {}
-    const daysSinceLast = (now - lastRun) / 86400000;
-    if (!isRootDay && daysSinceLast < 6 && lastRun > 0) {
-      // Not yet time — just render whatever is pending
-      renderMacroSuggestionCard();
-      return null;
-    }
-  }
-
-  // ── STEP 1: DATA VALIDATION ────────────────────
-  let weights = [];
-  try { weights = JSON.parse(localStorage.getItem('ironfuel_weights') || '[]'); } catch(e) {}
-
-  const now = Date.now();
-  const DAY = 86400000;
-
-  const thisWeekEntries = weights.filter(w => {
-    const age = (now - new Date(w.date).getTime()) / DAY;
-    return age >= 0 && age <= 7;
-  });
-
-  if (thisWeekEntries.length < 4) {
-    showToast('⚖️', 'Log 4+ weigh-ins this week to run the engine');
-    // Still render any existing pending suggestion
-    renderMacroSuggestionCard();
-    return null;
-  }
-
-  // ── STEP 2: ROLLING AVERAGE ────────────────────
-  const priorWeekEntries = weights.filter(w => {
-    const age = (now - new Date(w.date).getTime()) / DAY;
-    return age > 7 && age <= 14;
-  });
-
-  const priorEntries = priorWeekEntries.length >= 3
-    ? priorWeekEntries
-    : weights.filter(w => {
-        const age = (now - new Date(w.date).getTime()) / DAY;
-        return age > 7;
-      });
-
-  if (!priorEntries.length) {
-    showToast('📊', 'Need prior week data — log for 2 weeks to activate');
-    renderMacroSuggestionCard();
-    return null;
-  }
-
-  const currentAvg = _meanWeight(thisWeekEntries);
-  const priorAvg   = _meanWeight(priorEntries);
-  const roc = ((priorAvg - currentAvg) / priorAvg) * 100; // positive = losing
-
-  // ── STEP 3: CALORIE DECISION ───────────────────
-  let delta = 0;
-  let reason = '';
-
-  if (roc > 1.2) {
-    delta = +100;
-    reason = 'You lost ' + roc.toFixed(1) + '% this week — faster than optimal. Adding 100 kcal to protect your strength.';
-  } else if (roc < 0.3) {
-    delta = -100;
-    reason = 'Weight held flat this week. Reducing 100 kcal to restart the deficit.';
-  } else {
-    delta = 0;
-    reason = 'Rate of loss is ' + roc.toFixed(1) + '% — right in the target zone. Holding targets.';
-  }
-
-  // ── STEP 4: STRENGTH CHECK ─────────────────────
-  let workouts = [];
-  try { workouts = JSON.parse(localStorage.getItem('ironfuel_workouts') || '[]'); } catch(e) {}
-
-  const KEY_LIFTS = ['Bench Press', 'Squat', 'Deadlift', 'Overhead Press'];
-  let declineCount = 0;
-
-  KEY_LIFTS.forEach(lift => {
-    const thisWeekSessions = workouts.filter(s => {
-      const age = (now - new Date(s.date).getTime()) / DAY;
-      return age >= 0 && age <= 7;
-    });
-    const lastWeekSessions = workouts.filter(s => {
-      const age = (now - new Date(s.date).getTime()) / DAY;
-      return age > 7 && age <= 14;
-    });
-
-    const bestE1RM = (sessions) => {
-      let best = 0;
-      sessions.forEach(s => {
-        (s.exercises || []).forEach(ex => {
-          if (ex.name !== lift) return;
-          (ex.sets || []).filter(st => st.completed).forEach(st => {
-            const e = calcE1RM(parseFloat(st.weight) || 0, parseInt(st.reps) || 0);
-            if (e > best) best = e;
-          });
-        });
-      });
-      return best;
-    };
-
-    const thisE1RM = bestE1RM(thisWeekSessions);
-    const lastE1RM = bestE1RM(lastWeekSessions);
-
-    if (thisE1RM > 0 && lastE1RM > 0 && thisE1RM < lastE1RM * 0.97) {
-      declineCount++;
-    }
-  });
-
-  if (declineCount >= 2) {
-    delta += 75;
-    reason += ' Two lifts declined this week — adding 75 kcal buffer.';
-  }
-
-  // ── STEP 5: SAFETY CONSTRAINTS ─────────────────
-  let profile = {};
-  try { profile = JSON.parse(localStorage.getItem('ironfuel_profile') || '{}'); } catch(e) {}
-
-  delta = Math.max(-200, Math.min(200, delta));
-
-  const baseCalories = profile.calories || 2100;
-  const newCalories  = Math.max(1400, baseCalories + delta);
-  const protein      = profile.protein || Math.round((profile.weight || 190) * 1.0);
-
-  const currentCarbs = profile.carbs || Math.round((baseCalories * 0.35) / 4);
-  const currentFat   = profile.fat   || Math.round((baseCalories * 0.30) / 9);
-  const newCarbs     = Math.round(currentCarbs + (delta * 0.6) / 4);
-  const newFat       = Math.round(currentFat   + (delta * 0.4) / 9);
-
-  // ── STEP 6: SAVE SUGGESTION ────────────────────
-  const suggestion = {
-    calories:    newCalories,
-    protein:     protein,
-    carbs:       newCarbs,
-    fat:         newFat,
-    delta:       delta,
-    roc:         parseFloat(roc.toFixed(2)),
-    reason:      reason,
-    generatedAt: Date.now(),
-    status:      'pending',
-    week:        getCurrentWeekNum(),
-    // Store before/after for breakdown modal
-    prevCalories: baseCalories,
-    prevCarbs:    currentCarbs,
-    prevFat:      currentFat,
-    prevProtein:  protein,
-    declineCount: declineCount,
-    currentAvg:   parseFloat(currentAvg.toFixed(1)),
-    priorAvg:     parseFloat(priorAvg.toFixed(1))
-  };
-  localStorage.setItem('ironfuel_pending_suggestion', JSON.stringify(suggestion));
-
-  // ── STEP 7: SHOW ON HOME SCREEN ────────────────
-  renderMacroSuggestionCard();
-
-  return suggestion;
-}
-
-// ─────────────────────────────────────────────────
-function renderMacroSuggestionCard() {
-  const feed = document.getElementById('home-agent-feed');
-  if (!feed) return;
-
-  // Remove any previous engine card
-  const old = document.getElementById('macro-engine-card');
-  if (old) old.remove();
-
-  let suggestion = null;
-  try { suggestion = JSON.parse(localStorage.getItem('ironfuel_pending_suggestion') || 'null'); } catch(e) {}
-
-  if (!suggestion || suggestion.status !== 'pending') return;
-
-  const { delta, reason, calories, week, roc } = suggestion;
-
-  // Delta display
-  let deltaLabel, deltaColor;
-  if (delta > 0) {
-    deltaLabel = '+' + delta + ' kcal';
-    deltaColor = 'var(--lime)';
-  } else if (delta < 0) {
-    deltaLabel = delta + ' kcal';
-    deltaColor = 'var(--orange)';
-  } else {
-    deltaLabel = 'Hold Targets';
-    deltaColor = 'var(--green)';
-  }
-
-  const card = document.createElement('div');
-  card.id = 'macro-engine-card';
-  card.className = 'feed-item';
-  card.style.cssText = 'border-color:rgba(212,255,63,0.25);background:linear-gradient(135deg,rgba(212,255,63,0.04),transparent);';
-  card.innerHTML = `
-    <div class="feed-header">
-      <div class="feed-agent-dot" style="background:var(--lime);box-shadow:0 0 8px rgba(212,255,63,0.5);"></div>
-      <span class="feed-agent-name" style="color:var(--lime)">Macro Engine</span>
-      <span class="feed-time">Week ${week}</span>
-    </div>
-    <div style="margin:10px 0 6px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:${deltaColor};line-height:1;letter-spacing:0.03em;">${deltaLabel}</div>
-      <div style="font-size:11px;color:var(--textSub);margin-top:3px;">→ ${calories.toLocaleString()} kcal/day · Rate of loss: ${roc.toFixed(1)}%/wk</div>
-    </div>
-    <div class="feed-text" style="margin-bottom:12px;">${reason}</div>
-    <div class="feed-actions">
-      <button class="feed-btn-primary" onclick="approveMacroSuggestion()">Apply Targets</button>
-      <button class="feed-btn-ghost" onclick="showMacroBreakdown()">See Breakdown</button>
-    </div>
-  `;
-
-  // Insert at top of feed
-  feed.insertBefore(card, feed.firstChild);
-}
-
-// ─────────────────────────────────────────────────
-function approveMacroSuggestion() {
-  let suggestion = null;
-  try { suggestion = JSON.parse(localStorage.getItem('ironfuel_pending_suggestion') || 'null'); } catch(e) {}
-  if (!suggestion) { showToast('⚠', 'No pending suggestion found'); return; }
-
-  let profile = {};
-  try { profile = JSON.parse(localStorage.getItem('ironfuel_profile') || '{}'); } catch(e) {}
-
-  profile.calories = suggestion.calories;
-  profile.protein  = suggestion.protein;
-  profile.carbs    = suggestion.carbs;
-  profile.fat      = suggestion.fat;
-  localStorage.setItem('ironfuel_profile', JSON.stringify(profile));
-
-  suggestion.status = 'approved';
-  localStorage.setItem('ironfuel_pending_suggestion', JSON.stringify(suggestion));
-
-  showToast('✓', 'Targets updated — Week ' + suggestion.week + ' locked in');
-
-  // Remove the card
-  const card = document.getElementById('macro-engine-card');
-  if (card) {
-    card.style.transition = 'opacity 0.4s, max-height 0.5s';
-    card.style.opacity = '0';
-    card.style.overflow = 'hidden';
-    card.style.maxHeight = card.offsetHeight + 'px';
-    setTimeout(() => { card.style.maxHeight = '0'; card.style.marginBottom = '0'; }, 400);
-    setTimeout(() => card.remove(), 900);
-  }
-
-  // Update all displays
-  syncProfileTargets();
-}
-
-// ─────────────────────────────────────────────────
-function showMacroBreakdown() {
-  let suggestion = null;
-  try { suggestion = JSON.parse(localStorage.getItem('ironfuel_pending_suggestion') || 'null'); } catch(e) {}
-  if (!suggestion) { showToast('⚠', 'No pending suggestion'); return; }
-
-  const existing = document.getElementById('macro-breakdown-modal');
-  if (existing) existing.remove();
-
-  const { prevCalories, calories, prevProtein, protein, prevCarbs, carbs, prevFat, fat,
-          delta, roc, currentAvg, priorAvg, declineCount, week } = suggestion;
-
-  const arrow = delta > 0 ? '↑' : delta < 0 ? '↓' : '→';
-  const arrowColor = delta > 0 ? 'var(--lime)' : delta < 0 ? 'var(--orange)' : 'var(--green)';
-
-  function row(label, before, after, unit, color) {
-    const changed = before !== after;
-    return `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
-        <span style="font-size:12px;color:var(--textSub);min-width:72px;">${label}</span>
-        <span style="font-size:13px;color:var(--textDim);font-family:'DM Mono',monospace;">${before}${unit}</span>
-        <span style="font-size:16px;color:${arrowColor};margin:0 6px;">${arrow}</span>
-        <span style="font-size:13px;font-weight:700;color:${changed ? color : 'var(--textSub)'};font-family:'DM Mono',monospace;">${after}${unit}</span>
-      </div>`;
-  }
-
-  const modal = document.createElement('div');
-  modal.id = 'macro-breakdown-modal';
-  modal.className = 'modal-overlay open';
-  modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
-  modal.innerHTML = `
-    <div class="modal-sheet">
-      <div class="modal-handle"></div>
-      <div class="modal-title">Week ${week} Breakdown</div>
-      <div class="modal-sub" style="margin-bottom:16px;">Macro Engine analysis</div>
-
-      <div style="background:var(--surface2);border-radius:14px;padding:14px 16px;margin-bottom:16px;">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--textDim);margin-bottom:10px;">Weight Data</div>
-        <div style="display:flex;justify-content:space-around;text-align:center;">
-          <div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--textSub);">${priorAvg}</div>
-            <div style="font-size:10px;color:var(--textDim);">Prior avg (lb)</div>
-          </div>
-          <div style="font-size:24px;color:var(--textDim);align-self:center;">→</div>
-          <div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--lime);">${currentAvg}</div>
-            <div style="font-size:10px;color:var(--textDim);">This week (lb)</div>
-          </div>
-          <div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:${roc >= 0.3 && roc <= 1.2 ? 'var(--green)' : 'var(--orange)'};">${roc.toFixed(1)}%</div>
-            <div style="font-size:10px;color:var(--textDim);">Rate of loss</div>
-          </div>
-        </div>
-      </div>
-
-      ${declineCount >= 2 ? `
-      <div style="background:var(--redSoft);border:1px solid rgba(255,63,63,0.2);border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--red);">
-        ⚠ ${declineCount} compound lifts declined this week (+75 kcal buffer added)
-      </div>` : ''}
-
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--textDim);margin-bottom:6px;">Target Changes</div>
-      <div style="margin-bottom:20px;">
-        ${row('Calories', prevCalories, calories, ' kcal', 'var(--lime)')}
-        ${row('Protein',  prevProtein,  protein,  'g',     'var(--green)')}
-        ${row('Carbs',    prevCarbs,    carbs,    'g',     'var(--blue)')}
-        ${row('Fat',      prevFat,      fat,      'g',     'var(--orange)')}
-      </div>
-
-      <button class="btn-primary" onclick="approveMacroSuggestion();document.getElementById('macro-breakdown-modal')?.remove();">Apply These Targets</button>
-      <button class="btn-ghost" style="width:100%;margin-top:10px;" onclick="document.getElementById('macro-breakdown-modal').remove()">Dismiss</button>
-    </div>
-  `;
-  document.getElementById('app').appendChild(modal);
-}
-
-// ─────────────────────────────────────────────────
-// TRIGGER: Run engine on home screen load
-// Register as a home screen hook
-window._screenHooks = window._screenHooks || {};
-window._screenHooks.home = window._screenHooks.home || [];
-window._screenHooks.home.push(function() {
-  // Small delay so screen is painted first
-  setTimeout(() => runMacroEngine(false), 600);
-});
-
-// ─────────────────────────────────────────────────
-// SEED DEMO DATA — populate weights + workouts if empty
-// so Macro Engine can run on first open
-// ─────────────────────────────────────────────────
-(function ensureDemoProfile() {
-  // If no profile exists AND onboarding is hidden (was dismissed without completing),
-  // create a sensible default so the app is never broken
-  const existing = (() => { try { return JSON.parse(localStorage.getItem('ironfuel_profile') || 'null'); } catch(e) { return null; } })();
-  if (!existing) {
-    const demo = {
-      name: 'Athlete',
-      email: '',
-      gender: 'm',
-      age: 28,
-      heightFt: 5, heightIn: 10,
-      weight: 191,
-      goalWeight: 175,
-      activityMult: 1.55,
-      goal: 'cut',
-      plan: 'free',
-      calories: 2100,
-      protein: 191,
-      carbs: 184,
-      fat: 70,
-      createdAt: new Date().toISOString()
-    };
-    // Only write if onboarding overlay is already hidden
-    const overlay = document.getElementById('onboarding-overlay');
-    if (!overlay || overlay.classList.contains('hidden')) {
-      localStorage.setItem('ironfuel_profile', JSON.stringify(demo));
-    }
-  }
-})();
-
-(function seedDemoDataIfEmpty() {
-  const existingWeights = (() => {
-    try { return JSON.parse(localStorage.getItem('ironfuel_weights') || '[]'); } catch(e) { return []; }
-  })();
-
-  if (existingWeights.length < 8) {
-    // Seed 14 days of realistic weight data (slight downward trend, natural variance)
-    const baseWeight = 191.4;
-    const now = Date.now();
-    const DAY = 86400000;
-    const seeded = [];
-    // 14 entries: two full weeks, ~0.7%/wk loss
-    const weeklyLoss = 0.007;
-    for (let i = 13; i >= 0; i--) {
-      const daysAgo = i;
-      const trend = baseWeight - (baseWeight * weeklyLoss * ((13 - i) / 7));
-      const noise = (Math.random() - 0.5) * 0.6; // ±0.3 lb variance
-      const w = Math.round((trend + noise) * 10) / 10;
-      seeded.push({
-        date: new Date(now - daysAgo * DAY).toISOString(),
-        weight: w
-      });
-    }
-    localStorage.setItem('ironfuel_weights', JSON.stringify(seeded));
-  }
-
-  // Seed demo workouts if empty
-  const existingWorkouts = (() => {
-    try { return JSON.parse(localStorage.getItem('ironfuel_workouts') || '[]'); } catch(e) { return []; }
-  })();
-
-  if (existingWorkouts.length < 4) {
-    const now = Date.now();
-    const DAY = 86400000;
-    const demoWorkouts = [
-      {
-        name: 'Push Day A', date: new Date(now - 12 * DAY).toISOString(),
-        exercises: [
-          { name: 'Bench Press', sets: [
-            { weight: 200, reps: 5, completed: true }, { weight: 200, reps: 5, completed: true }, { weight: 200, reps: 4, completed: true }
-          ]},
-          { name: 'Overhead Press', sets: [
-            { weight: 140, reps: 5, completed: true }, { weight: 140, reps: 5, completed: true }
-          ]}
-        ]
-      },
-      {
-        name: 'Push Day B', date: new Date(now - 5 * DAY).toISOString(),
-        exercises: [
-          { name: 'Bench Press', sets: [
-            { weight: 205, reps: 5, completed: true }, { weight: 205, reps: 5, completed: true }, { weight: 205, reps: 5, completed: true }
-          ]},
-          { name: 'Overhead Press', sets: [
-            { weight: 145, reps: 5, completed: true }, { weight: 145, reps: 4, completed: true }
-          ]}
-        ]
-      },
-      {
-        name: 'Leg Day', date: new Date(now - 10 * DAY).toISOString(),
-        exercises: [
-          { name: 'Squat', sets: [
-            { weight: 275, reps: 5, completed: true }, { weight: 275, reps: 5, completed: true }, { weight: 275, reps: 5, completed: true }
-          ]},
-          { name: 'Romanian Deadlift', sets: [
-            { weight: 195, reps: 8, completed: true }, { weight: 195, reps: 8, completed: true }
-          ]}
-        ]
-      },
-      {
-        name: 'Pull Day', date: new Date(now - 3 * DAY).toISOString(),
-        exercises: [
-          { name: 'Deadlift', sets: [
-            { weight: 355, reps: 3, completed: true }, { weight: 365, reps: 3, completed: true }
-          ]},
-          { name: 'Barbell Row', sets: [
-            { weight: 185, reps: 6, completed: true }, { weight: 185, reps: 6, completed: true }
-          ]}
-        ]
-      }
-    ];
-    localStorage.setItem('ironfuel_workouts', JSON.stringify(demoWorkouts));
-  }
-})();
-
-// Also run on very first page load (home is default screen)
-setTimeout(() => runMacroEngine(false), 1200);
 
 // ═══════════════════════════════════════════════
 // INIT DISPLAY
