@@ -147,7 +147,8 @@ body {
   flex-direction: column;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  padding-bottom: 90px;
+  padding-bottom: 110px;
+  padding-top: 12px;
 }
 .screen::-webkit-scrollbar { display: none; }
 .screen.active { display: flex; }
@@ -330,13 +331,12 @@ body {
    SCREEN 1: HOME / DASHBOARD
 ═══════════════════════════════════════════ */
 #screen-home .hero-banner {
-  margin: 0 20px 16px;
+  margin: 4px 20px 16px;
   background: linear-gradient(135deg, #111118 0%, #0d0d14 100%);
   border: 1px solid var(--border);
   border-radius: 24px;
   padding: 20px;
   position: relative;
-  overflow: hidden;
 }
 .hero-banner::before {
   content: '';
@@ -560,6 +560,8 @@ body {
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* Lift summary row */
@@ -601,7 +603,7 @@ body {
   display: flex;
   overflow-x: auto;
   gap: 10px;
-  padding: 0 20px 4px;
+  padding: 0 20px 8px;
   scrollbar-width: none;
 }
 .macro-tape::-webkit-scrollbar { display: none; }
@@ -971,7 +973,7 @@ body {
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding: 0 20px 4px;
+  padding: 0 20px 12px;
   scrollbar-width: none;
 }
 .recipe-filters::-webkit-scrollbar { display: none; }
@@ -1007,7 +1009,7 @@ body {
 }
 .recipe-emoji-big {
   font-size: 40px;
-  padding: 20px 20px 8px;
+  padding: 16px 20px 6px;
 }
 .recipe-card-body { padding: 0 20px 16px; }
 .recipe-title-full {
@@ -1155,7 +1157,7 @@ body {
   font-size: 14px;
   line-height: 1.6;
   color: var(--text);
-  margin-bottom: 12px;
+  margin-bottom: 0;
 }
 .cm-text em { color: var(--lime); font-style: normal; font-weight: 600; }
 
@@ -1192,8 +1194,10 @@ body {
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding: 0 20px 4px;
+  padding: 0 20px 8px;
   scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(to right, black 80%, transparent 100%);
+  mask-image: linear-gradient(to right, black 80%, transparent 100%);
 }
 .context-chips::-webkit-scrollbar { display: none; }
 .ctx-chip {
@@ -1354,7 +1358,11 @@ svg.main-chart {
   padding: 12px 20px 40px;
   border-top: 1px solid var(--borderHi);
   animation: slideUp 0.3s cubic-bezier(0.16,1,0.3,1);
+  max-height: 92%;
+  overflow-y: auto;
+  scrollbar-width: none;
 }
+.modal-sheet::-webkit-scrollbar { display: none; }
 @keyframes slideUp {
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
@@ -1709,6 +1717,33 @@ input.set-rpe-input { color: var(--textSub); }
   align-items: center;
   gap: 20px;
   padding: 4px 20px 12px;
+  margin-top: 4px;
+}
+.macro-donut-legend {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.macro-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.macro-legend-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.macro-legend-name {
+  font-size: 12px;
+  color: var(--textSub);
+  flex: 1;
+}
+.macro-legend-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--text);
 }
 .macro-donut-canvas-wrap {
   position: relative;
@@ -1843,6 +1878,8 @@ input.set-rpe-input { color: var(--textSub); }
   padding: 0 20px 12px;
   overflow-x: auto;
   scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+  mask-image: linear-gradient(to right, black 85%, transparent 100%);
 }
 .plan-selector-row::-webkit-scrollbar { display: none; }
 .plan-chip {
@@ -2344,7 +2381,9 @@ input.set-rpe-input { color: var(--textSub); }
             <div class="hero-greeting">Good morning,</div>
             <div class="hero-name" style="margin-bottom:0;">MARCUS K.</div>
           </div>
-          <div onclick="openSettings()" style="width:38px;height:38px;background:rgba(255,255,255,0.07);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;border:1px solid rgba(255,255,255,0.1);flex-shrink:0;margin-top:2px;" title="Profile & Settings">👤</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div onclick="openSettings()" style="width:36px;height:36px;background:rgba(255,255,255,0.06);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;border:1px solid rgba(255,255,255,0.08);flex-shrink:0;" title="Profile & Settings">👤</div>
+          </div>
         </div>
         <div class="hero-stats">
           <div class="hero-stat">
@@ -2364,7 +2403,7 @@ input.set-rpe-input { color: var(--textSub); }
 
       <!-- Week streak -->
       <div class="screen-pad">
-        <div class="section-label">This Week</div>
+        <div class="section-label" style="margin-top:6px;">This Week</div>
       </div>
       <div style="padding: 0 20px 16px; display:flex; gap:6px; align-items:center;">
         <div class="week-dot wd-done">M</div>
@@ -2403,7 +2442,7 @@ input.set-rpe-input { color: var(--textSub); }
             <div class="md-val mono">198<span style="color:var(--textDim)">/210g</span></div>
           </div>
           <div style="padding: 2px 0;">
-            <div class="md-bar-wrap"><div class="md-bar" style="width:94%;background:var(--green)"></div></div>
+            <div class="md-bar-wrap"><div class="md-bar" style="width:0%;background:var(--green)"></div></div>
           </div>
           <div class="macro-detail-row" style="margin-top:8px;">
             <div class="md-label"><div class="md-dot" style="background:var(--lime)"></div> Carbs</div>
@@ -2433,7 +2472,7 @@ input.set-rpe-input { color: var(--textSub); }
       </div>
 
       <!-- Water Tracker -->
-      <div class="section-label">Hydration</div>
+      <div class="section-label" style="margin-top:6px;">Hydration</div>
       <div class="card" style="margin: 0 20px 16px; padding: 14px 16px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
           <div style="display:flex;align-items:center;gap:8px;">
@@ -2444,9 +2483,9 @@ input.set-rpe-input { color: var(--textSub); }
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:6px;">
-            <button onclick="logWater(-1)" style="width:30px;height:30px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:16px;cursor:pointer;">−</button>
+            <button onclick="logWater(-1)" style="width:34px;height:34px;border-radius:8px;background:var(--surface2);border:1px solid var(--borderHi);color:var(--text);font-size:18px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;">−</button>
             <span id="water-cups-val" style="font-family:'Bebas Neue',cursive;font-size:28px;color:var(--blue);min-width:28px;text-align:center;">0</span>
-            <button onclick="logWater(1)" style="width:30px;height:30px;border-radius:8px;background:var(--blue);border:none;color:#000;font-size:16px;cursor:pointer;font-weight:700;">+</button>
+            <button onclick="logWater(1)" style="width:34px;height:34px;border-radius:8px;background:var(--blue);border:none;color:#000;font-size:18px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;">+</button>
           </div>
         </div>
         <div style="background:var(--surface2);border-radius:6px;overflow:hidden;height:5px;">
@@ -2533,36 +2572,39 @@ input.set-rpe-input { color: var(--textSub); }
           <div class="page-title">Nutrition</div>
           <div class="page-sub">Friday, Feb 21 · 2,100 kcal target</div>
         </div>
-        <div style="width:38px;height:38px;background:var(--limeSoft);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;" onclick="openModal()">+</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:36px;height:36px;background:rgba(255,255,255,0.06);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;border:1px solid rgba(255,255,255,0.08);" onclick="openSettings()">👤</div>
+          <div style="width:36px;height:36px;background:var(--limeSoft);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;" onclick="openFoodSearch()">+</div>
+        </div>
       </div>
 
       <!-- Calorie progress -->
       <div class="macro-tape">
         <div class="macro-tape-card">
-          <div class="mtc-val" style="color:var(--lime)">1,880</div>
+          <div class="mtc-val" id="tape-kcal" style="color:var(--lime)">0</div>
           <div class="mtc-label">Consumed</div>
-          <div class="mtc-sub">220 remaining</div>
+          <div class="mtc-sub" id="tape-kcal-sub">-- remaining</div>
         </div>
         <div class="macro-tape-card">
-          <div class="mtc-val" style="color:var(--green)">198g</div>
+          <div class="mtc-val" id="tape-protein" style="color:var(--green)">0g</div>
           <div class="mtc-label">Protein</div>
-          <div class="mtc-sub" id="protein-tape-sub">94% of target</div>
+          <div class="mtc-sub" id="protein-tape-sub">0% of target</div>
         </div>
         <div class="macro-tape-card">
-          <div class="mtc-val" style="color:var(--lime)">180g</div>
+          <div class="mtc-val" id="tape-carbs" style="color:var(--lime)">0g</div>
           <div class="mtc-label">Carbs</div>
-          <div class="mtc-sub">86% of target</div>
+          <div class="mtc-sub" id="tape-carbs-sub">0% of target</div>
         </div>
         <div class="macro-tape-card">
-          <div class="mtc-val" style="color:var(--orange)">52g</div>
+          <div class="mtc-val" id="tape-fat" style="color:var(--orange)">0g</div>
           <div class="mtc-label">Fat</div>
-          <div class="mtc-sub">80% of target</div>
+          <div class="mtc-sub" id="tape-fat-sub">0% of target</div>
         </div>
       </div>
 
       <div class="section-gap-sm"></div>
-      <div class="calorie-bar-wrap">
-        <div class="calorie-bar-fill" id="calorie-bar-fill" style="width:89.5%"></div>
+      <div class="calorie-bar-wrap" style="margin-top:4px;">
+        <div class="calorie-bar-fill" id="calorie-bar-fill" style="width:0%"></div>
       </div>
 
       <!-- Macro Donut Chart -->
@@ -2605,7 +2647,7 @@ input.set-rpe-input { color: var(--textSub); }
           <div class="pp-value">94%</div>
         </div>
         <div class="pp-track">
-          <div class="pp-fill" id="pp-fill" style="width:94%"></div>
+          <div class="pp-fill" id="pp-fill" style="width:0%"></div>
         </div>
         <div class="pp-sub">198g logged · 12g to lock target</div>
       </div>
@@ -2773,9 +2815,10 @@ input.set-rpe-input { color: var(--textSub); }
           <div class="page-title">Lift Tracker</div>
           <div class="page-sub">Push Day · Fri Feb 21</div>
         </div>
-        <div style="display:flex;gap:8px;">
+        <div style="display:flex;gap:8px;align-items:center;">
           <div class="chip chip-lime" style="cursor:pointer;" onclick="timerSeconds=90;updateTimerDisplay();if(!timerRunning)toggleTimer();showToast('⏱','Rest timer: 90s')">⏱ Timer</div>
           <div class="chip chip-dim" style="cursor:pointer;" id="finish-session-chip" onclick="document.querySelector('#screen-lift .btn-primary').click()">✓ Finish</div>
+          <div style="width:30px;height:30px;background:rgba(255,255,255,0.06);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;border:1px solid rgba(255,255,255,0.08);flex-shrink:0;" onclick="openSettings()">👤</div>
         </div>
       </div>
 
@@ -2790,7 +2833,7 @@ input.set-rpe-input { color: var(--textSub); }
 
       <!-- Session overview -->
       <div class="session-card">
-        <div class="session-day" id="session-day-label">Push Day · Week 8</div>
+        <div class="session-day" id="session-day-label">Workout · Week 1</div>
         <div class="session-name" id="session-block-label">STRENGTH BLOCK</div>
         <div class="session-chips">
           <div class="chip chip-lime" id="session-progress-chip">3/5 Exercises</div>
@@ -2819,7 +2862,7 @@ input.set-rpe-input { color: var(--textSub); }
           <div class="chip chip-green" style="font-size:10px;">e1RM 239 lb ↑</div>
         </div>
         <div style="display:grid;grid-template-columns:32px 1fr 1fr 1fr 40px;gap:8px;padding:8px 16px 4px;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--textDim);">
-          <div>#</div><div style="text-align:center">WEIGHT</div><div style="text-align:center">REPS</div><div style="text-align:center">RPE</div><div></div>
+          <div style="text-align:center">#</div><div style="text-align:center">WEIGHT</div><div style="text-align:center">REPS</div><div style="text-align:center">RPE</div><div></div>
         </div>
         <div class="set-row">
           <div class="set-num">1</div>
@@ -2874,7 +2917,7 @@ input.set-rpe-input { color: var(--textSub); }
           <div class="chip chip-lime" style="font-size:10px;">PR Week 🏆</div>
         </div>
         <div style="display:grid;grid-template-columns:32px 1fr 1fr 1fr 40px;gap:8px;padding:8px 16px 4px;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--textDim);">
-          <div>#</div><div style="text-align:center">WEIGHT</div><div style="text-align:center">REPS</div><div style="text-align:center">RPE</div><div></div>
+          <div style="text-align:center">#</div><div style="text-align:center">WEIGHT</div><div style="text-align:center">REPS</div><div style="text-align:center">RPE</div><div></div>
         </div>
         <div class="set-row">
           <div class="set-num">1</div>
@@ -2909,12 +2952,12 @@ input.set-rpe-input { color: var(--textSub); }
           <div class="chart-bar" style="height:85%;background:var(--borderHi)"></div>
           <div class="chart-bar" style="height:92%;background:var(--lime)"></div>
         </div>
-        <div class="chart-axis-labels">
-          <span>Wk1</span><span>Wk2</span><span>Wk3</span><span>Wk4</span><span>Wk5</span><span>Wk6</span><span>Wk7</span><span>Wk8</span>
+        <div class="chart-axis-labels" id="volume-axis-labels">
+          <span>-7wk</span><span>-6wk</span><span>-5wk</span><span>-4wk</span><span>-3wk</span><span>-2wk</span><span>-1wk</span><span>Now</span>
         </div>
       </div>
 
-      <div style="padding: 0 20px 16px;">
+      <div style="padding: 0 20px 24px;">
         <button class="btn-primary" onclick="showToast('💪','Session saved! Great work.')">Finish Session</button>
       </div>
 
@@ -2929,7 +2972,10 @@ input.set-rpe-input { color: var(--textSub); }
           <div class="page-title">Recipe Vault</div>
           <div class="page-sub">94 original high-protein recipes</div>
         </div>
-        <div style="font-size:20px;cursor:pointer;padding:4px;" onclick="openRecipeSearch()">🔍</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:36px;height:36px;background:rgba(255,255,255,0.06);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;border:1px solid rgba(255,255,255,0.08);" onclick="openSettings()">👤</div>
+          <div style="font-size:20px;cursor:pointer;padding:4px;" onclick="openRecipeSearch()">🔍</div>
+        </div>
       </div>
 
       <!-- Filters -->
@@ -3010,6 +3056,9 @@ input.set-rpe-input { color: var(--textSub); }
             <span class="recipe-tag">Breakfast</span>
             <span class="recipe-tag">Low Carb</span>
           </div>
+          <div style="margin-top:12px;">
+            <button class="btn-ghost" style="width:100%;padding:10px 20px;border-radius:12px;" onclick="showToast('📖','Full recipe coming soon!')">View Recipe</button>
+          </div>
         </div>
       </div>
 
@@ -3041,6 +3090,9 @@ input.set-rpe-input { color: var(--textSub); }
             <span class="recipe-tag">Dinner</span>
             <span class="recipe-tag">Dairy-Free</span>
           </div>
+          <div style="margin-top:12px;">
+            <button class="btn-ghost" style="width:100%;padding:10px 20px;border-radius:12px;" onclick="showToast('📖','Full recipe coming soon!')">View Recipe</button>
+          </div>
         </div>
       </div>
 
@@ -3067,6 +3119,9 @@ input.set-rpe-input { color: var(--textSub); }
               <div class="rmr-key">fat</div>
             </div>
           </div>
+          <div style="margin-top:12px;">
+            <button class="btn-ghost" style="width:100%;padding:10px 20px;border-radius:12px;" onclick="showToast('📖','Full recipe coming soon!')">View Recipe</button>
+          </div>
         </div>
       </div>
 
@@ -3079,8 +3134,9 @@ input.set-rpe-input { color: var(--textSub); }
       <div class="page-header" style="align-items:flex-start;">
         <div>
           <div class="page-title">AI Coach</div>
-          <div class="page-sub">Powered by GPT-4o · Pro</div>
+          <div class="page-sub">Powered by Claude · Pro</div>
         </div>
+        <div onclick="openSettings()" style="width:36px;height:36px;background:rgba(175,63,255,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;border:1px solid rgba(175,63,255,0.2);flex-shrink:0;margin-top:4px;" title="Profile & Settings">👤</div>
       </div>
 
       <div class="coach-header">
@@ -3132,7 +3188,7 @@ input.set-rpe-input { color: var(--textSub); }
 
       <!-- Chat input -->
       <div class="section-label" style="margin-top:4px;">Ask Anything</div>
-      <div class="chat-input-bar">
+      <div class="chat-input-bar" style="margin-bottom:14px;">
         <input type="text" id="coach-chat-input" class="chat-input-text" placeholder="Ask about your cut, lifts, nutrition..." autocomplete="off" style="background:transparent;border:none;outline:none;width:100%;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);" />
         <button class="chat-send-btn" onclick="sendCoachMessage()" type="button">↑</button>
       </div>
@@ -3149,12 +3205,15 @@ input.set-rpe-input { color: var(--textSub); }
     <!-- ═══ SCREEN: PROGRESS ═══ -->
     <div class="screen" id="screen-progress">
 
-      <div class="page-header">
+      <div class="page-header" style="align-items:center;">
         <div>
           <div class="page-title">Progress</div>
           <div class="page-sub" id="progress-page-sub">Week 8 · Cut started Jan 3</div>
         </div>
-        <div class="chip chip-lime">On Track</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="chip chip-lime">On Track</div>
+          <div style="width:36px;height:36px;background:rgba(255,255,255,0.06);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;border:1px solid rgba(255,255,255,0.08);" onclick="openSettings()">👤</div>
+        </div>
       </div>
 
       <!-- Current weight hero -->
@@ -3293,7 +3352,7 @@ input.set-rpe-input { color: var(--textSub); }
           </div>
         </div>
         <div style="font-size:10px;color:var(--textDim);margin-top:10px;line-height:1.5;text-align:center;">Body fat estimated via weight + strength metrics. Tap <strong style="color:var(--textSub)">+ Weigh-In</strong> for most accurate tracking.</div>
-        <button style="width:100%;background:var(--surface3);border:none;border-radius:12px;padding:10px;font-size:12px;color:var(--textSub);cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:10px;" onclick="openWeighInModal()">📊 Log Today's Weight</button>
+        <button style="width:100%;background:var(--limeSoft);border:1px solid rgba(212,255,63,0.2);border-radius:12px;padding:11px;font-size:13px;color:var(--lime);font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:10px;" onclick="openWeighInModal()">📊 Log Today's Weight</button>
       </div>
 
       <!-- Weekly Check-In -->
@@ -3301,7 +3360,7 @@ input.set-rpe-input { color: var(--textSub); }
       <div style="margin: 0 20px 16px; background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:16px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
           <div style="font-size:13px;font-weight:600;color:var(--text);" id="week-review-label">Week 8 Review</div>
-          <div style="font-size:11px;color:var(--lime);font-weight:600;cursor:pointer;" onclick="openWeeklyCheckin()">Complete ›</div>
+          <div style="font-size:11px;color:var(--lime);font-weight:600;cursor:pointer;background:var(--limeSoft);padding:4px 10px;border-radius:8px;border:1px solid rgba(212,255,63,0.15);" onclick="openWeeklyCheckin()">Complete ›</div>
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;">
           <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;">
@@ -3334,7 +3393,7 @@ input.set-rpe-input { color: var(--textSub); }
     <!-- BOTTOM NAV -->
     <nav class="bottom-nav">
       <button class="nav-btn active" data-screen="home" onclick="switchScreen('home', this)">
-        <div class="nav-icon">⬛</div>
+        <div class="nav-icon">🏠</div>
         <div class="nav-label">Home</div>
       </button>
       <button class="nav-btn" data-screen="nutrition" onclick="switchScreen('nutrition', this)">
@@ -4259,12 +4318,22 @@ function switchScreen(screenId, btn) {
 
   currentScreen = screenId;
 
-  // Screen-specific bar animations
+  // Screen-specific bar animations — live data only, never hardcoded
   if (screenId === 'nutrition') {
     setTimeout(() => {
-      animateBar('calorie-bar-fill', '72%');
-      const _pp = typeof getProteinProgress === 'function' ? getProteinProgress() : null;
-      animateBar('pp-fill', (_pp ? _pp.pct : 94) + '%');
+      const profile = JSON.parse(localStorage.getItem('ironfuel_profile') || 'null');
+      const day = getNutritionDay();
+      const calTarget = profile?.calories || 2100;
+      const protTarget = profile?.protein || 210;
+      const calPct = Math.min(100, Math.round(day.kcal / calTarget * 100));
+      const protPct = Math.min(100, Math.round(day.protein / protTarget * 100));
+      animateBar('calorie-bar-fill', calPct + '%');
+      animateBar('pp-fill', protPct + '%');
+      // Also update the text label
+      const ppVal = document.querySelector('.pp-value');
+      if (ppVal) ppVal.textContent = protPct + '%';
+      const ppSub = document.querySelector('.pp-sub');
+      if (ppSub) ppSub.textContent = day.protein + 'g logged · ' + Math.max(0, protTarget - day.protein) + 'g to go';
     }, 300);
   }
 
@@ -4994,8 +5063,8 @@ loadSessionState();
 function getNutritionDay() {
   try {
     const key = 'ironfuel_nutrition_' + new Date().toDateString();
-    return JSON.parse(localStorage.getItem(key) || '{"kcal":1880,"protein":198,"carbs":180,"fat":52}');
-  } catch(e) { return {kcal:1880, protein:198, carbs:180, fat:52}; }
+    return JSON.parse(localStorage.getItem(key) || '{"kcal":0,"protein":0,"carbs":0,"fat":0}');
+  } catch(e) { return {kcal:0, protein:0, carbs:0, fat:0}; }
 }
 
 function saveNutritionDay(data) {
@@ -5010,39 +5079,65 @@ const _origAddFood = addFoodToLog;
 function addFoodToLog(food) {
   // Update localStorage totals
   const day = getNutritionDay();
-  day.kcal += food.kcal || 0;
-  day.protein += food.p || 0;
-  day.carbs += food.c || 0;
-  day.fat += food.f || 0;
+  day.kcal     += food.kcal || 0;
+  day.protein  += food.p   || 0;
+  day.carbs    += food.c   || 0;
+  day.fat      += food.f   || 0;
   saveNutritionDay(day);
 
-  // Update the macro tape cards live
-  const tape = document.querySelectorAll('.macro-tape-card');
-  if (tape.length >= 4) {
-    tape[0].querySelector('.mtc-val').textContent = day.kcal.toLocaleString();
-    const rem = Math.max(0, 2100 - day.kcal);
-    tape[0].querySelector('.mtc-sub').textContent = rem + ' remaining';
-    tape[1].querySelector('.mtc-val').textContent = day.protein + 'g';
-    tape[1].querySelector('.mtc-sub').textContent = Math.round(day.protein/210*100) + '% of target';
-    tape[2].querySelector('.mtc-val').textContent = day.carbs + 'g';
-    tape[3].querySelector('.mtc-val').textContent = day.fat + 'g';
-  }
+  // Read targets from profile (fall back to sensible defaults)
+  const prof       = JSON.parse(localStorage.getItem('ironfuel_profile') || '{}');
+  const kcalTarget = prof.calories  || 2100;
+  const protTarget = prof.protein   || Math.round(kcalTarget * 0.30 / 4);
+  const carbTarget = prof.carbs     || Math.round(kcalTarget * 0.40 / 4);
+  const fatTarget  = prof.fat       || Math.round(kcalTarget * 0.30 / 9);
+
+  // Update macro tape cards via IDs
+  const tKcal = document.getElementById('tape-kcal');
+  if (tKcal) tKcal.textContent = day.kcal.toLocaleString();
+  const tKcalSub = document.getElementById('tape-kcal-sub');
+  if (tKcalSub) tKcalSub.textContent = Math.max(0, kcalTarget - day.kcal) + ' remaining';
+
+  const tProtein = document.getElementById('tape-protein');
+  if (tProtein) tProtein.textContent = day.protein + 'g';
+  const tProteinSub = document.getElementById('protein-tape-sub');
+  if (tProteinSub) tProteinSub.textContent = Math.round(day.protein / protTarget * 100) + '% of target';
+
+  const tCarbs = document.getElementById('tape-carbs');
+  if (tCarbs) tCarbs.textContent = day.carbs + 'g';
+  const tCarbsSub = document.getElementById('tape-carbs-sub');
+  if (tCarbsSub) tCarbsSub.textContent = Math.round(day.carbs / carbTarget * 100) + '% of target';
+
+  const tFat = document.getElementById('tape-fat');
+  if (tFat) tFat.textContent = day.fat + 'g';
+  const tFatSub = document.getElementById('tape-fat-sub');
+  if (tFatSub) tFatSub.textContent = Math.round(day.fat / fatTarget * 100) + '% of target';
 
   // Update calorie bar
-  const pct = Math.min(100, Math.round(day.kcal / 2100 * 100));
+  const kcalPct = Math.min(100, Math.round(day.kcal / kcalTarget * 100));
   const bar = document.getElementById('calorie-bar-fill');
-  if (bar) bar.style.width = pct + '%';
+  if (bar) bar.style.width = kcalPct + '%';
 
-  // Update protein fill
-  const protPct = Math.min(100, Math.round(day.protein / 210 * 100));
+  // Update protein fill bar + label
+  const protPct = Math.min(100, Math.round(day.protein / protTarget * 100));
   const pp = document.getElementById('pp-fill');
   if (pp) pp.style.width = protPct + '%';
   const ppVal = document.querySelector('.pp-value');
   if (ppVal) ppVal.textContent = protPct + '%';
   const ppSub = document.querySelector('.pp-sub');
-  if (ppSub) ppSub.textContent = day.protein + 'g logged · ' + Math.max(0, 210 - day.protein) + 'g to lock target';
+  if (ppSub) ppSub.textContent = day.protein + 'g logged · ' + Math.max(0, protTarget - day.protein) + 'g to lock target';
 
-  // Call original (which shows toast + appends food entry row)
+  // Update home ring if visible
+  const homeRing = document.getElementById('home-calorie-ring');
+  if (homeRing && window.homeRingChart) {
+    const remaining = Math.max(0, kcalTarget - day.kcal);
+    window.homeRingChart.data.datasets[0].data = [day.kcal, remaining];
+    window.homeRingChart.update('none');
+    const ringPct = document.getElementById('home-ring-pct');
+    if (ringPct) ringPct.textContent = kcalPct + '%';
+  }
+
+  // Show toast + append food entry row
   showToast('✅', food.name + ' added · ' + food.kcal + ' kcal');
   closeFoodSearch();
 
@@ -6599,7 +6694,7 @@ function syncProfileTargets() {
     if (coachSub && profile.plan) {
       coachSub.textContent = profile.plan === 'free'
         ? 'Free Plan · Limited Queries'
-        : 'Pro Plan · Unlimited · Powered by GPT-4o';
+        : 'Pro Plan · Unlimited · Powered by Claude';
     }
   } catch(e) {}
 }
@@ -6618,6 +6713,16 @@ window._screenHooks.lift.push(function() {
     window._liftSessionStart = Date.now();
     startElapsedTimer();
   }
+  // Update session day label from profile (live week + active plan name)
+  try {
+    const profile = JSON.parse(localStorage.getItem('ironfuel_profile') || 'null');
+    const label = document.getElementById('session-day-label');
+    if (label && profile?.createdAt) {
+      const weekNum = Math.max(1, Math.floor((Date.now() - new Date(profile.createdAt)) / 604800000) + 1);
+      const plan = localStorage.getItem('ironfuel_active_plan') || 'Workout';
+      label.textContent = plan + ' · Week ' + weekNum;
+    }
+  } catch(e) {}
 });
 
 function startElapsedTimer() {
@@ -6748,20 +6853,20 @@ window._screenHooks = window._screenHooks || {};
 window._screenHooks.nutrition = window._screenHooks.nutrition || [];
 window._screenHooks.nutrition.push(function() {
   setTimeout(() => {
-    const vals = document.querySelectorAll('.macro-tape-card .mtc-val');
-    const protein  = parseInt((vals[1]?.textContent || '198').replace(/[^\d]/g,'')) || 198;
-    const carbs    = parseInt((vals[2]?.textContent || '180').replace(/[^\d]/g,'')) || 180;
-    const fat      = parseInt((vals[3]?.textContent || '52').replace(/[^\d]/g,'')) || 52;
-    const consumed = parseInt((vals[0]?.textContent || '1880').replace(/[^\d,]/g,'').replace(',','')) || 1880;
-    const profile  = JSON.parse(localStorage.getItem('ironfuel_profile') || '{}');
-    const target   = profile.calories || 2100;
-    initMacroDonut(protein, carbs, fat, consumed, target);
+    const day     = getNutritionDay();
+    const profile = JSON.parse(localStorage.getItem('ironfuel_profile') || '{}');
+    const target  = profile.calories || 2100;
+    initMacroDonut(day.protein, day.carbs, day.fat, day.kcal, target);
   }, 200);
 });
 
 // Init donut if already on nutrition screen
 if (document.querySelector('#screen-nutrition.active')) {
-  setTimeout(() => initMacroDonut(198, 180, 52, 1880, 2100), 500);
+  setTimeout(() => {
+    const day     = getNutritionDay();
+    const profile = JSON.parse(localStorage.getItem('ironfuel_profile') || '{}');
+    initMacroDonut(day.protein, day.carbs, day.fat, day.kcal, profile.calories || 2100);
+  }, 500);
 }
 
 // ═══════════════════════════════════════════════
@@ -7904,6 +8009,23 @@ function updateWaterDisplay() {
 window._screenHooks.home = window._screenHooks.home || [];
 window._screenHooks.home.push(updateWaterDisplay);
 updateWaterDisplay();
+
+// Sync hero name + settings display from profile on every home visit
+window._screenHooks.home.push(function() {
+  try {
+    const profile = JSON.parse(localStorage.getItem('ironfuel_profile') || 'null');
+    if (!profile) return;
+    const heroName = document.querySelector('.hero-name');
+    const firstName = profile.name.split(' ')[0].toUpperCase();
+    const lastInitial = profile.name.split(' ')[1]?.[0]?.toUpperCase() || '';
+    if (heroName) heroName.textContent = firstName + (lastInitial ? ' ' + lastInitial + '.' : '');
+    // Also sync settings modal name
+    const settingsName = document.getElementById('settings-display-name');
+    if (settingsName) settingsName.textContent = profile.name.toUpperCase();
+    const settingsEmail = document.getElementById('settings-display-email');
+    if (settingsEmail && profile.email) settingsEmail.textContent = profile.email;
+  } catch(e) {}
+});
 
 // ═══════════════════════════════════════════════
 // v12 — COACH: Predict goal date on demand
