@@ -2348,15 +2348,15 @@ input.set-rpe-input { color: var(--textSub); }
         </div>
         <div class="hero-stats">
           <div class="hero-stat">
-            <div class="hero-stat-val lime">94<span style="font-size:16px">%</span></div>
+            <div class="hero-stat-val lime" id="hero-srs-val">94<span style="font-size:16px">%</span></div>
             <div class="hero-stat-key">Strength</div>
           </div>
           <div class="hero-stat">
-            <div class="hero-stat-val green">91<span style="font-size:16px">%</span></div>
+            <div class="hero-stat-val green" id="hero-protein-val">91<span style="font-size:16px">%</span></div>
             <div class="hero-stat-key">Protein</div>
           </div>
           <div class="hero-stat">
-            <div class="hero-stat-val blue">0.8<span style="font-size:16px">%</span></div>
+            <div class="hero-stat-val blue" id="hero-wkloss-val">0.8<span style="font-size:16px">%</span></div>
             <div class="hero-stat-key">Wk Loss</div>
           </div>
         </div>
@@ -2444,7 +2444,7 @@ input.set-rpe-input { color: var(--textSub); }
             <span class="feed-agent-name" style="color:var(--blue)">Strength Sentinel</span>
             <span class="feed-time">8:47</span>
           </div>
-          <div class="feed-text">🏆 New deadlift PR — <strong>365 × 3</strong>, est 1RM <strong>401 lb</strong>. All compounds holding. Retention score updated to 94%.</div>
+          <div class="feed-text">🏆 New deadlift PR — <strong>365 × 3</strong>, est 1RM <strong>401 lb</strong>. All compounds holding. Retention score updated to <span id="feed-srs-val">94%</span>.</div>
         </div>
 
         <div class="feed-item">
@@ -2524,7 +2524,7 @@ input.set-rpe-input { color: var(--textSub); }
         <div class="macro-tape-card">
           <div class="mtc-val" style="color:var(--green)">198g</div>
           <div class="mtc-label">Protein</div>
-          <div class="mtc-sub">94% of target</div>
+          <div class="mtc-sub" id="protein-tape-sub">94% of target</div>
         </div>
         <div class="macro-tape-card">
           <div class="mtc-val" style="color:var(--lime)">180g</div>
@@ -3066,7 +3066,7 @@ input.set-rpe-input { color: var(--textSub); }
           <div class="coach-ai-dot"></div>
           Performance Assistant
         </div>
-        <div class="coach-title">WEEK 8 BRIEF</div>
+        <div class="coach-title" id="coach-week-brief">WEEK 8 BRIEF</div>
         <div class="coach-brief">
           <strong>Strongest week of your cut.</strong> You lost 1.4 lb but hit a deadlift PR. The deficit is working without costing muscle. Bench stalled — not alarming yet, but flag it if it happens again next week. Stay the course.
         </div>
@@ -3088,7 +3088,7 @@ input.set-rpe-input { color: var(--textSub); }
       <!-- Messages -->
       <div class="coach-message cm-positive">
         <div class="cm-type">✓ Strength Retention</div>
-        <div class="cm-text">Your Strength Retention Score is <em>94%</em> — top 8% of users at week 8 of a cut. The deadlift PR at <em>365×3</em> signals your nervous system is adapting well to the deficit. This is exactly what we're optimizing for.</div>
+        <div class="cm-text">Your Strength Retention Score is <em id="coach-srs-val">94%</em> — top 8% of users at <span id="coach-week-ref">week 8</span> of a cut. The deadlift PR at <em>365×3</em> signals your nervous system is adapting well to the deficit. This is exactly what we're optimizing for.</div>
       </div>
 
       <div class="coach-message cm-suggestion">
@@ -3130,7 +3130,7 @@ input.set-rpe-input { color: var(--textSub); }
       <div class="page-header">
         <div>
           <div class="page-title">Progress</div>
-          <div class="page-sub">Week 8 · Cut started Jan 3</div>
+          <div class="page-sub" id="progress-page-sub">Week 8 · Cut started Jan 3</div>
         </div>
         <div class="chip chip-lime">On Track</div>
       </div>
@@ -3179,7 +3179,7 @@ input.set-rpe-input { color: var(--textSub); }
       <div class="score-cards">
         <div class="score-card" style="border-color:rgba(63,255,143,0.2)">
           <div class="sc-icon">💪</div>
-          <div class="sc-val" style="color:var(--green)">94%</div>
+          <div class="sc-val" id="sc-srs-val" style="color:var(--green)">94%</div>
           <div class="sc-label">Strength Retention</div>
           <div class="sc-delta" style="color:var(--green)">↑ +2% wk</div>
         </div>
@@ -3278,7 +3278,7 @@ input.set-rpe-input { color: var(--textSub); }
       <div class="section-label">Weekly Check-In</div>
       <div style="margin: 0 20px 16px; background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:16px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <div style="font-size:13px;font-weight:600;color:var(--text);">Week 8 Review</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);" id="week-review-label">Week 8 Review</div>
           <div style="font-size:11px;color:var(--lime);font-weight:600;cursor:pointer;" onclick="openWeeklyCheckin()">Complete ›</div>
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;">
@@ -3301,7 +3301,7 @@ input.set-rpe-input { color: var(--textSub); }
       <div style="margin: 0 20px 16px; background: linear-gradient(135deg, #0f0f18, #0d0d14); border: 1px solid rgba(212,255,63,0.15); border-radius: var(--r); padding: 16px; display:flex; align-items:center; gap:12px;" onclick="shareProgress()">
         <div style="flex:1">
           <div style="font-size:13px;font-weight:600;color:var(--text);">Share Your Progress</div>
-          <div style="font-size:12px;color:var(--textSub);margin-top:2px;">-12 lb · 94% strength retention</div>
+          <div style="font-size:12px;color:var(--textSub);margin-top:2px;" id="share-srs-text">-12 lb · 94% strength retention</div>
         </div>
         <div style="background:var(--lime);color:#000;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;white-space:nowrap;">Share ↗</div>
       </div>
@@ -4048,18 +4048,8 @@ function obComplete(isFree) {
 }
 
 function obApplyProfileToApp(profile) {
-  // Update hero name
-  const heroName = document.querySelector('.hero-name');
-  if (heroName) {
-    const parts = profile.name.split(' ');
-    const firstInitial = parts.length > 1 ? parts[0].toUpperCase() + ' ' + parts[1][0].toUpperCase() + '.' : profile.name.toUpperCase();
-    heroName.textContent = firstInitial;
-  }
-  // Update greeting
-  const h = new Date().getHours();
-  const greeting = h < 12 ? 'Good morning,' : h < 17 ? 'Good afternoon,' : 'Good evening,';
-  const greetEl = document.querySelector('.hero-greeting');
-  if (greetEl) greetEl.textContent = greeting;
+  // Apply all live values (hero name, week label, SRS, weight, protein)
+  if (typeof applyAllLiveValues === 'function') applyAllLiveValues();
 
   // Show welcome toast
   showToast('🎯', 'Welcome to IronFuel, ' + profile.name.split(' ')[0] + '!');
@@ -4251,8 +4241,16 @@ function switchScreen(screenId, btn) {
   if (screenId === 'nutrition') {
     setTimeout(() => {
       animateBar('calorie-bar-fill', '72%');
-      animateBar('pp-fill', '94%');
+      const _pp = typeof getProteinProgress === 'function' ? getProteinProgress() : null;
+      animateBar('pp-fill', (_pp ? _pp.pct : 94) + '%');
     }, 300);
+  }
+
+  // Home screen: refresh all live values
+  if (screenId === 'home') {
+    if (typeof applyAllLiveValues === 'function') applyAllLiveValues();
+    if (typeof updateHomeStats === 'function') updateHomeStats();
+    if (typeof updateStreakDisplay === 'function') updateStreakDisplay();
   }
 
   // Execute all registered screen hooks
@@ -4705,7 +4703,8 @@ window.addEventListener('load', () => {
   setTimeout(() => {
     if (currentScreen === 'nutrition') {
       animateBar('calorie-bar-fill', '72%');
-      animateBar('pp-fill', '94%');
+      const _ppLoad = typeof getProteinProgress === 'function' ? getProteinProgress() : null;
+      animateBar('pp-fill', (_ppLoad ? _ppLoad.pct : 94) + '%');
     }
   }, 400);
 });
@@ -4714,7 +4713,8 @@ window.addEventListener('load', () => {
 document.querySelector('[data-screen="nutrition"]').addEventListener('click', () => {
   setTimeout(() => {
     animateBar('calorie-bar-fill', '72%');
-    animateBar('pp-fill', '94%');
+    const _ppNav = typeof getProteinProgress === 'function' ? getProteinProgress() : null;
+    animateBar('pp-fill', (_ppNav ? _ppNav.pct : 94) + '%');
   }, 300);
 });
 
@@ -4724,7 +4724,8 @@ document.querySelector('[data-screen="nutrition"]').addEventListener('click', ()
 document.addEventListener('click', function(e) {
   if (e.target.textContent === 'Finish Session' && e.target.tagName === 'BUTTON') {
     pauseTimer();
-    showToast('💪', 'Session saved! Great work, Marcus.');
+    const _firstName = (typeof getProfileFirstName === 'function' ? getProfileFirstName() : null) || 'Athlete';
+    showToast('💪', 'Session saved! Great work, ' + _firstName + '.');
     setTimeout(() => switchScreen('progress'), 1200);
   }
 });
@@ -5086,6 +5087,8 @@ function saveWorkoutSession() {
     if (idx >= 0) allSessions[idx] = session;
     else allSessions.push(session);
     localStorage.setItem('ironfuel_workouts', JSON.stringify(allSessions.slice(-30))); // keep 30 days
+    // Recompute SRS after saving workout
+    if (typeof computeSRS === 'function') computeSRS();
     return session;
   } catch(e) { return null; }
 }
@@ -5118,14 +5121,16 @@ function updateProgressFromStorage() {
   const phVal = document.querySelector('.ph-val');
   if (phVal) phVal.textContent = last.weight.toFixed(1);
 
-  // Update delta
-  const startWeight = 201.4;
+  // Update delta — use profile start weight
+  const _prof = typeof getProfileData === 'function' ? getProfileData() : null;
+  const startWeight = _prof ? (_prof.weight || 201.4) : 201.4;
+  const goalWeight = _prof ? (_prof.goalWeight || 175) : 175;
   const lost = (startWeight - last.weight).toFixed(1);
   const phDelta = document.querySelector('.ph-delta');
   if (phDelta && lost > 0) phDelta.textContent = '↓ ' + lost + ' lb since start';
 
   // Update progress bar
-  const pct = Math.min(100, Math.max(0, Math.round((startWeight - last.weight) / (startWeight - 175) * 100)));
+  const pct = Math.min(100, Math.max(0, Math.round((startWeight - last.weight) / (startWeight - goalWeight) * 100)));
   const progressBar = document.querySelector('.progress-hero [style*="width:46%"]');
   if (progressBar) progressBar.style.width = pct + '%';
   const pctLabel = document.querySelector('.progress-hero [style*="46% of the way"]');
@@ -5399,7 +5404,7 @@ async function searchFoods(query) {
 // Placeholder auth state — replace with real Supabase auth when ready
 const APP_USER = {
   id: 'local-user',
-  name: 'Marcus K.',
+  name: (() => { try { const p = JSON.parse(localStorage.getItem('ironfuel_profile') || 'null'); return p ? (p.name || 'Athlete') : 'Athlete'; } catch(e) { return 'Athlete'; } })(),
   email: null,
   plan: localStorage.getItem('ironfuel_plan') || 'pro',
   authenticated: false
@@ -5418,14 +5423,20 @@ async function syncToCloud(table, data) {
 // ═══════════════════════════════════════════════
 async function shareProgress() {
   const weights = getWeightHistory();
-  const currentWeight = weights.length ? weights[weights.length-1].weight : 189.4;
-  const lost = (201.4 - currentWeight).toFixed(1);
+  const currentWeight = weights.length ? weights[weights.length-1].weight : (getLatestWeight() || 189.4);
+  const profile = getProfileData();
+  const startWt = profile ? (profile.weight || 201.4) : 201.4;
+  const lost = (startWt - currentWeight).toFixed(1);
+  const _weeks = getWeeksOnCut();
+  const weekStr = _weeks !== null ? 'Week ' + _weeks : 'Week --';
+  const _srs = computeSRS();
+  const srsStr = _srs !== null ? _srs.toFixed(1) + '%' : '--%';
 
   if (navigator.share) {
     try {
       await navigator.share({
         title: 'My IronFuel Progress',
-        text: `Week 8 Cut Update 💪\n-${lost} lb | 94% strength retention | ${currentWeight} lb\n#IronFuel #Fitness`,
+        text: `${weekStr} Cut Update 💪\n-${lost} lb | ${srsStr} strength retention | ${currentWeight} lb\n#IronFuel #Fitness`,
         url: window.location.href
       });
       showToast('📤', 'Progress shared!');
@@ -5434,7 +5445,7 @@ async function shareProgress() {
     }
   } else {
     // Fallback: copy to clipboard
-    const text = `IronFuel Week 8: -${lost}lb | 94% strength retained | ${currentWeight}lb`;
+    const text = `IronFuel ${weekStr}: -${lost}lb | ${srsStr} strength retained | ${currentWeight}lb`;
     navigator.clipboard?.writeText(text).then(() => showToast('📋', 'Copied to clipboard!')).catch(() => showToast('📤', 'Share: ' + text));
   }
 }
@@ -5455,7 +5466,12 @@ document.addEventListener('click', function(e) {
 // ═══════════════════════════════════════════════
 function updateMacroRing() {
   const day = getNutritionDay();
-  const targets = { kcal: 2100, protein: 210, carbs: 210, fat: 65 };
+  const _prof = typeof getProfileData === 'function' ? getProfileData() : null;
+  const _calTarget = _prof ? (_prof.calories || 2100) : 2100;
+  const _protTarget = _prof ? (_prof.protein || 210) : 210;
+  const _carbTarget = Math.round((_calTarget * 0.4) / 4) || 210;
+  const _fatTarget = Math.round((_calTarget * 0.25) / 9) || 65;
+  const targets = { kcal: _calTarget, protein: _protTarget, carbs: _carbTarget, fat: _fatTarget };
   const pct = Math.min(100, Math.round(day.kcal / targets.kcal * 100));
 
   // Update ring center text
@@ -5473,9 +5489,9 @@ function updateMacroRing() {
   // Update macro values text
   const vals = document.querySelectorAll('.macro-ring-card .md-val');
   if (vals.length >= 3) {
-    vals[0].innerHTML = day.protein + '<span style="color:var(--textDim)">/210g</span>';
-    vals[1].innerHTML = day.carbs + '<span style="color:var(--textDim)">/210g</span>';
-    vals[2].innerHTML = day.fat + '<span style="color:var(--textDim)">/65g</span>';
+    vals[0].innerHTML = day.protein + '<span style="color:var(--textDim)">/' + targets.protein + 'g</span>';
+    vals[1].innerHTML = day.carbs + '<span style="color:var(--textDim)">/' + targets.carbs + 'g</span>';
+    vals[2].innerHTML = day.fat + '<span style="color:var(--textDim)">/' + targets.fat + 'g</span>';
   }
 
   // Animate SVG ring protein arc (circumference = 182.2)
@@ -5514,11 +5530,17 @@ document.addEventListener('click', function(e) {
 // ═══════════════════════════════════════════════
 (function initBars() {
   const day = getNutritionDay();
-  const pct = Math.min(100, Math.round(day.kcal / 2100 * 100));
+  const _prof = typeof getProfileData === 'function' ? getProfileData() : null;
+  const _calTarget = _prof ? (_prof.calories || 2100) : 2100;
+  const _protTarget = _prof ? (_prof.protein || 210) : 210;
+  const pct = Math.min(100, Math.round(day.kcal / _calTarget * 100));
   const bar = document.getElementById('calorie-bar-fill');
   if (bar) bar.style.width = pct + '%';
   const pp = document.getElementById('pp-fill');
-  if (pp) pp.style.width = Math.min(100, Math.round(day.protein / 210 * 100)) + '%';
+  if (pp) pp.style.width = Math.min(100, Math.round(day.protein / _protTarget * 100)) + '%';
+  // Also update pp-value text
+  const ppVal = document.querySelector('.pp-value');
+  if (ppVal) ppVal.textContent = Math.min(100, Math.round(day.protein / _protTarget * 100)) + '%';
 })();
 
 // ═══════════════════════════════════════════════
@@ -5769,19 +5791,290 @@ if (postWoBtn && postWoBtn.textContent.includes('Post-Workout')) {
 }
 
 // ═══════════════════════════════════════════════
+// LIVE DATA HELPERS — Read computed values from localStorage
+// ═══════════════════════════════════════════════
+function getProfileData() {
+  try { return JSON.parse(localStorage.getItem('ironfuel_profile') || 'null'); } catch(e) { return null; }
+}
+
+function getProfileName() {
+  const p = getProfileData();
+  return p ? (p.name || null) : null;
+}
+
+function getProfileFirstName() {
+  const name = getProfileName();
+  return name ? name.split(' ')[0] : null;
+}
+
+function formatHeroName(name) {
+  if (!name) return '--';
+  const parts = name.split(' ');
+  return parts.length > 1
+    ? parts[0].toUpperCase() + ' ' + parts[1][0].toUpperCase() + '.'
+    : name.toUpperCase();
+}
+
+function getWeeksOnCut() {
+  const profile = getProfileData();
+  if (!profile || !profile.createdAt) return null;
+  const weeks = Math.floor((Date.now() - new Date(profile.createdAt)) / (7 * 24 * 60 * 60 * 1000));
+  return Math.max(0, weeks);
+}
+
+function formatCutStartDate() {
+  const profile = getProfileData();
+  if (!profile || !profile.createdAt) return null;
+  return new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function getLatestWeight() {
+  try {
+    const weights = JSON.parse(localStorage.getItem('ironfuel_weights') || '[]');
+    if (!weights.length) return null;
+    const last = weights[weights.length - 1];
+    return typeof last === 'object' ? (last.weight || last.value || null) : Number(last);
+  } catch(e) { return null; }
+}
+
+function computeSRS() {
+  try {
+    const workouts = JSON.parse(localStorage.getItem('ironfuel_workouts') || '[]');
+    if (!workouts.length) return null;
+    const profile = getProfileData();
+    const cutStart = profile && profile.createdAt ? new Date(profile.createdAt).getTime() : null;
+    if (!cutStart) return null;
+
+    const compounds = ["Bench Press", "Squat", "Deadlift", "Overhead Press"];
+    const now = Date.now();
+    const day14 = 14 * 24 * 60 * 60 * 1000;
+    const baselineEnd = cutStart + day14;
+    const currentStart = now - day14;
+
+    const ratios = [];
+    for (const lift of compounds) {
+      let baseline = 0;
+      let current = 0;
+
+      // Baseline: best e1RM in first 14 days of cut
+      const baselineWorkouts = workouts.filter(w => {
+        const t = new Date(w.date).getTime();
+        return t >= cutStart && t <= baselineEnd;
+      });
+      // Fallback: earliest recorded workouts for this lift
+      const fallbackWorkouts = baselineWorkouts.length > 0
+        ? baselineWorkouts
+        : workouts.slice(0, Math.min(5, workouts.length));
+
+      for (const w of fallbackWorkouts) {
+        for (const ex of (w.exercises || [])) {
+          if (ex.name !== lift) continue;
+          for (const s of (ex.sets || [])) {
+            const e = calcE1RM(s.weight, s.reps);
+            if (e && e > baseline) baseline = e;
+          }
+        }
+      }
+
+      // Current: best e1RM in last 14 days
+      const currentWorkouts = workouts.filter(w => {
+        const t = new Date(w.date).getTime();
+        return t >= currentStart;
+      });
+      for (const w of currentWorkouts) {
+        for (const ex of (w.exercises || [])) {
+          if (ex.name !== lift) continue;
+          for (const s of (ex.sets || [])) {
+            const e = calcE1RM(s.weight, s.reps);
+            if (e && e > current) current = e;
+          }
+        }
+      }
+
+      if (baseline > 0 && current > 0) {
+        ratios.push(current / baseline);
+      }
+    }
+
+    if (ratios.length === 0) return null;
+    const srs = Math.round((ratios.reduce((s, r) => s + r, 0) / ratios.length) * 1000) / 10;
+    localStorage.setItem('ironfuel_srs', srs.toString());
+    return srs;
+  } catch(e) { return null; }
+}
+
+function getProteinProgress() {
+  const profile = getProfileData();
+  const proteinTarget = profile ? (profile.protein || 0) : 0;
+  if (!proteinTarget) return null;
+
+  // Try ISO date key first, then toDateString key
+  const todayISO = new Date().toISOString().slice(0, 10);
+  const todayStr = new Date().toDateString();
+  let data = null;
+  try { data = JSON.parse(localStorage.getItem('ironfuel_nutrition_' + todayISO) || 'null'); } catch(e) {}
+  if (!data) {
+    try { data = JSON.parse(localStorage.getItem('ironfuel_nutrition_' + todayStr) || 'null'); } catch(e) {}
+  }
+
+  let proteinToday = 0;
+  if (data) {
+    if (typeof data.protein_g === 'number') proteinToday = data.protein_g;
+    else if (typeof data.protein === 'number') proteinToday = data.protein;
+    else if (Array.isArray(data)) {
+      proteinToday = data.reduce((s, e) => s + (e.protein_g || e.protein || 0), 0);
+    }
+  }
+
+  const pct = Math.min(100, Math.round((proteinToday / proteinTarget) * 100));
+  return { proteinToday, proteinTarget, pct };
+}
+
+// ═══════════════════════════════════════════════
+// APPLY ALL LIVE VALUES — Replace hardcoded data with localStorage reads
+// ═══════════════════════════════════════════════
+function applyAllLiveValues() {
+  const profile = getProfileData();
+
+  // 1. Hero name
+  if (profile && profile.name) {
+    const heroName = document.querySelector('.hero-name');
+    if (heroName) heroName.textContent = formatHeroName(profile.name);
+  }
+
+  // 2. Greeting
+  const h = new Date().getHours();
+  const greeting = h < 12 ? 'Good morning,' : h < 17 ? 'Good afternoon,' : 'Good evening,';
+  const greetEl = document.querySelector('.hero-greeting');
+  if (greetEl) greetEl.textContent = greeting;
+
+  // 3. Weeks on cut
+  const weeks = getWeeksOnCut();
+  const weekLabel = weeks !== null ? 'Week ' + weeks : 'Week --';
+  const cutStart = formatCutStartDate();
+
+  // Session day label — keep day part, replace week part
+  const sessionDay = document.getElementById('session-day-label');
+  if (sessionDay) {
+    const dayPart = sessionDay.textContent.split('\u00B7')[0] || sessionDay.textContent.split('·')[0] || 'Push Day ';
+    sessionDay.textContent = dayPart.trim() + ' \u00B7 ' + weekLabel;
+  }
+
+  // Coach title
+  const coachTitle = document.getElementById('coach-week-brief');
+  if (coachTitle) coachTitle.textContent = weekLabel.toUpperCase() + ' BRIEF';
+
+  // Coach week reference
+  const coachWeekRef = document.getElementById('coach-week-ref');
+  if (coachWeekRef) coachWeekRef.textContent = weekLabel.toLowerCase();
+
+  // Progress page sub
+  const progressSub = document.getElementById('progress-page-sub');
+  if (progressSub) {
+    progressSub.textContent = weekLabel + (cutStart ? ' \u00B7 Cut started ' + cutStart : '');
+  }
+
+  // Week review label
+  const weekReviewLabel = document.getElementById('week-review-label');
+  if (weekReviewLabel) weekReviewLabel.textContent = weekLabel + ' Review';
+
+  // 4. SRS
+  const srs = computeSRS();
+  const srsDisplay = srs !== null ? srs.toFixed(1) + '%' : '--%';
+  const srsInt = srs !== null ? Math.round(srs) : null;
+
+  // Hero SRS
+  const heroSrs = document.getElementById('hero-srs-val');
+  if (heroSrs) heroSrs.innerHTML = (srsInt !== null ? srsInt : '--') + '<span style="font-size:16px">%</span>';
+
+  // Score card SRS
+  const scSrs = document.getElementById('sc-srs-val');
+  if (scSrs) scSrs.textContent = srsDisplay;
+
+  // Coach SRS
+  const coachSrs = document.getElementById('coach-srs-val');
+  if (coachSrs) coachSrs.textContent = srsDisplay;
+
+  // Feed SRS
+  const feedSrs = document.getElementById('feed-srs-val');
+  if (feedSrs) feedSrs.textContent = srsDisplay;
+
+  // Share card
+  const shareSrs = document.getElementById('share-srs-text');
+  if (shareSrs) {
+    const latestWt = getLatestWeight();
+    const startWt = profile ? (profile.weight || 201.4) : 201.4;
+    const lost = latestWt !== null ? (startWt - latestWt).toFixed(1) : '--';
+    shareSrs.textContent = '-' + lost + ' lb \u00B7 ' + srsDisplay + ' strength retention';
+  }
+
+  // 5. Current weight on progress screen
+  const latestWeight = getLatestWeight();
+  const phVal = document.querySelector('.ph-val');
+  if (phVal) phVal.textContent = latestWeight !== null ? latestWeight.toFixed(1) : '--';
+
+  // 6. Protein progress
+  const pp = getProteinProgress();
+  if (pp) {
+    const ppFill = document.getElementById('pp-fill');
+    if (ppFill) ppFill.style.width = pp.pct + '%';
+    const ppValue = document.querySelector('.pp-value');
+    if (ppValue) ppValue.textContent = pp.pct + '%';
+    const ppSub = document.querySelector('.pp-sub');
+    if (ppSub) ppSub.textContent = pp.proteinToday + 'g logged \u00B7 ' + Math.max(0, pp.proteinTarget - pp.proteinToday) + 'g to lock target';
+
+    // Hero protein stat
+    const heroProt = document.getElementById('hero-protein-val');
+    if (heroProt) heroProt.innerHTML = pp.pct + '<span style="font-size:16px">%</span>';
+
+    // Protein tape card sub
+    const proteinTapeSub = document.getElementById('protein-tape-sub');
+    if (proteinTapeSub) proteinTapeSub.textContent = pp.pct + '% of target';
+  }
+}
+
+// ═══════════════════════════════════════════════
 // HOME SCREEN HERO — Update stats from live data
 // ═══════════════════════════════════════════════
 function updateHomeStats() {
+  const profile = getProfileData();
   const day = getNutritionDay();
-  const pStreak = getProteinStreak();
-  const sessions = JSON.parse(localStorage.getItem('ironfuel_workouts') || '[]');
 
-  // Update hero stats
-  const vals = document.querySelectorAll('.hero-stat-val');
-  if (vals.length >= 2) {
-    // Protein % of target
-    const protPct = Math.min(100, Math.round(day.protein / 210 * 100));
-    vals[1].innerHTML = protPct + '<span style="font-size:16px">%</span>';
+  // Protein % of target (use profile protein target or fallback 210)
+  const proteinTarget = profile ? (profile.protein || 210) : 210;
+  const protPct = Math.min(100, Math.round(day.protein / proteinTarget * 100));
+  const heroProt = document.getElementById('hero-protein-val');
+  if (heroProt) heroProt.innerHTML = protPct + '<span style="font-size:16px">%</span>';
+
+  // SRS on hero
+  const srs = computeSRS();
+  const heroSrs = document.getElementById('hero-srs-val');
+  if (heroSrs) {
+    const srsInt = srs !== null ? Math.round(srs) : null;
+    heroSrs.innerHTML = (srsInt !== null ? srsInt : '--') + '<span style="font-size:16px">%</span>';
+  }
+
+  // Current weight on hero — weekly loss %
+  const latestWeight = getLatestWeight();
+  const weights = (() => { try { return JSON.parse(localStorage.getItem('ironfuel_weights') || '[]'); } catch(e) { return []; } })();
+  if (weights.length >= 2 && latestWeight) {
+    const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const weekAgoEntry = weights.filter(w => new Date(w.date).getTime() <= oneWeekAgo).pop();
+    if (weekAgoEntry) {
+      const weekAgoWt = typeof weekAgoEntry === 'object' ? (weekAgoEntry.weight || weekAgoEntry.value) : Number(weekAgoEntry);
+      const wkLoss = ((weekAgoWt - latestWeight) / weekAgoWt * 100).toFixed(1);
+      const heroWk = document.getElementById('hero-wkloss-val');
+      if (heroWk) heroWk.innerHTML = wkLoss + '<span style="font-size:16px">%</span>';
+    }
+  }
+
+  // Also update protein bar
+  const pp = getProteinProgress();
+  if (pp) {
+    const ppFill = document.getElementById('pp-fill');
+    if (ppFill) ppFill.style.width = pp.pct + '%';
+    const ppValue = document.querySelector('.pp-value');
+    if (ppValue) ppValue.textContent = pp.pct + '%';
   }
 }
 updateHomeStats();
@@ -5980,7 +6273,8 @@ function selectWorkoutPlan(plan, el) {
   const planData = WORKOUT_PLANS[plan] || WORKOUT_PLANS['PPL'];
   const dayLabel = document.getElementById('session-day-label');
   const blockLabel = document.getElementById('session-block-label');
-  if (dayLabel) dayLabel.textContent = planData.days[0] + ' · Week 8';
+  const _wk = typeof getWeeksOnCut === 'function' ? getWeeksOnCut() : null;
+  if (dayLabel) dayLabel.textContent = planData.days[0] + ' \u00B7 Week ' + (_wk !== null ? _wk : '--');
   if (blockLabel) blockLabel.textContent = planData.desc.toUpperCase().slice(0, 20);
   showToast('💪', plan + ' selected — ' + planData.days.length + ' day split');
   localStorage.setItem('ironfuel_plan', plan);
@@ -6392,6 +6686,7 @@ function saveProfileSettings() {
     document.getElementById('settings-protein').textContent = protein;
 
     syncProfileTargets();
+    if (typeof applyAllLiveValues === 'function') applyAllLiveValues();
     showToast('✓', 'Profile saved!');
     setTimeout(() => closeSettings(), 800);
   } catch(e) {
@@ -6519,7 +6814,7 @@ function openWeeklyCheckin() {
     <div class="modal-sheet">
       <div class="modal-handle"></div>
       <div class="modal-title">Weekly Check-In</div>
-      <div class="modal-sub" style="margin-bottom:18px;">Week 8 — How did it go?</div>
+      <div class="modal-sub" style="margin-bottom:18px;">${(typeof getWeeksOnCut === 'function' && getWeeksOnCut() !== null) ? 'Week ' + getWeeksOnCut() : 'Week --'} — How did it go?</div>
 
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--textDim);margin-bottom:8px;">Average Sleep</div>
       <div style="display:flex;gap:8px;margin-bottom:14px;">
@@ -6555,7 +6850,8 @@ function openWeeklyCheckin() {
 
 function submitWeeklyCheckin(modal) {
   if (modal) modal.remove();
-  showToast('✓', 'Week 8 check-in logged — AI brief updating...');
+  const _ckWk = (typeof getWeeksOnCut === 'function' && getWeeksOnCut() !== null) ? 'Week ' + getWeeksOnCut() : 'Week --';
+  showToast('✓', _ckWk + ' check-in logged — AI brief updating...');
   setTimeout(() => showToast('🧠', 'AI Coach noted your check-in. Brief updated.'), 2500);
 }
 
@@ -6570,10 +6866,18 @@ window._screenHooks.progress.push(function() {
   if (_progressAnimated) return;
   _progressAnimated = true;
   setTimeout(() => {
+    // Animate weight counter with live data
     const phVal = document.querySelector('.ph-val');
-    if (phVal) animateCounter(phVal, 201.4, 189.4, '', 1200);
+    const _liveWt = typeof getLatestWeight === 'function' ? getLatestWeight() : null;
+    const _profile = typeof getProfileData === 'function' ? getProfileData() : null;
+    const _startWt = _profile ? (_profile.weight || 201.4) : 201.4;
+    const _targetWt = _liveWt !== null ? _liveWt : 189.4;
+    if (phVal) animateCounter(phVal, _startWt, _targetWt, '', 1200);
+
+    // Animate score cards with live SRS
+    const _liveSRS = typeof computeSRS === 'function' ? computeSRS() : null;
     const scVals = document.querySelectorAll('.sc-val');
-    const targets = [94, 91, 0.8, 87];
+    const targets = [_liveSRS !== null ? _liveSRS : 94, 91, 0.8, 87];
     const suffixes = ['%','%','%','%'];
     scVals.forEach((el, i) => {
       setTimeout(() => animateCounter(el, 0, targets[i], suffixes[i], 900), i * 120);
@@ -6649,18 +6953,8 @@ function updateBodyComposition() {
   try {
     const profile = JSON.parse(localStorage.getItem('ironfuel_profile') || 'null');
     if (!profile) return;
-    // Update hero name
-    const heroName = document.querySelector('.hero-name');
-    if (heroName && profile.name) {
-      const parts = profile.name.split(' ');
-      const display = parts.length > 1
-        ? parts[0].toUpperCase() + ' ' + parts[1][0].toUpperCase() + '.'
-        : profile.name.toUpperCase();
-      heroName.textContent = display;
-    }
-    // Update calorie target display if present
-    const calEl = document.querySelector('#screen-nutrition .calorie-bar ~ div, #screen-nutrition .cal-num');
-    // Update protein target if profile has it
+    // Apply all live values from localStorage (name, week, SRS, weight, protein)
+    if (typeof applyAllLiveValues === 'function') applyAllLiveValues();
   } catch(e) {}
 })();
 
