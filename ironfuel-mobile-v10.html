@@ -3801,6 +3801,98 @@ input.set-rpe-input { color: var(--textSub); }
 <script>
 'use strict';
 
+// ⚠️ DEVELOPMENT ONLY — move to backend proxy before public launch
+const ANTHROPIC_API_KEY = 'YOUR_KEY_HERE'; // user fills this in
+
+// ═══════════════════════════════════════════════
+// AI COACH — Build user context for Anthropic API
+// ═══════════════════════════════════════════════
+function getUserContext() {
+  const parts = [];
+
+  // --- Profile ---
+  let profile = null;
+  try { profile = JSON.parse(localStorage.getItem('ironfuel_profile')); } catch(e) {}
+  if (profile) {
+    parts.push(`Profile: ${profile.name || 'Unknown'}, current weight ${profile.weight ?? '?'}lb, goal ${profile.goalWeight ?? '?'}lb, daily targets ${profile.calories ?? '?'}cal / ${profile.protein ?? '?'}g protein.`);
+  } else {
+    parts.push('Profile: no data yet.');
+  }
+
+  // --- Last 7 days of weights ---
+  let weights = [];
+  try { weights = JSON.parse(localStorage.getItem('ironfuel_weights')) || []; } catch(e) {}
+  if (weights.length > 0) {
+    const recent = weights.slice(-7);
+    const avg = (recent.reduce((s, w) => s + (typeof w === 'object' ? (w.weight || w.value || 0) : Number(w)), 0) / recent.length).toFixed(1);
+    let direction = 'holding';
+    if (recent.length >= 2) {
+      const first = typeof recent[0] === 'object' ? (recent[0].weight || recent[0].value || 0) : Number(recent[0]);
+      const last  = typeof recent[recent.length-1] === 'object' ? (recent[recent.length-1].weight || recent[recent.length-1].value || 0) : Number(recent[recent.length-1]);
+      if (last < first - 0.3) direction = 'losing';
+      else if (last > first + 0.3) direction = 'gaining';
+    }
+    parts.push(`Weight (last ${recent.length} entries): 7-day avg ${avg}lb, trend ${direction}.`);
+  } else {
+    parts.push('Weight history: no data yet.');
+  }
+
+  // --- Last 3 workout sessions ---
+  let workouts = [];
+  try { workouts = JSON.parse(localStorage.getItem('ironfuel_workouts')) || []; } catch(e) {}
+  if (workouts.length > 0) {
+    const last3 = workouts.slice(-3);
+    const summaries = last3.map(w => {
+      const date = w.date || 'unknown date';
+      const exercises = (w.exercises || []).map(ex => {
+        const best = (ex.sets || []).reduce((b, s) => {
+          const vol = (s.weight || 0) * (s.reps || 0);
+          return vol > b.vol ? { vol, weight: s.weight, reps: s.reps } : b;
+        }, { vol: 0, weight: 0, reps: 0 });
+        return `${ex.name || 'exercise'} best ${best.weight}×${best.reps}`;
+      }).join(', ');
+      return `${date}: ${exercises || 'no exercises logged'}`;
+    });
+    parts.push('Recent workouts: ' + summaries.join(' | '));
+  } else {
+    parts.push('Workouts: no data yet.');
+  }
+
+  // --- Protein adherence this week ---
+  const proteinTarget = profile ? (profile.protein || 0) : 0;
+  let totalProtein = 0;
+  let daysWithData = 0;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const key = 'ironfuel_nutrition_' + d.toISOString().slice(0, 10);
+    try {
+      const day = JSON.parse(localStorage.getItem(key));
+      if (day && typeof day.protein_g === 'number') {
+        totalProtein += day.protein_g;
+        daysWithData++;
+      }
+    } catch(e) {}
+  }
+  if (daysWithData > 0 && proteinTarget > 0) {
+    const weeklyTarget = proteinTarget * 7;
+    const pct = Math.round((totalProtein / weeklyTarget) * 100);
+    parts.push(`Protein this week: ${totalProtein}g of ${weeklyTarget}g target (${pct}% adherence, ${daysWithData} days tracked).`);
+  } else {
+    parts.push('Protein adherence: no data yet.');
+  }
+
+  // --- Protein streak ---
+  const streak = localStorage.getItem('ironfuel_protein_streak');
+  if (streak !== null) {
+    parts.push(`Protein streak: ${streak} day(s).`);
+  } else {
+    parts.push('Protein streak: no data yet.');
+  }
+
+  return parts.join(' ');
+}
+
 // ═══════════════════════════════════════════════
 // ONBOARDING FLOW
 // ═══════════════════════════════════════════════
@@ -4527,17 +4619,7 @@ document.querySelectorAll('.period-btn').forEach(btn => {
 // ═══════════════════════════════════════════════
 // AI COACH CHAT
 // ═══════════════════════════════════════════════
-const AI_RESPONSES = [
-  { type: '🧠 Analysis', text: 'Based on your current metrics, you\'re in an optimal deficit. Your strength retention at <em>94%</em> is exceptional — keep protein above 185g and this trend holds.' },
-  { type: '💪 Training', text: 'Your bench stall is likely CNS fatigue, not a true strength issue. Try reducing bench volume by 1 set next session and focus on quality over quantity.' },
-  { type: '🥗 Nutrition', text: 'Protein timing looks good. For best muscle retention, aim to spread your <em>185g protein target</em> across 4+ meals. Your current logging shows solid adherence.' },
-  { type: '📉 Progress', text: 'At <em>0.8% weekly loss rate</em> you\'re in the sweet spot. Any faster risks muscle loss. Any slower and the cut extends unnecessarily. Stay the course.' },
-  { type: '😴 Recovery', text: 'Recovery optimization: prioritize <em>8+ hours sleep</em> on nights before heavy compound days. Sleep quality directly impacts next-day strength output by up to 12%.' },
-  { type: '⚡ Insight', text: 'Your deadlift PR during a cut is a strong signal. The nervous system adaptations are outpacing any minor muscle loss. This is elite-level body recomposition.' },
-];
-let aiResponseIndex = 0;
-
-function sendCoachMessage() {
+async function sendCoachMessage() {
   const input = document.getElementById('coach-chat-input');
   if (!input) return;
   const msg = input.value.trim();
@@ -4545,27 +4627,55 @@ function sendCoachMessage() {
   input.value = '';
   const container = document.getElementById('coach-chat-messages');
   if (!container) return;
-  // User message
+
+  // User message bubble
   const userDiv = document.createElement('div');
   userDiv.className = 'coach-message-user';
   userDiv.textContent = msg;
   container.appendChild(userDiv);
+
   // Typing indicator
   const typingDiv = document.createElement('div');
   typingDiv.className = 'coach-message-ai';
   typingDiv.innerHTML = '<div class="ai-typing"><span></span><span></span><span></span></div>';
   container.appendChild(typingDiv);
-  // Scroll to bottom
+
   const screen = document.getElementById('screen-coach');
   if (screen) setTimeout(() => { screen.scrollTop = screen.scrollHeight; }, 50);
-  // AI response after delay
-  setTimeout(() => {
-    const resp = AI_RESPONSES[aiResponseIndex % AI_RESPONSES.length];
-    aiResponseIndex++;
-    typingDiv.innerHTML = `<div class="cm-type">${resp.type}</div><div class="cm-text">${resp.text}</div>`;
-    typingDiv.className = 'coach-message-ai';
-    if (screen) screen.scrollTop = screen.scrollHeight;
-  }, 900 + Math.random() * 400);
+
+  // Call Anthropic API
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 200,
+        system: "You are IronFuel's AI Performance Coach. You specialize in strength-preserving fat loss. Be direct and specific — reference the user's actual numbers. Max 100 words. Never suggest auto-applying changes. Never invent data.",
+        messages: [{ role: 'user', content: getUserContext() + '\n\nUser asks: ' + msg }]
+      })
+    });
+
+    if (!res.ok) {
+      const errBody = await res.text();
+      throw new Error(`API ${res.status}: ${errBody}`);
+    }
+
+    const data = await res.json();
+    const reply = (data.content && data.content[0] && data.content[0].text) || 'No response from coach.';
+    typingDiv.innerHTML = `<div class="cm-text">${reply.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')}</div>`;
+  } catch (err) {
+    console.error('Coach API error:', err);
+    typingDiv.innerHTML = '<div class="cm-text" style="color:var(--red)">Coach unavailable — check connection</div>';
+  }
+
+  typingDiv.className = 'coach-message-ai';
+  if (screen) screen.scrollTop = screen.scrollHeight;
 }
 
 // Allow Enter key to send
@@ -6054,7 +6164,7 @@ document.addEventListener('input', function(e) {
 });
 
 // ═══════════════════════════════════════════════
-// COACH — Chip quick-send
+// COACH — Chip quick-send (uses real Anthropic API via sendCoachMessage)
 // ═══════════════════════════════════════════════
 function sendChip(message) {
   const input = document.getElementById('coach-chat-input');
