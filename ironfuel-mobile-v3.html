@@ -1,0 +1,3412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>IronFuel — Elite Mobile App</title>
+<!-- PWA Manifest (inline) -->
+<link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;IronFuel&quot;,&quot;short_name&quot;:&quot;IronFuel&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;%2308080a&quot;,&quot;theme_color&quot;:&quot;%23d4ff3f&quot;,&quot;start_url&quot;:&quot;.&quot;}">
+<meta name="theme-color" content="#d4ff3f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="IronFuel">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   DESIGN SYSTEM
+═══════════════════════════════════════════ */
+:root {
+  --bg:         #08080a;
+  --surface:    #101014;
+  --surface2:   #16161c;
+  --surface3:   #1e1e26;
+  --border:     #252530;
+  --borderHi:   #32323f;
+  --text:       #eeeef2;
+  --textSub:    #8888a0;
+  --textDim:    #44445a;
+  --lime:       #d4ff3f;
+  --limeD:      #a8cc2a;
+  --limeSoft:   rgba(212,255,63,0.08);
+  --red:        #ff3f3f;
+  --redSoft:    rgba(255,63,63,0.08);
+  --blue:       #3fbfff;
+  --blueSoft:   rgba(63,191,255,0.08);
+  --green:      #3fff8f;
+  --greenSoft:  rgba(63,255,143,0.08);
+  --orange:     #ff9f3f;
+  --orangeSoft: rgba(255,159,63,0.08);
+  --purple:     #af3fff;
+  --purpleSoft: rgba(175,63,255,0.08);
+  --r:          20px;
+  --rSm:        12px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+body {
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 20px 16px 40px;
+  font-family: 'DM Sans', sans-serif;
+  overflow-x: hidden;
+}
+
+/* ═══════════════════════════════════════════
+   PHONE SHELL
+═══════════════════════════════════════════ */
+.phone-shell {
+  width: 390px;
+  min-height: 844px;
+  background: var(--bg);
+  border-radius: 50px;
+  overflow: hidden;
+  position: relative;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.08),
+    0 40px 120px rgba(0,0,0,0.8),
+    0 0 80px rgba(212,255,63,0.04);
+  flex-shrink: 0;
+}
+
+/* Dynamic island */
+.dynamic-island {
+  position: absolute;
+  top: 14px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 34px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.di-camera {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #111;
+  border: 1px solid #1a1a1a;
+}
+.di-sensor {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #0a0a0a;
+}
+
+/* Status bar */
+.status-bar {
+  height: 59px;
+  padding: 16px 28px 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  position: relative;
+  z-index: 150;
+}
+.status-time {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+.status-icons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+.status-icons span {
+  font-size: 12px;
+  color: var(--text);
+}
+
+/* Screen system */
+.screen-container {
+  position: relative;
+  height: calc(844px - 59px);
+  overflow: hidden;
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: none;
+  flex-direction: column;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-bottom: 90px;
+}
+.screen::-webkit-scrollbar { display: none; }
+.screen.active { display: flex; }
+
+/* ═══════════════════════════════════════════
+   BOTTOM NAV
+═══════════════════════════════════════════ */
+.bottom-nav {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 82px;
+  background: rgba(8,8,10,0.95);
+  backdrop-filter: blur(24px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-around;
+  padding-top: 10px;
+  z-index: 100;
+}
+
+.nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  -webkit-user-select: none;
+  user-select: none;
+  border: none;
+  background: none;
+  min-width: 60px;
+}
+.nav-icon {
+  width: 26px; height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  transition: all 0.2s;
+  position: relative;
+}
+.nav-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--textDim);
+  letter-spacing: 0.02em;
+  transition: color 0.2s;
+}
+.nav-btn.active .nav-label { color: var(--lime); }
+.nav-btn.active .nav-icon { transform: translateY(-2px); }
+
+/* Nav indicator dot */
+.nav-btn.active::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: var(--lime);
+}
+
+/* ═══════════════════════════════════════════
+   SHARED COMPONENTS
+═══════════════════════════════════════════ */
+.screen-pad { padding: 0 20px; }
+
+.page-header {
+  padding: 8px 20px 20px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+.page-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 34px;
+  letter-spacing: 0.03em;
+  color: var(--text);
+  line-height: 1;
+}
+.page-sub {
+  font-size: 12px;
+  color: var(--textSub);
+  margin-top: 2px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.card-dark {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+}
+
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--textDim);
+  padding: 0 20px;
+  margin-bottom: 10px;
+}
+
+.row-gap { display: flex; flex-direction: column; gap: 10px; }
+.h-gap { display: flex; gap: 10px; }
+
+.lime-text { color: var(--lime); }
+.red-text { color: var(--red); }
+.green-text { color: var(--green); }
+.blue-text { color: var(--blue); }
+.orange-text { color: var(--orange); }
+.sub-text { color: var(--textSub); }
+.dim-text { color: var(--textDim); }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.chip-lime { background: var(--limeSoft); color: var(--lime); }
+.chip-green { background: var(--greenSoft); color: var(--green); }
+.chip-red { background: var(--redSoft); color: var(--red); }
+.chip-blue { background: var(--blueSoft); color: var(--blue); }
+.chip-orange { background: var(--orangeSoft); color: var(--orange); }
+.chip-dim { background: var(--surface3); color: var(--textSub); }
+
+.mono { font-family: 'DM Mono', monospace; }
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0 20px;
+}
+
+/* Pill button */
+.btn-primary {
+  background: var(--lime);
+  color: #000;
+  border: none;
+  border-radius: 100px;
+  padding: 14px 28px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.15s;
+  letter-spacing: -0.01em;
+}
+.btn-primary:active { transform: scale(0.97); background: var(--limeD); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--textSub);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 13px 28px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-ghost:active { border-color: var(--borderHi); color: var(--text); }
+
+/* ═══════════════════════════════════════════
+   SCREEN 1: HOME / DASHBOARD
+═══════════════════════════════════════════ */
+#screen-home .hero-banner {
+  margin: 0 20px 16px;
+  background: linear-gradient(135deg, #111118 0%, #0d0d14 100%);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-banner::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 140px; height: 140px;
+  background: radial-gradient(circle, rgba(212,255,63,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-greeting {
+  font-size: 13px;
+  color: var(--textSub);
+  margin-bottom: 2px;
+}
+.hero-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 30px;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  line-height: 1;
+  margin-bottom: 16px;
+}
+.hero-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+.hero-stat {}
+.hero-stat-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 0.03em;
+  line-height: 1;
+}
+.hero-stat-val.lime { color: var(--lime); }
+.hero-stat-val.green { color: var(--green); }
+.hero-stat-val.blue { color: var(--blue); }
+.hero-stat-key {
+  font-size: 10px;
+  color: var(--textDim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 2px;
+}
+
+/* Week at a glance */
+.week-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.week-dot {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+}
+.wd-done { background: var(--lime); color: #000; }
+.wd-today { background: var(--surface3); color: var(--lime); border: 1.5px solid var(--lime); }
+.wd-future { background: var(--surface2); color: var(--textDim); }
+.wd-missed { background: var(--redSoft); color: var(--red); }
+
+/* Macro ring card */
+.macro-ring-card {
+  margin: 0 20px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.ring-container {
+  position: relative;
+  width: 72px; height: 72px;
+  flex-shrink: 0;
+}
+.ring-svg { transform: rotate(-90deg); }
+.ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.ring-pct {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  color: var(--lime);
+  line-height: 1;
+}
+.ring-pct-label {
+  font-size: 8px;
+  color: var(--textDim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.macro-details { flex: 1; }
+.macro-detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.macro-detail-row:last-child { margin-bottom: 0; }
+.md-label {
+  font-size: 12px;
+  color: var(--textSub);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.md-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+}
+.md-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--text);
+}
+.md-bar-wrap {
+  height: 3px;
+  background: var(--surface3);
+  border-radius: 2px;
+  margin-top: 3px;
+  overflow: hidden;
+}
+.md-bar { height: 100%; border-radius: 2px; }
+
+/* Quick log FAB */
+.quick-log-fab {
+  position: absolute;
+  bottom: 90px;
+  right: 20px;
+  width: 56px; height: 56px;
+  background: var(--lime);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #000;
+  box-shadow: 0 4px 20px rgba(212,255,63,0.35);
+  cursor: pointer;
+  z-index: 99;
+  transition: all 0.2s;
+  border: none;
+}
+.quick-log-fab:active { transform: scale(0.92); }
+
+/* Feed items */
+.feed-item {
+  margin: 0 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+.feed-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.feed-agent-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.feed-agent-name {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.feed-time {
+  margin-left: auto;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--textDim);
+}
+.feed-text {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+}
+.feed-text strong { color: var(--lime); font-weight: 600; }
+.feed-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.feed-btn-primary {
+  flex: 1;
+  background: var(--lime);
+  color: #000;
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.feed-btn-primary:active { transform: scale(0.97); }
+.feed-btn-ghost {
+  background: var(--surface3);
+  color: var(--textSub);
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Lift summary row */
+.lift-row {
+  display: flex;
+  align-items: center;
+  padding: 13px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.lift-row:last-child { border-bottom: none; }
+.lift-row-icon {
+  width: 36px; height: 36px;
+  background: var(--surface2);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+.lift-row-name { font-size: 14px; font-weight: 500; color: var(--text); }
+.lift-row-sub { font-size: 12px; color: var(--textSub); margin-top: 1px; }
+.lift-row-right { margin-left: auto; text-align: right; }
+.lift-row-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 14px;
+  color: var(--text);
+}
+.lift-row-trend { font-size: 13px; margin-left: 4px; }
+.trend-up-icon { color: var(--green); }
+.trend-flat-icon { color: var(--textDim); }
+.trend-down-icon { color: var(--red); }
+
+/* ═══════════════════════════════════════════
+   SCREEN 2: NUTRITION LOG
+═══════════════════════════════════════════ */
+.macro-tape {
+  display: flex;
+  overflow-x: auto;
+  gap: 10px;
+  padding: 0 20px 4px;
+  scrollbar-width: none;
+}
+.macro-tape::-webkit-scrollbar { display: none; }
+
+.macro-tape-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px 16px;
+  flex-shrink: 0;
+  min-width: 90px;
+}
+.mtc-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+.mtc-label {
+  font-size: 10px;
+  color: var(--textDim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 2px;
+}
+.mtc-sub { font-size: 11px; color: var(--textSub); margin-top: 4px; }
+
+.calorie-bar-wrap {
+  margin: 0 20px 16px;
+  background: var(--surface2);
+  border-radius: 100px;
+  height: 8px;
+  overflow: hidden;
+}
+.calorie-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--lime), #a8ff00);
+  border-radius: 100px;
+  transition: width 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+
+/* Meal slots */
+.meal-slot {
+  margin: 0 20px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.meal-slot-header {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  cursor: pointer;
+}
+.meal-slot-icon {
+  width: 32px; height: 32px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+.meal-slot-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+.meal-slot-cals {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  color: var(--textSub);
+  margin-left: auto;
+}
+.meal-slot-add {
+  width: 26px; height: 26px;
+  background: var(--limeSoft);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--lime);
+  font-size: 16px;
+  margin-left: 10px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.food-entry {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+}
+.food-entry-name {
+  font-size: 13px;
+  color: var(--text);
+  flex: 1;
+}
+.food-entry-qty {
+  font-size: 12px;
+  color: var(--textSub);
+  margin-right: 8px;
+}
+.food-entry-cals {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  color: var(--lime);
+}
+
+/* Protein progress bar (prominent) */
+.protein-progress {
+  margin: 0 20px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px;
+}
+.pp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.pp-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--textSub);
+}
+.pp-value {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 0.03em;
+  color: var(--green);
+}
+.pp-track {
+  height: 10px;
+  background: var(--surface3);
+  border-radius: 100px;
+  overflow: hidden;
+}
+.pp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green), #00ff7f);
+  border-radius: 100px;
+  transition: width 0.8s cubic-bezier(0.16,1,0.3,1);
+  position: relative;
+}
+.pp-fill::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: rgba(255,255,255,0.4);
+  border-radius: 2px;
+}
+.pp-sub {
+  font-size: 11px;
+  color: var(--textSub);
+  margin-top: 6px;
+}
+
+/* Search bar */
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 12px 16px;
+  gap: 10px;
+  cursor: text;
+}
+.search-icon { font-size: 16px; color: var(--textDim); }
+.search-text { font-size: 14px; color: var(--textDim); flex: 1; }
+
+/* ═══════════════════════════════════════════
+   SCREEN 3: LIFT TRACKER
+═══════════════════════════════════════════ */
+.session-card {
+  margin: 0 20px 16px;
+  background: linear-gradient(135deg, #0f0f18, #0a0a10);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.session-card::after {
+  content: '';
+  position: absolute;
+  bottom: -30px; right: -30px;
+  width: 100px; height: 100px;
+  background: radial-gradient(circle, rgba(63,191,255,0.1) 0%, transparent 70%);
+}
+.session-day {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--blue);
+  margin-bottom: 4px;
+}
+.session-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+.session-chips { display: flex; gap: 8px; }
+
+/* Lift exercise log */
+.exercise-block {
+  margin: 0 20px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.exercise-header {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.exercise-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+}
+.exercise-e1rm {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--textSub);
+}
+
+.set-row {
+  display: grid;
+  grid-template-columns: 32px 1fr 1fr 1fr 40px;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.set-row:last-child { border-bottom: none; }
+.set-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--textDim);
+}
+.set-input {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-family: 'DM Mono', monospace;
+  font-size: 14px;
+  color: var(--text);
+  text-align: center;
+  width: 100%;
+}
+.set-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--textDim);
+  text-align: center;
+  margin-top: 3px;
+}
+.set-rpe-badge {
+  background: var(--surface3);
+  border-radius: 8px;
+  padding: 7px 6px;
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  color: var(--textSub);
+  text-align: center;
+}
+.set-check {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--limeSoft);
+  border: 1.5px solid var(--lime);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.set-check.done {
+  background: var(--lime);
+  color: #000;
+}
+
+/* PR animation */
+@keyframes prFlash {
+  0% { box-shadow: 0 0 0 0 rgba(212,255,63,0.5); }
+  70% { box-shadow: 0 0 0 12px rgba(212,255,63,0); }
+  100% { box-shadow: 0 0 0 0 rgba(212,255,63,0); }
+}
+.pr-flash { animation: prFlash 0.6s ease; }
+
+/* Timer */
+.rest-timer {
+  margin: 0 20px 10px;
+  background: var(--surface2);
+  border: 1px solid var(--borderHi);
+  border-radius: var(--r);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.timer-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--textSub);
+}
+.timer-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px;
+  color: var(--lime);
+  letter-spacing: 0.04em;
+}
+.timer-controls { display: flex; gap: 8px; }
+.timer-btn {
+  width: 36px; height: 36px;
+  background: var(--surface3);
+  border: none;
+  border-radius: 50%;
+  color: var(--text);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Volume chart */
+.mini-chart {
+  height: 60px;
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  padding: 0 16px;
+}
+.chart-bar {
+  flex: 1;
+  border-radius: 3px 3px 0 0;
+  min-height: 4px;
+  transition: height 0.4s ease;
+}
+
+/* ═══════════════════════════════════════════
+   SCREEN 4: RECIPES
+═══════════════════════════════════════════ */
+.recipe-filters {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 0 20px 4px;
+  scrollbar-width: none;
+}
+.recipe-filters::-webkit-scrollbar { display: none; }
+.filter-pill {
+  padding: 7px 14px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--textSub);
+}
+.filter-pill.active {
+  background: var(--lime);
+  color: #000;
+  border-color: var(--lime);
+}
+
+.recipe-card-full {
+  margin: 0 20px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  position: relative;
+}
+.recipe-card-full.featured {
+  border-color: rgba(212,255,63,0.2);
+  background: linear-gradient(135deg, #0f0f14, #12121a);
+}
+.recipe-emoji-big {
+  font-size: 40px;
+  padding: 20px 20px 8px;
+}
+.recipe-card-body { padding: 0 20px 16px; }
+.recipe-title-full {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+  letter-spacing: -0.02em;
+}
+.recipe-sub {
+  font-size: 12px;
+  color: var(--textSub);
+  margin-bottom: 12px;
+}
+.recipe-macro-row {
+  display: flex;
+  gap: 0;
+  background: var(--surface2);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.rmr-cell {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+  border-right: 1px solid var(--border);
+}
+.rmr-cell:last-child { border-right: none; }
+.rmr-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+.rmr-key {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--textDim);
+  margin-top: 2px;
+}
+.recipe-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.recipe-tag {
+  padding: 4px 10px;
+  background: var(--surface3);
+  border-radius: 100px;
+  font-size: 11px;
+  color: var(--textSub);
+}
+
+/* Featured label */
+.featured-label {
+  position: absolute;
+  top: 14px; right: 14px;
+  background: var(--lime);
+  color: #000;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ═══════════════════════════════════════════
+   SCREEN 5: AI COACH
+═══════════════════════════════════════════ */
+.coach-header {
+  margin: 0 20px 16px;
+  background: linear-gradient(135deg, #120c1e, #0e0a18);
+  border: 1px solid rgba(175,63,255,0.2);
+  border-radius: 24px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.coach-header::before {
+  content: '';
+  position: absolute;
+  top: -40px; left: -40px;
+  width: 160px; height: 160px;
+  background: radial-gradient(circle, rgba(175,63,255,0.1) 0%, transparent 70%);
+}
+.coach-ai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(175,63,255,0.12);
+  border: 1px solid rgba(175,63,255,0.25);
+  border-radius: 100px;
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--purple);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+.coach-ai-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--purple);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+.coach-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 0.03em;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.coach-brief {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--textSub);
+}
+.coach-brief strong { color: var(--text); font-weight: 600; }
+
+.coach-message {
+  margin: 0 20px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px;
+}
+.cm-type {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.cm-suggestion .cm-type { color: var(--lime); }
+.cm-warning .cm-type { color: var(--orange); }
+.cm-positive .cm-type { color: var(--green); }
+.cm-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+.cm-text em { color: var(--lime); font-style: normal; font-weight: 600; }
+
+/* Chat input */
+.chat-input-bar {
+  margin: 0 20px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.chat-input-text {
+  flex: 1;
+  font-size: 14px;
+  color: var(--textSub);
+}
+.chat-send-btn {
+  width: 34px; height: 34px;
+  background: var(--purple);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+}
+
+/* Context chips */
+.context-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 0 20px 4px;
+  scrollbar-width: none;
+}
+.context-chips::-webkit-scrollbar { display: none; }
+.ctx-chip {
+  padding: 8px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  font-size: 12px;
+  color: var(--textSub);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.ctx-chip:active {
+  background: var(--surface3);
+  color: var(--text);
+}
+
+/* ═══════════════════════════════════════════
+   SCREEN 6: PROGRESS
+═══════════════════════════════════════════ */
+.progress-hero {
+  margin: 0 20px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 20px;
+}
+.ph-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--textDim);
+  margin-bottom: 4px;
+}
+.ph-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 52px;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  color: var(--lime);
+}
+.ph-unit {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  color: var(--textSub);
+}
+.ph-delta {
+  font-size: 14px;
+  color: var(--green);
+  font-weight: 600;
+  margin-top: 4px;
+}
+.ph-context { font-size: 12px; color: var(--textSub); margin-top: 2px; }
+
+/* SVG Chart area */
+.chart-wrap {
+  margin: 0 20px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.chart-title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 10px;
+}
+.chart-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.chart-period {
+  display: flex;
+  gap: 6px;
+}
+.period-btn {
+  padding: 4px 9px;
+  background: var(--surface2);
+  border-radius: 6px;
+  font-size: 11px;
+  color: var(--textSub);
+  cursor: pointer;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+}
+.period-btn.active {
+  background: var(--lime);
+  color: #000;
+  font-weight: 700;
+}
+
+svg.main-chart {
+  display: block;
+  width: 100%;
+  height: 140px;
+}
+.chart-axis-labels {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 16px 14px;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: var(--textDim);
+}
+
+/* Stats grid */
+.stats-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 0 20px 16px;
+}
+.stat-card-sm {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px;
+}
+.scm-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--textDim);
+  margin-bottom: 8px;
+}
+.scm-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 30px;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+.scm-sub { font-size: 11px; color: var(--textSub); margin-top: 4px; }
+
+/* ═══════════════════════════════════════════
+   MODAL OVERLAY (Quick Log)
+═══════════════════════════════════════════ */
+.modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  z-index: 300;
+  display: none;
+  align-items: flex-end;
+}
+.modal-overlay.open { display: flex; }
+
+.modal-sheet {
+  width: 100%;
+  background: var(--surface);
+  border-radius: 28px 28px 0 0;
+  padding: 12px 20px 40px;
+  border-top: 1px solid var(--borderHi);
+  animation: slideUp 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.modal-handle {
+  width: 36px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 0 auto 16px;
+}
+.modal-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.modal-sub { font-size: 13px; color: var(--textSub); margin-bottom: 20px; }
+
+.quick-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.quick-option {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+.quick-option:active { border-color: var(--lime); background: var(--limeSoft); }
+.qo-emoji { font-size: 28px; margin-bottom: 6px; }
+.qo-label { font-size: 13px; font-weight: 600; color: var(--text); }
+.qo-sub { font-size: 11px; color: var(--textSub); margin-top: 2px; }
+
+.quick-protein-row {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.qpr-label { font-size: 14px; color: var(--text); }
+.qpr-sub { font-size: 12px; color: var(--textSub); }
+.qpr-toggle {
+  width: 48px; height: 28px;
+  background: var(--lime);
+  border-radius: 100px;
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.qpr-toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px; right: 3px;
+  width: 22px; height: 22px;
+  background: #000;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+/* ═══════════════════════════════════════════
+   TOAST NOTIFICATION
+═══════════════════════════════════════════ */
+.toast {
+  position: absolute;
+  top: 70px; left: 20px; right: 20px;
+  background: var(--surface);
+  border: 1px solid var(--borderHi);
+  border-radius: 16px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 400;
+  transform: translateY(-20px);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+  pointer-events: none;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast-icon { font-size: 18px; }
+.toast-text { font-size: 13px; color: var(--text); flex: 1; }
+.toast-text strong { font-weight: 600; }
+
+/* ═══════════════════════════════════════════
+   ACTIVE WORKOUT BANNER
+═══════════════════════════════════════════ */
+.active-workout-banner {
+  margin: 0 20px 16px;
+  background: var(--limeSoft);
+  border: 1.5px solid rgba(212,255,63,0.3);
+  border-radius: var(--r);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+.awb-indicator {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--lime);
+  animation: pulse 1.5s infinite;
+}
+.awb-text { font-size: 13px; font-weight: 600; color: var(--lime); flex: 1; }
+.awb-sub { font-size: 11px; color: var(--limeD); }
+.awb-arrow { color: var(--lime); font-size: 16px; }
+
+/* ═══════════════════════════════════════════
+   SCORE CARD (swiping)
+═══════════════════════════════════════════ */
+.score-cards {
+  display: flex;
+  overflow-x: auto;
+  gap: 10px;
+  padding: 0 20px 4px;
+  scrollbar-width: none;
+}
+.score-cards::-webkit-scrollbar { display: none; }
+.score-card {
+  flex-shrink: 0;
+  width: 140px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 16px;
+}
+.sc-icon { font-size: 20px; margin-bottom: 8px; }
+.sc-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+.sc-label { font-size: 11px; color: var(--textSub); margin-top: 4px; }
+.sc-delta { font-size: 11px; font-weight: 600; margin-top: 4px; }
+
+/* ═══════════════════════════════════════════
+   SECTION SPACING
+═══════════════════════════════════════════ */
+.section-gap { height: 24px; }
+.section-gap-sm { height: 12px; }
+
+/* Animated entrance */
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.screen.active > * {
+  animation: slideInUp 0.35s cubic-bezier(0.16,1,0.3,1) both;
+}
+.screen.active > *:nth-child(1) { animation-delay: 0.02s; }
+.screen.active > *:nth-child(2) { animation-delay: 0.06s; }
+.screen.active > *:nth-child(3) { animation-delay: 0.1s; }
+.screen.active > *:nth-child(4) { animation-delay: 0.14s; }
+.screen.active > *:nth-child(5) { animation-delay: 0.18s; }
+.screen.active > *:nth-child(6) { animation-delay: 0.22s; }
+.screen.active > *:nth-child(7) { animation-delay: 0.26s; }
+.screen.active > *:nth-child(8) { animation-delay: 0.3s; }
+.screen.active > *:nth-child(9) { animation-delay: 0.34s; }
+.screen.active > *:nth-child(10) { animation-delay: 0.38s; }
+
+/* Weight dot on chart */
+@keyframes dotPop {
+  from { r: 0; opacity: 0; }
+  to { r: 4; opacity: 1; }
+}
+
+/* ═══ REAL INPUT OVERRIDES ═══ */
+input.set-input {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 4px;
+  font-family: 'DM Mono', monospace;
+  font-size: 14px;
+  color: var(--text);
+  text-align: center;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.15s;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+input.set-input::-webkit-inner-spin-button,
+input.set-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input.set-input:focus { border-color: var(--lime); background: rgba(212,255,63,0.04); }
+input.set-rpe-input { color: var(--textSub); }
+
+/* ═══ COACH CHAT MESSAGES ═══ */
+.coach-msg-user {
+  margin: 0 20px 8px;
+  background: var(--limeSoft);
+  border: 1px solid rgba(212,255,63,0.2);
+  border-radius: var(--r);
+  padding: 12px 14px;
+  font-size: 14px;
+  color: var(--lime);
+  text-align: right;
+}
+.coach-msg-ai {
+  margin: 0 20px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 14px;
+}
+.coach-msg-ai .cm-type { color: var(--purple); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:6px; }
+.coach-msg-ai .cm-text { font-size:14px; line-height:1.6; color:var(--text); }
+.ai-typing { display:flex; gap:4px; padding: 6px 0; }
+.ai-typing span { width:7px; height:7px; background:var(--purple); border-radius:50%; animation: typingBounce 1s infinite; }
+.ai-typing span:nth-child(2) { animation-delay:0.15s; }
+.ai-typing span:nth-child(3) { animation-delay:0.3s; }
+@keyframes typingBounce { 0%,60%,100% { transform:translateY(0); opacity:0.4; } 30% { transform:translateY(-5px); opacity:1; } }
+
+/* ═══ WEIGH-IN INPUT ═══ */
+#weighin-input::-webkit-inner-spin-button,
+#weighin-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+#weighin-input { -moz-appearance: textfield; appearance: textfield; }
+
+/* ═══ RECIPE MODAL DETAIL ═══ */
+.recipe-ingredient-list { list-style:none; margin-top:10px; }
+.recipe-ingredient-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size:14px;
+  color:var(--text);
+  display:flex;
+  justify-content:space-between;
+}
+.recipe-ingredient-list li:last-child { border-bottom:none; }
+.recipe-ingredient-list li span { color:var(--textSub); font-size:13px; }
+
+/* ═══ WEIGH-IN MODAL STYLES ═══ */
+.weighin-input-row {
+  display:flex; align-items:center; justify-content:center; gap:16px; margin:20px 0 24px;
+}
+.weighin-center { display:flex; flex-direction:column; align-items:center; gap:4px; }
+.weighin-number-input {
+  background:var(--surface2); border:2px solid var(--borderHi); border-radius:16px;
+  font-family:'Bebas Neue',sans-serif; font-size:56px; letter-spacing:0.02em;
+  color:var(--lime); text-align:center; width:160px; padding:12px 8px; outline:none;
+  -moz-appearance:textfield; appearance:textfield; transition:border-color 0.2s;
+}
+.weighin-number-input:focus { border-color:var(--lime); }
+.weighin-number-input::-webkit-inner-spin-button,
+.weighin-number-input::-webkit-outer-spin-button { -webkit-appearance:none; }
+.weighin-unit { font-family:'Bebas Neue',sans-serif; font-size:18px; color:var(--textSub); letter-spacing:0.06em; }
+.weighin-adj-btn {
+  width:52px; height:52px; border-radius:50%; background:var(--surface3);
+  border:1px solid var(--borderHi); color:var(--text); font-size:26px; font-weight:300;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:all 0.15s; flex-shrink:0; font-family:'DM Sans',sans-serif;
+}
+.weighin-adj-btn:active { background:var(--lime); color:#000; border-color:var(--lime); transform:scale(0.93); }
+
+/* ═══ RECIPE DETAIL MODAL STYLES ═══ */
+.recipe-modal-sheet { max-height:88vh; overflow-y:auto; scrollbar-width:none; }
+.recipe-modal-sheet::-webkit-scrollbar { display:none; }
+.recipe-ingredient-row {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:11px 14px; border-bottom:1px solid var(--border); transition:background 0.15s;
+}
+.recipe-ingredient-row:last-child { border-bottom:none; }
+.ri-name { font-size:13px; color:var(--text); }
+.ri-qty { font-family:'DM Mono',monospace; font-size:12px; color:var(--textSub); margin-left:12px; white-space:nowrap; }
+
+/* ═══ RECIPE CARD FILTER TRANSITIONS ═══ */
+.recipe-card-full { transition:opacity 0.25s ease, transform 0.25s ease; }
+.recipe-card-full.recipe-hidden { display:none; }
+.recipe-card-full.recipe-fading { opacity:0.15; pointer-events:none; }
+
+/* ═══ CHAT INPUT FIELD ═══ */
+.chat-input-field {
+  flex:1; background:transparent; border:none; outline:none;
+  font-family:'DM Sans',sans-serif; font-size:14px; color:var(--text); min-width:0;
+}
+.chat-input-field::placeholder { color:var(--textSub); }
+
+/* ═══ FOOD SEARCH MODAL ═══ */
+.food-search-row {
+  display:flex; align-items:center; gap:12px; padding:12px 0;
+  border-bottom:1px solid var(--border); cursor:pointer;
+  transition:background 0.1s;
+}
+.food-search-row:last-child { border-bottom:none; }
+.food-search-row:active { background:var(--surface2); margin:0 -4px; padding-left:4px; border-radius:8px; }
+.fsr-info { flex:1; min-width:0; }
+.fsr-name { font-size:13px; color:var(--text); font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.fsr-sub { font-size:11px; color:var(--textSub); margin-top:1px; }
+.fsr-kcal { font-family:'Bebas Neue',sans-serif; font-size:20px; color:var(--lime); line-height:1; text-align:right; white-space:nowrap; }
+.fsr-kcal span { font-family:'DM Sans',sans-serif; font-size:9px; color:var(--textDim); display:block; text-transform:uppercase; letter-spacing:0.06em; }
+.fsr-add { width:28px; height:28px; background:var(--limeSoft); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--lime); font-size:18px; font-weight:300; flex-shrink:0; }
+
+/* ═══ COACH BUBBLE STYLES ═══ */
+.coach-message-user {
+  margin:0 20px 10px; background:var(--limeSoft);
+  border:1px solid rgba(212,255,63,0.2); border-radius:var(--r);
+  padding:12px 16px; font-size:14px; color:var(--text); line-height:1.5;
+}
+.coach-message-ai {
+  margin:0 20px 10px; background:var(--surface);
+  border:1px solid var(--border); border-radius:var(--r); padding:12px 16px;
+}
+.coach-message-ai .cm-type {
+  font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em;
+  color:var(--purple); margin-bottom:6px;
+}
+.coach-message-ai .cm-text { font-size:14px; line-height:1.6; color:var(--text); }
+
+</style>
+</head>
+<body>
+
+<div class="phone-shell" id="app">
+  <!-- Dynamic Island -->
+  <div class="dynamic-island">
+    <div class="di-camera"></div>
+    <div class="di-sensor"></div>
+  </div>
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <span>●●●●</span>
+      <span>WiFi</span>
+      <span>🔋</span>
+    </div>
+  </div>
+
+  <!-- SCREENS -->
+  <div class="screen-container">
+
+    <!-- ═══ SCREEN: HOME ═══ -->
+    <div class="screen active" id="screen-home">
+
+      <!-- Hero -->
+      <div class="hero-banner">
+        <div class="hero-greeting">Good morning,</div>
+        <div class="hero-name">MARCUS K.</div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="hero-stat-val lime">94<span style="font-size:16px">%</span></div>
+            <div class="hero-stat-key">Strength</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-val green">91<span style="font-size:16px">%</span></div>
+            <div class="hero-stat-key">Protein</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-val blue">0.8<span style="font-size:16px">%</span></div>
+            <div class="hero-stat-key">Wk Loss</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Week streak -->
+      <div class="screen-pad">
+        <div class="section-label">This Week</div>
+      </div>
+      <div style="padding: 0 20px 16px; display:flex; gap:6px; align-items:center;">
+        <div class="week-dot wd-done">M</div>
+        <div class="week-dot wd-done">T</div>
+        <div class="week-dot wd-done">W</div>
+        <div class="week-dot wd-done">T</div>
+        <div class="week-dot wd-today">F</div>
+        <div class="week-dot wd-future">S</div>
+        <div class="week-dot wd-future">S</div>
+        <div style="margin-left: auto; font-size:12px; color:var(--textSub);">4 day streak 🔥</div>
+      </div>
+
+      <!-- Macro ring -->
+      <div class="macro-ring-card">
+        <div class="ring-container">
+          <svg class="ring-svg" width="72" height="72" viewBox="0 0 72 72">
+            <circle cx="36" cy="36" r="29" fill="none" stroke="#1e1e26" stroke-width="7"/>
+            <!-- Fat -->
+            <circle cx="36" cy="36" r="29" fill="none" stroke="#ff9f3f" stroke-width="7"
+              stroke-dasharray="182.2" stroke-dashoffset="36" stroke-linecap="butt" opacity="0.6"/>
+            <!-- Carbs -->
+            <circle cx="36" cy="36" r="29" fill="none" stroke="#d4ff3f" stroke-width="7"
+              stroke-dasharray="182.2" stroke-dashoffset="72" stroke-linecap="butt" opacity="0.8"/>
+            <!-- Protein -->
+            <circle cx="36" cy="36" r="29" fill="none" stroke="#3fff8f" stroke-width="7"
+              stroke-dasharray="182.2" stroke-dashoffset="110" stroke-linecap="butt"/>
+          </svg>
+          <div class="ring-center">
+            <div class="ring-pct">87</div>
+            <div class="ring-pct-label">kcal</div>
+          </div>
+        </div>
+        <div class="macro-details">
+          <div class="macro-detail-row">
+            <div class="md-label"><div class="md-dot" style="background:var(--green)"></div> Protein</div>
+            <div class="md-val mono">198<span style="color:var(--textDim)">/210g</span></div>
+          </div>
+          <div style="padding: 2px 0;">
+            <div class="md-bar-wrap"><div class="md-bar" style="width:94%;background:var(--green)"></div></div>
+          </div>
+          <div class="macro-detail-row" style="margin-top:8px;">
+            <div class="md-label"><div class="md-dot" style="background:var(--lime)"></div> Carbs</div>
+            <div class="md-val mono">180<span style="color:var(--textDim)">/210g</span></div>
+          </div>
+          <div style="padding: 2px 0;">
+            <div class="md-bar-wrap"><div class="md-bar" style="width:86%;background:var(--lime)"></div></div>
+          </div>
+          <div class="macro-detail-row" style="margin-top:8px;">
+            <div class="md-label"><div class="md-dot" style="background:var(--orange)"></div> Fat</div>
+            <div class="md-val mono">52<span style="color:var(--textDim)">/65g</span></div>
+          </div>
+          <div style="padding: 2px 0;">
+            <div class="md-bar-wrap"><div class="md-bar" style="width:80%;background:var(--orange)"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active workout banner -->
+      <div class="active-workout-banner" onclick="switchScreen('lift')">
+        <div class="awb-indicator"></div>
+        <div>
+          <div class="awb-text">Push Day · In Progress</div>
+          <div class="awb-sub">3 of 5 exercises done</div>
+        </div>
+        <div class="awb-arrow">›</div>
+      </div>
+
+      <!-- Agent feed -->
+      <div class="section-label">Agent Feed</div>
+
+      <div class="feed-item">
+        <div class="feed-header">
+          <div class="feed-agent-dot" style="background:var(--lime)"></div>
+          <span class="feed-agent-name" style="color:var(--lime)">Macro Engine</span>
+          <span class="feed-time">9:14</span>
+        </div>
+        <div class="feed-text">Your 7-day trend is <strong>0.8%/wk</strong> — perfectly on target. No calorie change needed. Holding at 2,100 kcal.</div>
+        <div class="feed-actions">
+          <button class="feed-btn-primary" onclick="showToast('✓', 'Targets confirmed for this week')">Confirm Hold</button>
+          <button class="feed-btn-ghost">Details</button>
+        </div>
+      </div>
+
+      <div class="feed-item">
+        <div class="feed-header">
+          <div class="feed-agent-dot" style="background:var(--blue)"></div>
+          <span class="feed-agent-name" style="color:var(--blue)">Strength Sentinel</span>
+          <span class="feed-time">8:47</span>
+        </div>
+        <div class="feed-text">🏆 New deadlift PR — <strong>365 × 3</strong>, est 1RM <strong>401 lb</strong>. All compounds holding. Retention score updated to 94%.</div>
+      </div>
+
+      <div class="feed-item">
+        <div class="feed-header">
+          <div class="feed-agent-dot" style="background:var(--orange)"></div>
+          <span class="feed-agent-name" style="color:var(--orange)">Nutrition Coach</span>
+          <span class="feed-time">3:02</span>
+        </div>
+        <div class="feed-text">At 3pm you had only 88g protein. Suggested: <strong>Chicken Power Bowl</strong> from Vault — 52g protein, 10 min.</div>
+        <div class="feed-actions">
+          <button class="feed-btn-primary" onclick="switchScreen('recipes')">Open Recipe</button>
+          <button class="feed-btn-ghost">Dismiss</button>
+        </div>
+      </div>
+
+      <!-- Today's lifts -->
+      <div class="section-label" style="margin-top:6px;">Today's Lifts</div>
+      <div class="card" style="margin: 0 20px 16px;">
+        <div class="lift-row">
+          <div class="lift-row-icon">🏋</div>
+          <div>
+            <div class="lift-row-name">Bench Press</div>
+            <div class="lift-row-sub">205 × 5, 3 sets</div>
+          </div>
+          <div class="lift-row-right">
+            <div class="lift-row-val">239 lb <span class="lift-row-trend trend-flat-icon">→</span></div>
+            <div style="font-size:10px;color:var(--textDim)">e1RM</div>
+          </div>
+        </div>
+        <div class="lift-row">
+          <div class="lift-row-icon">💪</div>
+          <div>
+            <div class="lift-row-name">Overhead Press</div>
+            <div class="lift-row-sub">145 × 5, 3 sets</div>
+          </div>
+          <div class="lift-row-right">
+            <div class="lift-row-val">169 lb <span class="lift-row-trend trend-up-icon">↑</span></div>
+            <div style="font-size:10px;color:var(--textDim)">e1RM</div>
+          </div>
+        </div>
+        <div class="lift-row">
+          <div class="lift-row-icon">🔄</div>
+          <div>
+            <div class="lift-row-name">Tricep Dips</div>
+            <div class="lift-row-sub">BW+45 × 8, 3 sets</div>
+          </div>
+          <div class="lift-row-right">
+            <div class="lift-row-val">—</div>
+            <div style="font-size:10px;color:var(--textDim)">Accessory</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-gap"></div>
+    </div>
+
+    <!-- ═══ SCREEN: NUTRITION ═══ -->
+    <div class="screen" id="screen-nutrition">
+
+      <div class="page-header">
+        <div>
+          <div class="page-title">Nutrition</div>
+          <div class="page-sub">Friday, Feb 21 · 2,100 kcal target</div>
+        </div>
+        <div style="width:38px;height:38px;background:var(--limeSoft);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;" onclick="openModal()">+</div>
+      </div>
+
+      <!-- Calorie progress -->
+      <div class="macro-tape">
+        <div class="macro-tape-card">
+          <div class="mtc-val" style="color:var(--lime)">1,880</div>
+          <div class="mtc-label">Consumed</div>
+          <div class="mtc-sub">220 remaining</div>
+        </div>
+        <div class="macro-tape-card">
+          <div class="mtc-val" style="color:var(--green)">198g</div>
+          <div class="mtc-label">Protein</div>
+          <div class="mtc-sub">94% of target</div>
+        </div>
+        <div class="macro-tape-card">
+          <div class="mtc-val" style="color:var(--lime)">180g</div>
+          <div class="mtc-label">Carbs</div>
+          <div class="mtc-sub">86% of target</div>
+        </div>
+        <div class="macro-tape-card">
+          <div class="mtc-val" style="color:var(--orange)">52g</div>
+          <div class="mtc-label">Fat</div>
+          <div class="mtc-sub">80% of target</div>
+        </div>
+      </div>
+
+      <div class="section-gap-sm"></div>
+      <div class="calorie-bar-wrap">
+        <div class="calorie-bar-fill" style="width:89.5%"></div>
+      </div>
+
+      <!-- Protein progress -->
+      <div class="protein-progress">
+        <div class="pp-header">
+          <div class="pp-title">🛡 Protein Protection</div>
+          <div class="pp-value">94%</div>
+        </div>
+        <div class="pp-track">
+          <div class="pp-fill" id="pp-fill" style="width:94%"></div>
+        </div>
+        <div class="pp-sub">198g logged · 12g to lock target</div>
+      </div>
+
+      <!-- Food search -->
+      <div style="padding: 0 20px 12px;">
+        <div class="search-bar" onclick="openFoodSearch()" style="cursor:pointer;">
+          <span class="search-icon">🔍</span>
+          <span class="search-text">Search food, scan barcode...</span>
+          <span style="font-size:18px; color:var(--textSub);">📷</span>
+        </div>
+      </div>
+
+      <!-- Meal slots -->
+      <div class="section-label">Meal Log</div>
+
+      <div class="meal-slot">
+        <div class="meal-slot-header">
+          <div class="meal-slot-icon" style="background:rgba(255,200,63,0.1)">🌅</div>
+          <div>
+            <div class="meal-slot-title">Breakfast</div>
+          </div>
+          <div class="meal-slot-cals">480 kcal</div>
+          <div class="meal-slot-add" onclick="openFoodSearch('breakfast')">+</div>
+        </div>
+        <div class="food-entry">
+          <div class="food-entry-name">Greek Yogurt, 2% Fage</div>
+          <div class="food-entry-qty">227g</div>
+          <div class="food-entry-cals">150</div>
+        </div>
+        <div class="food-entry">
+          <div class="food-entry-name">Eggs, large, scrambled</div>
+          <div class="food-entry-qty">3 eggs</div>
+          <div class="food-entry-cals">210</div>
+        </div>
+        <div class="food-entry">
+          <div class="food-entry-name">Oats, dry rolled</div>
+          <div class="food-entry-qty">50g</div>
+          <div class="food-entry-cals">190</div>
+        </div>
+      </div>
+
+      <div class="meal-slot">
+        <div class="meal-slot-header">
+          <div class="meal-slot-icon" style="background:rgba(63,255,143,0.1)">☀️</div>
+          <div>
+            <div class="meal-slot-title">Lunch</div>
+          </div>
+          <div class="meal-slot-cals">620 kcal</div>
+          <div class="meal-slot-add" onclick="openFoodSearch('lunch')">+</div>
+        </div>
+        <div class="food-entry">
+          <div class="food-entry-name">Chicken Breast, grilled</div>
+          <div class="food-entry-qty">220g</div>
+          <div class="food-entry-cals">330</div>
+        </div>
+        <div class="food-entry">
+          <div class="food-entry-name">Brown Rice, cooked</div>
+          <div class="food-entry-qty">200g</div>
+          <div class="food-entry-cals">216</div>
+        </div>
+        <div class="food-entry">
+          <div class="food-entry-name">Broccoli, steamed</div>
+          <div class="food-entry-qty">150g</div>
+          <div class="food-entry-cals">52</div>
+        </div>
+      </div>
+
+      <div class="meal-slot">
+        <div class="meal-slot-header">
+          <div class="meal-slot-icon" style="background:rgba(63,191,255,0.1)">🌙</div>
+          <div>
+            <div class="meal-slot-title">Pre-Workout</div>
+          </div>
+          <div class="meal-slot-cals">380 kcal</div>
+          <div class="meal-slot-add" onclick="openFoodSearch('pre-workout')">+</div>
+        </div>
+        <div class="food-entry">
+          <div class="food-entry-name">Whey Protein Shake</div>
+          <div class="food-entry-qty">1 scoop</div>
+          <div class="food-entry-cals">130</div>
+        </div>
+        <div class="food-entry">
+          <div class="food-entry-name">Banana, medium</div>
+          <div class="food-entry-qty">1 ea (120g)</div>
+          <div class="food-entry-cals">107</div>
+        </div>
+        <div class="food-entry">
+          <div class="food-entry-name">Peanut Butter, natural</div>
+          <div class="food-entry-qty">2 tbsp</div>
+          <div class="food-entry-cals">188</div>
+        </div>
+      </div>
+
+      <div class="meal-slot">
+        <div class="meal-slot-header">
+          <div class="meal-slot-icon" style="background:rgba(255,159,63,0.1)">🍽</div>
+          <div>
+            <div class="meal-slot-title">Dinner</div>
+          </div>
+          <div class="meal-slot-cals">400 kcal</div>
+          <div class="meal-slot-add" onclick="openFoodSearch('dinner')">+</div>
+        </div>
+        <div class="food-entry">
+          <div class="food-entry-name">Salmon, Atlantic (wild)</div>
+          <div class="food-entry-qty">180g</div>
+          <div class="food-entry-cals">352</div>
+        </div>
+        <div class="food-entry">
+          <div class="food-entry-name">Asparagus, roasted</div>
+          <div class="food-entry-qty">120g</div>
+          <div class="food-entry-cals">27</div>
+        </div>
+      </div>
+
+      <div style="padding: 16px 20px;">
+        <button class="btn-primary" onclick="showToast('🍽', 'Post-workout meal logged!')">+ Log Post-Workout</button>
+      </div>
+
+      <div class="section-gap"></div>
+    </div>
+
+    <!-- ═══ SCREEN: LIFT TRACKER ═══ -->
+    <div class="screen" id="screen-lift">
+
+      <div class="page-header">
+        <div>
+          <div class="page-title">Lift Tracker</div>
+          <div class="page-sub">Push Day · Fri Feb 21</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <div class="chip chip-lime" style="cursor:pointer;" onclick="showToast('⏱','Rest timer started: 90s')">⏱ Timer</div>
+          <div class="chip chip-dim" style="cursor:pointer;">✓ Finish</div>
+        </div>
+      </div>
+
+      <!-- Session overview -->
+      <div class="session-card">
+        <div class="session-day">Push Day · Week 8</div>
+        <div class="session-name">STRENGTH BLOCK</div>
+        <div class="session-chips">
+          <div class="chip chip-lime">3/5 Exercises</div>
+          <div class="chip chip-blue">Volume ↑ 4%</div>
+          <div class="chip chip-dim">48 min</div>
+        </div>
+      </div>
+
+      <!-- Rest timer -->
+      <div class="rest-timer">
+        <div>
+          <div class="timer-label">Rest Timer</div>
+          <div class="timer-val" id="timer-display">1:30</div>
+        </div>
+        <div class="timer-controls">
+          <button class="timer-btn" onclick="adjustTimer(-15)">-15</button>
+          <button class="timer-btn" onclick="toggleTimer()" id="timer-toggle-btn">▶</button>
+          <button class="timer-btn" onclick="adjustTimer(+15)">+15</button>
+        </div>
+      </div>
+
+      <!-- Exercise 1 -->
+      <div class="exercise-block">
+        <div class="exercise-header">
+          <div class="exercise-name">Bench Press</div>
+          <div class="chip chip-green" style="font-size:10px;">e1RM 239 lb ↑</div>
+        </div>
+        <div style="display:grid;grid-template-columns:32px 1fr 1fr 1fr 40px;gap:8px;padding:8px 16px 4px;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--textDim);">
+          <div>#</div><div style="text-align:center">WEIGHT</div><div style="text-align:center">REPS</div><div style="text-align:center">RPE</div><div></div>
+        </div>
+        <div class="set-row">
+          <div class="set-num">1</div>
+          <div><input type="number" class="set-input" value="205" min="0" max="9999" step="2.5"><div class="set-label">lb</div></div>
+          <div><input type="number" class="set-input" value="5" min="1" max="99" step="1"><div class="set-label">reps</div></div>
+          <div><input type="number" class="set-input set-rpe-input" value="7.5" min="1" max="10" step="0.5"><div class="set-label">RPE</div></div>
+          <div class="set-check done">✓</div>
+        </div>
+        <div class="set-row">
+          <div class="set-num">2</div>
+          <div><input type="number" class="set-input" value="205" min="0" max="9999" step="2.5"><div class="set-label">lb</div></div>
+          <div><input type="number" class="set-input" value="5" min="1" max="99" step="1"><div class="set-label">reps</div></div>
+          <div><input type="number" class="set-input set-rpe-input" value="8.0" min="1" max="10" step="0.5"><div class="set-label">RPE</div></div>
+          <div class="set-check done">✓</div>
+        </div>
+        <div class="set-row">
+          <div class="set-num">3</div>
+          <div><input type="number" class="set-input" value="205" min="0" max="9999" step="2.5"><div class="set-label">lb</div></div>
+          <div><input type="number" class="set-input" value="5" min="1" max="99" step="1"><div class="set-label">reps</div></div>
+          <div><input type="number" class="set-input set-rpe-input" value="8.5" min="1" max="10" step="0.5"><div class="set-label">RPE</div></div>
+          <div class="set-check" onclick="logSet(this)">○</div>
+        </div>
+        <div style="padding: 10px 16px; border-top: 1px solid var(--border); display:flex; gap:8px;">
+          <button class="add-set-btn" style="flex:1;background:var(--surface3);border:none;border-radius:10px;padding:8px;font-size:12px;color:var(--textSub);cursor:pointer;font-family:'DM Sans',sans-serif;">+ Add Set</button>
+          <button style="flex:1;background:var(--surface3);border:none;border-radius:10px;padding:8px;font-size:12px;color:var(--textSub);cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="showToast('📈','History coming soon')">📈 History</button>
+        </div>
+      </div>
+
+      <!-- Exercise 2 -->
+      <div class="exercise-block">
+        <div class="exercise-header">
+          <div class="exercise-name">Overhead Press</div>
+          <div class="chip chip-lime" style="font-size:10px;">PR Week 🏆</div>
+        </div>
+        <div style="display:grid;grid-template-columns:32px 1fr 1fr 1fr 40px;gap:8px;padding:8px 16px 4px;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--textDim);">
+          <div>#</div><div style="text-align:center">WEIGHT</div><div style="text-align:center">REPS</div><div style="text-align:center">RPE</div><div></div>
+        </div>
+        <div class="set-row">
+          <div class="set-num">1</div>
+          <div><input type="number" class="set-input" value="150" min="0" max="9999" step="2.5"><div class="set-label">lb</div></div>
+          <div><input type="number" class="set-input" value="5" min="1" max="99" step="1"><div class="set-label">reps</div></div>
+          <div><input type="number" class="set-input set-rpe-input" value="8.0" min="1" max="10" step="0.5"><div class="set-label">RPE</div></div>
+          <div class="set-check done">✓</div>
+        </div>
+        <div style="padding: 10px 16px; border-top: 1px solid var(--border); background: var(--limeSoft);">
+          <div style="font-size:12px;color:var(--lime);font-weight:600;">🏆 New est 1RM: 175 lb · Previous: 169 lb</div>
+        </div>
+      </div>
+
+      <!-- Add exercise -->
+      <div style="margin: 0 20px 10px;">
+        <button class="btn-ghost" style="width:100%;border-radius:var(--r);padding:16px;" onclick="showToast('+','Exercise added to session')">
+          + Add Exercise
+        </button>
+      </div>
+
+      <!-- Volume bars -->
+      <div class="section-label">Volume Trend</div>
+      <div class="card" style="margin: 0 20px 16px; padding: 16px 16px 0;">
+        <div style="font-size:12px;color:var(--textSub);margin-bottom:10px;">Weekly Push Volume (sets)</div>
+        <div class="mini-chart">
+          <div class="chart-bar" style="height:50%;background:var(--surface3)"></div>
+          <div class="chart-bar" style="height:60%;background:var(--surface3)"></div>
+          <div class="chart-bar" style="height:70%;background:var(--surface3)"></div>
+          <div class="chart-bar" style="height:65%;background:var(--surface3)"></div>
+          <div class="chart-bar" style="height:75%;background:var(--surface3)"></div>
+          <div class="chart-bar" style="height:80%;background:var(--surface3)"></div>
+          <div class="chart-bar" style="height:85%;background:var(--borderHi)"></div>
+          <div class="chart-bar" style="height:92%;background:var(--lime)"></div>
+        </div>
+        <div class="chart-axis-labels">
+          <span>Wk1</span><span>Wk2</span><span>Wk3</span><span>Wk4</span><span>Wk5</span><span>Wk6</span><span>Wk7</span><span>Wk8</span>
+        </div>
+      </div>
+
+      <div style="padding: 0 20px 16px;">
+        <button class="btn-primary" onclick="showToast('💪','Session saved! Great work.')">Finish Session</button>
+      </div>
+
+      <div class="section-gap"></div>
+    </div>
+
+    <!-- ═══ SCREEN: RECIPES ═══ -->
+    <div class="screen" id="screen-recipes">
+
+      <div class="page-header">
+        <div>
+          <div class="page-title">Recipe Vault</div>
+          <div class="page-sub">94 original high-protein recipes</div>
+        </div>
+        <div style="font-size:20px;cursor:pointer;" onclick="showToast('🔍','Search recipes...')">🔍</div>
+      </div>
+
+      <!-- Filters -->
+      <div class="recipe-filters">
+        <div class="filter-pill active" onclick="activateFilter(this)">All</div>
+        <div class="filter-pill" onclick="activateFilter(this)">Breakfast</div>
+        <div class="filter-pill" onclick="activateFilter(this)">Meal Prep</div>
+        <div class="filter-pill" onclick="activateFilter(this)">Dinner</div>
+        <div class="filter-pill" onclick="activateFilter(this)">Snack</div>
+        <div class="filter-pill" onclick="activateFilter(this)">Under 15 min</div>
+        <div class="filter-pill" onclick="activateFilter(this)">Dairy-Free</div>
+      </div>
+
+      <div class="section-gap-sm"></div>
+      <div class="section-label">Recommended For You</div>
+
+      <!-- Featured recipe -->
+      <div class="recipe-card-full featured" data-category="meal-prep">
+        <div class="featured-label">Recommended</div>
+        <div class="recipe-emoji-big">🍗</div>
+        <div class="recipe-card-body">
+          <div class="recipe-title-full">Chicken Power Bowl</div>
+          <div class="recipe-sub">Meal Prep · 25 min · Satiety ★★★★★ · Volume ★★★★</div>
+          <div class="recipe-macro-row">
+            <div class="rmr-cell">
+              <div class="rmr-val" style="color:var(--lime)">478</div>
+              <div class="rmr-key">kcal</div>
+            </div>
+            <div class="rmr-cell">
+              <div class="rmr-val" style="color:var(--green)">52g</div>
+              <div class="rmr-key">protein</div>
+            </div>
+            <div class="rmr-cell">
+              <div class="rmr-val" style="color:var(--lime)">38g</div>
+              <div class="rmr-key">carbs</div>
+            </div>
+            <div class="rmr-cell">
+              <div class="rmr-val" style="color:var(--orange)">12g</div>
+              <div class="rmr-key">fat</div>
+            </div>
+          </div>
+          <div class="recipe-tags">
+            <span class="recipe-tag">Meal Prep</span>
+            <span class="recipe-tag">High Protein</span>
+            <span class="recipe-tag">Gluten Free</span>
+          </div>
+          <div style="margin-top:12px;">
+            <button class="btn-primary" onclick="openRecipeModal('chicken-power-bowl')">View Full Recipe</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="recipe-card-full" data-category="breakfast">
+        <div class="recipe-emoji-big">🥚</div>
+        <div class="recipe-card-body">
+          <div class="recipe-title-full">3-Egg Cottage Cheese Scramble</div>
+          <div class="recipe-sub">Breakfast · 8 min · Satiety ★★★★ · Volume ★★★</div>
+          <div class="recipe-macro-row">
+            <div class="rmr-cell">
+              <div class="rmr-val" style="color:var(--lime)">340</div>
+              <div class="rmr-key">kcal</div>
+            </div>
+            <div class="rmr-cell">
+              <div class="rmr-val" style="color:var(--green)">38g</div>
+              <div class="rmr-key">protein</div>
+            </div>
+            <div class="rmr-cell">
+              <div class="rmr-val" style="color:var(--lime)">8g</div>
+              <div class="rmr-key">carbs</div>
+            </div>
+            <div class="rmr-cell">
+              <div class="rmr-val" style="color:var(--orange)">18g</div>
+              <div class="rmr-key">fat</div>
+            </div>
+          </div>
+          <div class="recipe-tags">
+            <span class="recipe-tag">Quick</span>
+            <span class="recipe-tag">Breakfast</span>
+            <span class="recipe-tag">Low Carb</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="recipe-card-full" data-category="dinner">
+        <div class="recipe-emoji-big">🐟</div>
+        <div class="recipe-card-body">
+          <div class="recipe-title-full">Teriyaki Salmon & Rice</div>
+          <div class="recipe-sub">Dinner · 20 min · Satiety ★★★★★</div>
+          <div class="recipe-macro-row">
+            <div class="rmr-cell">
+              <div class="rmr-val" style="color:var(--lime)">520</div>
+              <div class="rmr-key">kcal</div>
+            </div>
+            <div class="rmr-cell">
+              <div class="rmr-val" style="color:var(--green)">44g</div>
+              <div class="rmr-key">protein</div>
+            </div>
+            <div class="rmr-cell">
+              <div class="rmr-val" style="color:var(--lime)">52g</div>
+              <div class="rmr-key">carbs</div>
+            </div>
+            <div class="rmr-cell">
+              <div class="rmr-val" style="color:var(--orange)">14g</div>
+              <div class="rmr-key">fat</div>
+            </div>
+          </div>
+          <div class="recipe-tags">
+            <span class="recipe-tag">Omega-3</span>
+            <span class="recipe-tag">Dinner</span>
+            <span class="recipe-tag">Dairy-Free</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="recipe-card-full" data-category="dinner">
+        <div class="recipe-emoji-big">🥩</div>
+        <div class="recipe-card-body">
+          <div class="recipe-title-full">Lean Beef & Sweet Potato Mash</div>
+          <div class="recipe-sub">Dinner · 30 min · Satiety ★★★★★</div>
+          <div class="recipe-macro-row">
+            <div class="rmr-cell">
+              <div class="rmr-val" style="color:var(--lime)">490</div>
+              <div class="rmr-key">kcal</div>
+            </div>
+            <div class="rmr-cell">
+              <div class="rmr-val" style="color:var(--green)">46g</div>
+              <div class="rmr-key">protein</div>
+            </div>
+            <div class="rmr-cell">
+              <div class="rmr-val" style="color:var(--lime)">42g</div>
+              <div class="rmr-key">carbs</div>
+            </div>
+            <div class="rmr-cell">
+              <div class="rmr-val" style="color:var(--orange)">11g</div>
+              <div class="rmr-key">fat</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-gap"></div>
+    </div>
+
+    <!-- ═══ SCREEN: AI COACH ═══ -->
+    <div class="screen" id="screen-coach">
+
+      <div class="page-header" style="align-items:flex-start;">
+        <div>
+          <div class="page-title">AI Coach</div>
+          <div class="page-sub">Powered by GPT-4o · Pro</div>
+        </div>
+      </div>
+
+      <div class="coach-header">
+        <div class="coach-ai-badge">
+          <div class="coach-ai-dot"></div>
+          Performance Assistant
+        </div>
+        <div class="coach-title">WEEK 8 BRIEF</div>
+        <div class="coach-brief">
+          <strong>Strongest week of your cut.</strong> You lost 1.4 lb but hit a deadlift PR. The deficit is working without costing muscle. Bench stalled — not alarming yet, but flag it if it happens again next week. Stay the course.
+        </div>
+      </div>
+
+      <!-- Context chips -->
+      <div class="context-chips">
+        <div class="ctx-chip" onclick="showToast('🧠','Why no calorie change?')">Why no change?</div>
+        <div class="ctx-chip" onclick="showToast('💪','Bench stall analysis...')">Why is bench stalling?</div>
+        <div class="ctx-chip" onclick="showToast('📉','Deficit safety check...')">Am I in too deep?</div>
+        <div class="ctx-chip" onclick="showToast('🍖','Protein timing advice...')">Protein timing</div>
+        <div class="ctx-chip" onclick="showToast('😴','Recovery optimization...')">Recovery tips</div>
+      </div>
+
+      <div class="section-gap-sm"></div>
+
+      <!-- Messages -->
+      <div class="coach-message cm-positive">
+        <div class="cm-type">✓ Strength Retention</div>
+        <div class="cm-text">Your Strength Retention Score is <em>94%</em> — top 8% of users at week 8 of a cut. The deadlift PR at <em>365×3</em> signals your nervous system is adapting well to the deficit. This is exactly what we're optimizing for.</div>
+      </div>
+
+      <div class="coach-message cm-suggestion">
+        <div class="cm-type">→ Macro Status</div>
+        <div class="cm-text">Rate of loss at <em>0.8%/week</em> is ideal — right in the 0.5–1.0% zone. Protein at 91% adherence is solid. No adjustment this week. Next suggested check-in: <em>Sunday 9am</em>.</div>
+        <div class="feed-actions">
+          <button class="feed-btn-primary" onclick="showToast('✓','Targets locked for Week 9')">Confirm Targets</button>
+          <button class="feed-btn-ghost">View Details</button>
+        </div>
+      </div>
+
+      <div class="coach-message" style="border-color: rgba(255,159,63,0.15);">
+        <div class="cm-type" style="color:var(--orange);">⚠ Watch List</div>
+        <div class="cm-text">Bench press has been flat 2 sessions. Not a decline — but worth watching. If it drops next week, I'll suggest a +75 kcal buffer. For now: <em>ensure 8hr sleep pre-bench</em> and check grip width consistency.</div>
+      </div>
+
+      <!-- Chat messages container -->
+      <div id="coach-chat-messages"></div>
+
+      <!-- Chat input -->
+      <div class="section-label" style="margin-top:4px;">Ask Anything</div>
+      <div class="chat-input-bar">
+        <input type="text" id="coach-chat-input" class="chat-input-text" placeholder="Ask about your cut, lifts, nutrition..." autocomplete="off" style="background:transparent;border:none;outline:none;width:100%;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);" />
+        <button class="chat-send-btn" onclick="sendCoachMessage()" type="button">↑</button>
+      </div>
+
+      <!-- Rate limit indicator -->
+      <div style="padding: 0 20px; display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+        <span style="font-size:11px;color:var(--textDim)">Pro · Unlimited queries</span>
+        <span style="font-size:11px;color:var(--textDim)">Next brief: Sun 8am</span>
+      </div>
+
+      <div class="section-gap"></div>
+    </div>
+
+    <!-- ═══ SCREEN: PROGRESS ═══ -->
+    <div class="screen" id="screen-progress">
+
+      <div class="page-header">
+        <div>
+          <div class="page-title">Progress</div>
+          <div class="page-sub">Week 8 · Cut started Jan 3</div>
+        </div>
+        <div class="chip chip-lime">On Track</div>
+      </div>
+
+      <!-- Current weight hero -->
+      <div class="progress-hero">
+        <div class="ph-label">Current Weight (7-day avg)</div>
+        <div>
+          <span class="ph-val">189.4</span>
+          <span class="ph-unit"> lb</span>
+        </div>
+        <div class="ph-delta">↓ 12.0 lb since start</div>
+        <div class="ph-context">Started 201.4 lb · Target: 175 lb</div>
+        <div style="margin-top: 14px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:11px;color:var(--textSub);">
+            <span>Start: 201.4</span>
+            <span>Target: 175</span>
+          </div>
+          <div style="height:8px;background:var(--surface3);border-radius:100px;overflow:hidden;">
+            <div style="height:100%;width:46%;background:linear-gradient(90deg,var(--lime),#a8ff00);border-radius:100px;"></div>
+          </div>
+          <div style="font-size:11px;color:var(--textSub);margin-top:4px;">46% of the way to goal</div>
+        </div>
+      </div>
+
+      <!-- Weight chart -->
+      <div class="chart-wrap">
+        <div class="chart-title-bar">
+          <div class="chart-title">Weight Trend</div>
+          <div class="chart-period">
+            <button class="period-btn">4W</button>
+            <button class="period-btn active">8W</button>
+            <button class="period-btn">All</button>
+          </div>
+        </div>
+        <svg class="main-chart" viewBox="0 0 350 140" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="wGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#d4ff3f" stop-opacity="0.15"/>
+              <stop offset="100%" stop-color="#d4ff3f" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <!-- Grid -->
+          <line x1="0" y1="35" x2="350" y2="35" stroke="#1e1e26" stroke-width="1"/>
+          <line x1="0" y1="70" x2="350" y2="70" stroke="#1e1e26" stroke-width="1"/>
+          <line x1="0" y1="105" x2="350" y2="105" stroke="#1e1e26" stroke-width="1"/>
+          <!-- Raw daily (noisy) -->
+          <polyline
+            points="0,15 44,24 88,10 132,30 176,18 220,38 264,25 308,32 350,22"
+            fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1.5" stroke-dasharray="3,3"/>
+          <!-- 7-day rolling avg (smooth trend down) -->
+          <polyline
+            points="44,20 88,28 132,40 176,52 220,65 264,78 308,92 350,102"
+            fill="none" stroke="#d4ff3f" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- Fill under avg -->
+          <polygon
+            points="44,20 88,28 132,40 176,52 220,65 264,78 308,92 350,102 350,140 44,140"
+            fill="url(#wGrad)"/>
+          <!-- End dot -->
+          <circle cx="350" cy="102" r="5" fill="#d4ff3f"/>
+          <circle cx="350" cy="102" r="9" fill="rgba(212,255,63,0.2)"/>
+          <!-- Target line -->
+          <line x1="0" y1="128" x2="350" y2="128" stroke="rgba(63,255,143,0.2)" stroke-width="1" stroke-dasharray="4,4"/>
+          <text x="355" y="131" fill="rgba(63,255,143,0.5)" font-size="8">Goal</text>
+        </svg>
+        <div class="chart-axis-labels">
+          <span>Jan 3</span><span>Jan 17</span><span>Jan 31</span><span>Feb 7</span><span>Feb 14</span><span>Today</span>
+        </div>
+      </div>
+
+      <!-- Score cards (horizontal scroll) -->
+      <div class="section-label">Performance Scores</div>
+      <div class="score-cards">
+        <div class="score-card" style="border-color:rgba(63,255,143,0.2)">
+          <div class="sc-icon">💪</div>
+          <div class="sc-val" style="color:var(--green)">94%</div>
+          <div class="sc-label">Strength Retention</div>
+          <div class="sc-delta" style="color:var(--green)">↑ +2% wk</div>
+        </div>
+        <div class="score-card" style="border-color:rgba(212,255,63,0.2)">
+          <div class="sc-icon">🛡</div>
+          <div class="sc-val" style="color:var(--lime)">91%</div>
+          <div class="sc-label">Protein Adherence</div>
+          <div class="sc-delta" style="color:var(--lime)">↑ +4% wk</div>
+        </div>
+        <div class="score-card" style="border-color:rgba(63,191,255,0.2)">
+          <div class="sc-icon">📉</div>
+          <div class="sc-val" style="color:var(--blue)">0.8%</div>
+          <div class="sc-label">Weekly Loss Rate</div>
+          <div class="sc-delta" style="color:var(--blue)">→ On target</div>
+        </div>
+        <div class="score-card">
+          <div class="sc-icon">🔥</div>
+          <div class="sc-val" style="color:var(--orange)">87%</div>
+          <div class="sc-label">Calorie Compliance</div>
+          <div class="sc-delta" style="color:var(--orange)">↓ -3% wk</div>
+        </div>
+      </div>
+
+      <div class="section-gap-sm"></div>
+
+      <!-- Stats grid -->
+      <div class="stats-grid-2">
+        <div class="stat-card-sm">
+          <div class="scm-label">Deadlift e1RM</div>
+          <div class="scm-val" style="color:var(--green)">401</div>
+          <div class="scm-sub">lb · +12 since start</div>
+        </div>
+        <div class="stat-card-sm">
+          <div class="scm-label">Squat e1RM</div>
+          <div class="scm-val" style="color:var(--green)">323</div>
+          <div class="scm-sub">lb · +8 since start</div>
+        </div>
+        <div class="stat-card-sm">
+          <div class="scm-label">Total PRs</div>
+          <div class="scm-val" style="color:var(--lime)">14</div>
+          <div class="scm-sub">During this cut</div>
+        </div>
+        <div class="stat-card-sm">
+          <div class="scm-label">Wk Rate of Loss</div>
+          <div class="scm-val" style="color:var(--blue)">0.8%</div>
+          <div class="scm-sub">Target: 0.5–1.0%</div>
+        </div>
+      </div>
+
+      <!-- Lift chart -->
+      <div class="chart-wrap">
+        <div class="chart-title-bar">
+          <div class="chart-title">Deadlift e1RM Trend</div>
+          <div class="chip chip-green" style="font-size:10px;">+3.1% cut</div>
+        </div>
+        <svg class="main-chart" viewBox="0 0 350 140" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="dGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#3fff8f" stop-opacity="0.12"/>
+              <stop offset="100%" stop-color="#3fff8f" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <line x1="0" y1="35" x2="350" y2="35" stroke="#1e1e26" stroke-width="1"/>
+          <line x1="0" y1="70" x2="350" y2="70" stroke="#1e1e26" stroke-width="1"/>
+          <line x1="0" y1="105" x2="350" y2="105" stroke="#1e1e26" stroke-width="1"/>
+          <!-- Lift trend (going up) -->
+          <polyline
+            points="0,110 50,105 100,100 150,95 200,88 250,78 300,72 350,65"
+            fill="none" stroke="#3fff8f" stroke-width="2.5" stroke-linecap="round"/>
+          <polygon
+            points="0,110 50,105 100,100 150,95 200,88 250,78 300,72 350,65 350,140 0,140"
+            fill="url(#dGrad)"/>
+          <!-- Data points -->
+          <circle cx="0" cy="110" r="3" fill="#3fff8f" opacity="0.5"/>
+          <circle cx="100" cy="100" r="3" fill="#3fff8f" opacity="0.5"/>
+          <circle cx="200" cy="88" r="3" fill="#3fff8f" opacity="0.7"/>
+          <circle cx="300" cy="72" r="3" fill="#3fff8f" opacity="0.8"/>
+          <circle cx="350" cy="65" r="5" fill="#3fff8f"/>
+          <circle cx="350" cy="65" r="9" fill="rgba(63,255,143,0.2)"/>
+        </svg>
+        <div class="chart-axis-labels">
+          <span>389 lb</span><span></span><span></span><span>395 lb</span><span></span><span></span><span></span><span>401 lb</span>
+        </div>
+      </div>
+
+      <!-- Share card -->
+      <div style="margin: 0 20px 16px; background: linear-gradient(135deg, #0f0f18, #0d0d14); border: 1px solid rgba(212,255,63,0.15); border-radius: var(--r); padding: 16px; display:flex; align-items:center; gap:12px;" onclick="showToast('📤','Progress card ready to share!')">
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;color:var(--text);">Share Your Progress</div>
+          <div style="font-size:12px;color:var(--textSub);margin-top:2px;">-12 lb · 94% strength retention</div>
+        </div>
+        <div style="background:var(--lime);color:#000;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;white-space:nowrap;">Share ↗</div>
+      </div>
+
+      <div class="section-gap"></div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+      <button class="nav-btn active" data-screen="home" onclick="switchScreen('home', this)">
+        <div class="nav-icon">⬛</div>
+        <div class="nav-label">Home</div>
+      </button>
+      <button class="nav-btn" data-screen="nutrition" onclick="switchScreen('nutrition', this)">
+        <div class="nav-icon">🍽</div>
+        <div class="nav-label">Nutrition</div>
+      </button>
+      <button class="nav-btn" data-screen="lift" onclick="switchScreen('lift', this)">
+        <div class="nav-icon">🏋</div>
+        <div class="nav-label">Lift</div>
+      </button>
+      <button class="nav-btn" data-screen="recipes" onclick="switchScreen('recipes', this)">
+        <div class="nav-icon">📖</div>
+        <div class="nav-label">Recipes</div>
+      </button>
+      <button class="nav-btn" data-screen="coach" onclick="switchScreen('coach', this)">
+        <div class="nav-icon">🧠</div>
+        <div class="nav-label">Coach</div>
+      </button>
+      <button class="nav-btn" data-screen="progress" onclick="switchScreen('progress', this)">
+        <div class="nav-icon">📈</div>
+        <div class="nav-label">Progress</div>
+      </button>
+    </nav>
+
+    <!-- Quick Log FAB -->
+    <button class="quick-log-fab" onclick="openModal()">+</button>
+
+    <!-- Quick Log Modal -->
+    <div class="modal-overlay" id="quick-modal" onclick="closeModalIfBg(event)">
+      <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-title">Quick Log</div>
+        <div class="modal-sub">What are you tracking?</div>
+        <div class="quick-options">
+          <div class="quick-option" onclick="showToast('📷','Barcode scanner ready'); closeModal()">
+            <div class="qo-emoji">📷</div>
+            <div class="qo-label">Scan Barcode</div>
+            <div class="qo-sub">Instant entry</div>
+          </div>
+          <div class="quick-option" onclick="showToast('🔍','USDA search open'); closeModal()">
+            <div class="qo-emoji">🔍</div>
+            <div class="qo-label">Search Food</div>
+            <div class="qo-sub">900k+ items</div>
+          </div>
+          <div class="quick-option" onclick="showToast('🏋','Starting workout...'); closeModal(); switchScreen('lift')">
+            <div class="qo-emoji">🏋</div>
+            <div class="qo-label">Log Workout</div>
+            <div class="qo-sub">Start session</div>
+          </div>
+          <div class="quick-option" onclick="openWeighInModal(); closeModal()">
+            <div class="qo-emoji">⚖️</div>
+            <div class="qo-label">Weigh-In</div>
+            <div class="qo-sub">Log today</div>
+          </div>
+        </div>
+        <div class="quick-protein-row">
+          <div>
+            <div class="qpr-label">Hit Protein Today ✓</div>
+            <div class="qpr-sub">One tap — mark protein goal done</div>
+          </div>
+          <div class="qpr-toggle" onclick="showToast('🛡','Protein goal marked — great work!'); closeModal()"></div>
+        </div>
+        <button class="btn-ghost" style="width:100%;margin-top:4px;" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Weigh-In Modal -->
+    <!-- Weigh-In Modal -->
+    <div class="modal-overlay" id="weighin-modal" onclick="closeWeighInIfBg(event)">
+      <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-title">Weigh-In</div>
+        <div class="modal-sub">Log your weight · <span id="weighin-date"></span></div>
+        <div class="weighin-input-row">
+          <button type="button" class="weighin-adj-btn" onclick="adjustWeight(-0.1)">−</button>
+          <div class="weighin-center">
+            <input type="number" id="weighin-input" class="weighin-number-input"
+              value="189.2" min="50" max="500" step="0.1" />
+            <div class="weighin-unit">pounds</div>
+          </div>
+          <button type="button" class="weighin-adj-btn" onclick="adjustWeight(0.1)">+</button>
+        </div>
+        <div id="weighin-history" style="background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--textSub);min-height:44px;"></div>
+        <button class="btn-primary" onclick="logWeighIn()">Log Weigh-In</button>
+        <button class="btn-ghost" style="width:100%;margin-top:10px;" onclick="closeWeighInModal()">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Recipe Detail Modal -->
+    <div class="modal-overlay" id="recipe-modal" onclick="closeRecipeIfBg(event)">
+      <div class="modal-sheet recipe-modal-sheet">
+        <div class="modal-handle"></div>
+        <div id="recipe-modal-content"></div>
+        <button class="btn-ghost" style="width:100%;margin-top:10px;" onclick="closeRecipeModal()">Close</button>
+      </div>
+    </div>
+
+    <!-- Food Search Modal -->
+    <div class="modal-overlay" id="food-search-modal" onclick="closeFoodSearchIfBg(event)">
+      <div class="modal-sheet" style="padding-bottom:20px;">
+        <div class="modal-handle"></div>
+        <div class="modal-title">Add Food</div>
+        <div class="modal-sub" id="food-search-slot-label">Search 900k+ items</div>
+        <div style="display:flex;align-items:center;background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:12px 14px;gap:10px;margin-bottom:14px;">
+          <span style="font-size:16px;">🔍</span>
+          <input type="text" id="food-search-input" placeholder="Search foods (e.g. chicken breast, oats...)"
+            style="flex:1;background:transparent;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);" autocomplete="off" />
+        </div>
+        <div id="food-search-results"></div>
+        <div id="food-search-common" style="margin-top:4px;">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--textDim);margin-bottom:8px;">Common Foods</div>
+          <div id="food-common-list"></div>
+        </div>
+        <button class="btn-ghost" style="width:100%;margin-top:12px;" onclick="closeFoodSearch()">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+      <span class="toast-icon" id="toast-icon">✓</span>
+      <span class="toast-text" id="toast-text"><strong>Action complete</strong></span>
+    </div>
+
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════
+// LIVE CLOCK
+// ═══════════════════════════════════════════════
+function updateClock() {
+  const now = new Date();
+  let h = now.getHours(), m = now.getMinutes();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  const timeStr = h + ':' + String(m).padStart(2,'0');
+  const el = document.querySelector('.status-time');
+  if (el) el.textContent = timeStr;
+}
+updateClock();
+setInterval(updateClock, 10000);
+
+// ═══════════════════════════════════════════════
+// DYNAMIC WEEK DOTS
+// ═══════════════════════════════════════════════
+function renderWeekDots() {
+  const container = document.querySelector('#screen-home .week-dots, #screen-home [style*="week-dot"]');
+  const dots = document.querySelectorAll('#screen-home .week-dot');
+  if (!dots.length) return;
+  const dayOfWeek = new Date().getDay(); // 0=Sun,1=Mon...6=Sat
+  // Our dots are M T W T F S S = indices 1 2 3 4 5 6 0
+  const dayMap = [6, 0, 1, 2, 3, 4, 5]; // dot index -> JS day (Mon=dot0, Sun=dot6)
+  dots.forEach((dot, i) => {
+    const jsDay = dayMap[i];
+    dot.className = 'week-dot';
+    if (jsDay === dayOfWeek) {
+      dot.classList.add('wd-today');
+    } else {
+      // Determine if past or future
+      // Mon=1..Sat=6, Sun=0 in JS; our week starts Mon
+      const todayPos = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Mon=0..Sun=6
+      if (i < todayPos) {
+        dot.classList.add('wd-done');
+      } else {
+        dot.classList.add('wd-future');
+      }
+    }
+  });
+  // Update streak label
+  const streakEl = document.querySelector('#screen-home [style*="streak"]');
+  const todayPos = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+  if (streakEl) streakEl.textContent = todayPos + ' day streak 🔥';
+}
+renderWeekDots();
+
+// ═══════════════════════════════════════════════
+// DYNAMIC GREETING
+// ═══════════════════════════════════════════════
+(function() {
+  const h = new Date().getHours();
+  const greeting = h < 12 ? 'Good morning,' : h < 17 ? 'Good afternoon,' : 'Good evening,';
+  const el = document.querySelector('.hero-greeting');
+  if (el) el.textContent = greeting;
+})();
+
+// ═══════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════
+let currentScreen = 'home';
+
+function switchScreen(screenId, btn) {
+  if (screenId === currentScreen) return;
+
+  // Pause timer if leaving lift screen
+  if (currentScreen === 'lift' && timerRunning) {
+    pauseTimer();
+    showToast('⏸', 'Timer paused');
+  }
+  if (screenId === 'lift' && !timerRunning && timerSeconds < 90) {
+    showToast('⏱', 'Timer ready — tap ▶ to resume');
+  }
+
+  // Hide all screens
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+    s.style.display = 'none';
+  });
+
+  // Show target
+  const target = document.getElementById('screen-' + screenId);
+  if (target) {
+    target.style.display = 'flex';
+    target.offsetHeight; // reflow for animation
+    target.classList.add('active');
+    target.scrollTop = 0;
+  }
+
+  // Update nav buttons
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  if (btn && btn.classList) {
+    btn.classList.add('active');
+  } else {
+    const navBtn = document.querySelector(`.nav-btn[data-screen="${screenId}"]`);
+    if (navBtn) navBtn.classList.add('active');
+  }
+
+  currentScreen = screenId;
+
+  // Screen-specific actions
+  if (screenId === 'nutrition') {
+    setTimeout(() => {
+      animateBar('calorie-bar-fill', '72%');
+      animateBar('pp-fill', '94%');
+    }, 300);
+  }
+}
+
+// Init: show home, hide rest
+document.querySelectorAll('.screen').forEach((s, i) => {
+  s.style.display = i === 0 ? 'flex' : 'none';
+});
+
+// ═══════════════════════════════════════════════
+// BAR ANIMATION HELPER
+// ═══════════════════════════════════════════════
+function animateBar(id, targetWidth) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.transition = 'none';
+  el.style.width = '0';
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      el.style.transition = 'width 0.9s cubic-bezier(0.16,1,0.3,1)';
+      el.style.width = targetWidth;
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════
+// QUICK LOG MODAL
+// ═══════════════════════════════════════════════
+function openModal() {
+  document.getElementById('quick-modal').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('quick-modal').classList.remove('open');
+}
+function closeModalIfBg(e) {
+  if (e.target === document.getElementById('quick-modal')) closeModal();
+}
+
+// ═══════════════════════════════════════════════
+// WEIGH-IN MODAL
+// ═══════════════════════════════════════════════
+function openWeighInModal() {
+  const modal = document.getElementById('weighin-modal');
+  if (!modal) return;
+  modal.classList.add('open');
+  // Set today's date
+  const dateEl = document.getElementById('weighin-date');
+  if (dateEl) {
+    dateEl.textContent = new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  }
+  // Prefill with last logged or 189.2
+  const weights = getWeightHistory();
+  const input = document.getElementById('weighin-input');
+  if (input && weights.length > 0) {
+    input.value = weights[weights.length - 1].weight;
+  }
+  renderWeighInHistory();
+}
+function closeWeighInModal() {
+  const modal = document.getElementById('weighin-modal');
+  if (modal) modal.classList.remove('open');
+}
+function closeWeighInIfBg(e) {
+  if (e.target === document.getElementById('weighin-modal')) closeWeighInModal();
+}
+function adjustWeight(delta) {
+  const input = document.getElementById('weighin-input');
+  if (!input) return;
+  let val = parseFloat(input.value) || 189.2;
+  val = Math.round((val + delta) * 10) / 10;
+  val = Math.min(500, Math.max(50, val));
+  input.value = val.toFixed(1);
+}
+function getWeightHistory() {
+  try {
+    return JSON.parse(localStorage.getItem('ironfuel_weights') || '[]');
+  } catch { return []; }
+}
+function logWeighIn() {
+  const input = document.getElementById('weighin-input');
+  const weight = parseFloat(input ? input.value : 189.2);
+  if (isNaN(weight)) { showToast('⚠️','Enter a valid weight'); return; }
+  const entry = { date: new Date().toISOString(), weight };
+  const history = getWeightHistory();
+  history.push(entry);
+  localStorage.setItem('ironfuel_weights', JSON.stringify(history));
+  // Update progress screen hero
+  const phVal = document.querySelector('.ph-val');
+  if (phVal) phVal.textContent = weight.toFixed(1);
+  showToast('⚖️', 'Weigh-in logged: ' + weight.toFixed(1) + ' lb');
+  closeWeighInModal();
+}
+function renderWeighInHistory() {
+  const el = document.getElementById('weighin-history');
+  if (!el) return;
+  const history = getWeightHistory().slice(-5).reverse();
+  if (!history.length) {
+    el.innerHTML = '<span style="color:var(--textDim)">No previous entries</span>';
+    return;
+  }
+  el.innerHTML = '<div style="font-weight:600;color:var(--textSub);margin-bottom:6px;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;">Recent</div>' +
+    history.map(e => {
+      const d = new Date(e.date).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+      return `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)">
+        <span>${d}</span><span style="color:var(--lime);font-family:'DM Mono',monospace">${e.weight.toFixed(1)} lb</span>
+      </div>`;
+    }).join('');
+}
+
+// ═══════════════════════════════════════════════
+// RECIPE MODAL
+// ═══════════════════════════════════════════════
+const RECIPES = {
+  'chicken-power-bowl': {
+    emoji: '🍗', title: 'Chicken Power Bowl',
+    sub: 'Meal Prep · 25 min · High Protein',
+    macros: { kcal: 478, protein: '52g', carbs: '38g', fat: '12g' },
+    ingredients: [
+      { name: 'Chicken Breast, grilled', qty: '200g' },
+      { name: 'Brown Rice, cooked', qty: '1 cup (195g)' },
+      { name: 'Baby Spinach', qty: '2 cups (60g)' },
+      { name: 'Cherry Tomatoes', qty: '½ cup (75g)' },
+      { name: 'Cucumber, sliced', qty: '½ ea (75g)' },
+      { name: 'Avocado', qty: '¼ ea (50g)' },
+      { name: 'Olive Oil', qty: '1 tsp (5ml)' },
+      { name: 'Lemon Juice', qty: '1 tbsp' },
+      { name: 'Salt & Pepper', qty: 'to taste' },
+    ],
+    steps: ['Season and grill chicken 6-7 min/side until 165°F internal.', 'Cook rice per package. Let cool slightly.', 'Assemble bowl: rice base, sliced chicken, veggies, avocado.', 'Drizzle olive oil and lemon juice. Season and serve.']
+  }
+};
+
+function openRecipeModal(recipeId) {
+  const r = RECIPES[recipeId];
+  if (!r) { showToast('📖', 'Loading recipe...'); return; }
+  const content = document.getElementById('recipe-modal-content');
+  if (!content) return;
+  content.innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+      <div style="font-size:48px;line-height:1;">${r.emoji}</div>
+      <div>
+        <div class="modal-title" style="margin-bottom:2px;">${r.title}</div>
+        <div class="modal-sub" style="margin-bottom:0;">${r.sub}</div>
+      </div>
+    </div>
+    <div class="recipe-macro-row" style="margin-bottom:16px;">
+      <div class="rmr-cell"><div class="rmr-val" style="color:var(--lime)">${r.macros.kcal}</div><div class="rmr-key">kcal</div></div>
+      <div class="rmr-cell"><div class="rmr-val" style="color:var(--green)">${r.macros.protein}</div><div class="rmr-key">protein</div></div>
+      <div class="rmr-cell"><div class="rmr-val" style="color:var(--lime)">${r.macros.carbs}</div><div class="rmr-key">carbs</div></div>
+      <div class="rmr-cell"><div class="rmr-val" style="color:var(--orange)">${r.macros.fat}</div><div class="rmr-key">fat</div></div>
+    </div>
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--textDim);margin-bottom:10px;">Ingredients</div>
+    <div style="background:var(--surface2);border-radius:14px;overflow:hidden;margin-bottom:16px;">
+      ${r.ingredients.map(ing => `<div class="recipe-ingredient-row"><span class="ri-name">${ing.name}</span><span class="ri-qty">${ing.qty}</span></div>`).join('')}
+    </div>
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--textDim);margin-bottom:10px;">Instructions</div>
+    ${r.steps.map((s,i) => `<div style="display:flex;gap:10px;margin-bottom:10px;"><div style="min-width:22px;height:22px;background:var(--lime);color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">${i+1}</div><div style="font-size:13px;color:var(--textSub);line-height:1.6;">${s}</div></div>`).join('')}
+    <button class="btn-primary" style="margin-top:16px;" onclick="showToast('🍽','Chicken Power Bowl added to meal log!');closeRecipeModal()">Add to Meal Log</button>
+  `;
+  document.getElementById('recipe-modal').classList.add('open');
+}
+function closeRecipeModal() {
+  const modal = document.getElementById('recipe-modal');
+  if (modal) modal.classList.remove('open');
+}
+function closeRecipeIfBg(e) {
+  if (e.target === document.getElementById('recipe-modal')) closeRecipeModal();
+}
+
+// ═══════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════
+let toastTimeout;
+function showToast(icon, msg) {
+  const toast = document.getElementById('toast');
+  const iconEl = document.getElementById('toast-icon');
+  const textEl = document.getElementById('toast-text');
+  if (!toast || !iconEl || !textEl) return;
+  iconEl.textContent = icon;
+  textEl.innerHTML = '<strong>' + msg + '</strong>';
+  toast.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => toast.classList.remove('show'), 2800);
+}
+
+// ═══════════════════════════════════════════════
+// REST TIMER
+// ═══════════════════════════════════════════════
+let timerSeconds = 90;
+let timerRunning = false;
+let timerInterval = null;
+
+function updateTimerDisplay() {
+  const m = Math.floor(timerSeconds / 60);
+  const s = timerSeconds % 60;
+  const el = document.getElementById('timer-display');
+  if (el) el.textContent = m + ':' + String(s).padStart(2,'0');
+}
+
+function pauseTimer() {
+  if (!timerRunning) return;
+  timerRunning = false;
+  clearInterval(timerInterval);
+  timerInterval = null;
+  const btn = document.getElementById('timer-toggle-btn');
+  if (btn) btn.textContent = '▶';
+}
+
+function toggleTimer() {
+  timerRunning = !timerRunning;
+  const btn = document.getElementById('timer-toggle-btn');
+  if (timerRunning) {
+    if (btn) btn.textContent = '⏸';
+    timerInterval = setInterval(() => {
+      if (timerSeconds <= 0) {
+        timerRunning = false;
+        timerSeconds = 90;
+        clearInterval(timerInterval);
+        timerInterval = null;
+        if (btn) btn.textContent = '▶';
+        updateTimerDisplay();
+        showToast('✅', 'Rest complete — start your next set!');
+        return;
+      }
+      timerSeconds--;
+      updateTimerDisplay();
+      // Flash display red when ≤10s
+      const disp = document.getElementById('timer-display');
+      if (disp) disp.style.color = timerSeconds <= 10 ? 'var(--red)' : 'var(--lime)';
+    }, 1000);
+  } else {
+    if (btn) btn.textContent = '▶';
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+}
+
+function adjustTimer(delta) {
+  timerSeconds = Math.max(15, Math.min(600, timerSeconds + delta));
+  updateTimerDisplay();
+}
+
+// ═══════════════════════════════════════════════
+// SET LOG
+// ═══════════════════════════════════════════════
+function logSet(el) {
+  el.textContent = '✓';
+  el.classList.add('done', 'pr-flash');
+  el.onclick = null; // prevent re-tap
+  // Flash exercise name
+  const exBlock = el.closest('.exercise-block');
+  if (exBlock) {
+    const name = exBlock.querySelector('.exercise-name');
+    if (name) {
+      name.style.color = 'var(--lime)';
+      setTimeout(() => { name.style.color = ''; }, 1000);
+    }
+  }
+  showToast('✓', 'Set logged · Rest timer started');
+  timerSeconds = 90;
+  updateTimerDisplay();
+  const disp = document.getElementById('timer-display');
+  if (disp) disp.style.color = 'var(--lime)';
+  if (!timerRunning) toggleTimer();
+}
+
+// ═══════════════════════════════════════════════
+// ADD SET
+// ═══════════════════════════════════════════════
+document.addEventListener('click', function(e) {
+  if (!e.target.classList.contains('add-set-btn')) return;
+  const block = e.target.closest('.exercise-block');
+  if (!block) return;
+  const rows = block.querySelectorAll('.set-row');
+  const lastRow = rows[rows.length - 1];
+  if (!lastRow) return;
+  const newRow = lastRow.cloneNode(true);
+  // Update set number
+  const numEl = newRow.querySelector('.set-num');
+  if (numEl) numEl.textContent = rows.length + 1;
+  // Reset check button
+  const check = newRow.querySelector('.set-check');
+  if (check) {
+    check.classList.remove('done','pr-flash');
+    check.textContent = '○';
+    check.onclick = function() { logSet(this); };
+  }
+  // Insert before the footer buttons row
+  const footer = e.target.closest('[style*="border-top"]') || e.target.parentElement;
+  block.insertBefore(newRow, footer);
+  showToast('+', 'Set ' + (rows.length + 1) + ' added');
+});
+
+// ═══════════════════════════════════════════════
+// RECIPE FILTER PILLS
+// ═══════════════════════════════════════════════
+const filterCategoryMap = {
+  'all': 'all', 'breakfast': 'breakfast', 'meal prep': 'meal-prep',
+  'dinner': 'dinner', 'snack': 'snack', 'under 15 min': 'quick',
+  'dairy-free': 'dairy-free'
+};
+
+function activateFilter(el) {
+  el.closest('.recipe-filters').querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  const filterText = el.textContent.trim().toLowerCase();
+  const category = filterCategoryMap[filterText] || 'all';
+  const cards = document.querySelectorAll('#screen-recipes .recipe-card-full');
+  cards.forEach(card => {
+    card.classList.remove('recipe-hidden', 'recipe-fading');
+    if (category === 'all') {
+      // show all
+    } else {
+      const cardCat = card.dataset.category || '';
+      if (cardCat !== category) {
+        card.classList.add('recipe-fading');
+        setTimeout(() => {
+          if (card.classList.contains('recipe-fading')) card.classList.add('recipe-hidden');
+          card.classList.remove('recipe-fading');
+        }, 260);
+      }
+    }
+  });
+  if (category !== 'all') showToast('📖', 'Showing: ' + el.textContent.trim());
+  else showToast('📖', 'Showing all recipes');
+}
+
+// ═══════════════════════════════════════════════
+// CHART PERIOD BUTTONS
+// ═══════════════════════════════════════════════
+const weightChartLabels = {
+  '4W': ['Jan 24','Jan 28','Feb 1','Feb 5','Feb 9','Today'],
+  '8W': ['Jan 3','Jan 17','Jan 31','Feb 7','Feb 14','Today'],
+  'All': ['Jan 3','Jan 17','Jan 31','Feb 7','Feb 14','Today']
+};
+
+document.querySelectorAll('.period-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const group = this.closest('.chart-period');
+    group.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    const period = this.textContent.trim();
+    // Update axis labels for the nearest chart
+    const chartWrap = this.closest('.chart-wrap');
+    if (chartWrap) {
+      const labels = chartWrap.querySelectorAll('.chart-axis-labels span');
+      const newLabels = weightChartLabels[period] || weightChartLabels['8W'];
+      labels.forEach((lbl, i) => {
+        lbl.textContent = newLabels[i] || '';
+      });
+    }
+  });
+});
+
+// ═══════════════════════════════════════════════
+// AI COACH CHAT
+// ═══════════════════════════════════════════════
+const AI_RESPONSES = [
+  { type: '🧠 Analysis', text: 'Based on your current metrics, you\'re in an optimal deficit. Your strength retention at <em>94%</em> is exceptional — keep protein above 185g and this trend holds.' },
+  { type: '💪 Training', text: 'Your bench stall is likely CNS fatigue, not a true strength issue. Try reducing bench volume by 1 set next session and focus on quality over quantity.' },
+  { type: '🥗 Nutrition', text: 'Protein timing looks good. For best muscle retention, aim to spread your <em>185g protein target</em> across 4+ meals. Your current logging shows solid adherence.' },
+  { type: '📉 Progress', text: 'At <em>0.8% weekly loss rate</em> you\'re in the sweet spot. Any faster risks muscle loss. Any slower and the cut extends unnecessarily. Stay the course.' },
+  { type: '😴 Recovery', text: 'Recovery optimization: prioritize <em>8+ hours sleep</em> on nights before heavy compound days. Sleep quality directly impacts next-day strength output by up to 12%.' },
+  { type: '⚡ Insight', text: 'Your deadlift PR during a cut is a strong signal. The nervous system adaptations are outpacing any minor muscle loss. This is elite-level body recomposition.' },
+];
+let aiResponseIndex = 0;
+
+function sendCoachMessage() {
+  const input = document.getElementById('coach-chat-input');
+  if (!input) return;
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  const container = document.getElementById('coach-chat-messages');
+  if (!container) return;
+  // User message
+  const userDiv = document.createElement('div');
+  userDiv.className = 'coach-msg-user';
+  userDiv.textContent = msg;
+  container.appendChild(userDiv);
+  // Typing indicator
+  const typingDiv = document.createElement('div');
+  typingDiv.className = 'coach-msg-ai';
+  typingDiv.innerHTML = '<div class="ai-typing"><span></span><span></span><span></span></div>';
+  container.appendChild(typingDiv);
+  // Scroll to bottom
+  const screen = document.getElementById('screen-coach');
+  if (screen) setTimeout(() => { screen.scrollTop = screen.scrollHeight; }, 50);
+  // AI response after delay
+  setTimeout(() => {
+    const resp = AI_RESPONSES[aiResponseIndex % AI_RESPONSES.length];
+    aiResponseIndex++;
+    typingDiv.innerHTML = `<div class="cm-type">${resp.type}</div><div class="cm-text">${resp.text}</div>`;
+    if (screen) screen.scrollTop = screen.scrollHeight;
+  }, 900 + Math.random() * 400);
+}
+
+// Allow Enter key to send
+document.addEventListener('DOMContentLoaded', () => {});
+const chatInput = document.getElementById('coach-chat-input');
+if (chatInput) {
+  chatInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendCoachMessage(); }
+  });
+}
+
+// ═══════════════════════════════════════════════
+// FEED BUTTON (scoped — only affects clicked btn)
+// ═══════════════════════════════════════════════
+document.addEventListener('click', function(e) {
+  if (!e.target.classList.contains('feed-btn-primary')) return;
+  if (e.target.disabled) return;
+  e.target.textContent = '✓ Done';
+  e.target.style.opacity = '0.6';
+  e.target.disabled = true;
+  showToast('✓', 'Target confirmed for next week');
+});
+
+// ═══════════════════════════════════════════════
+// NUTRITION BAR — animate on first load
+// ═══════════════════════════════════════════════
+window.addEventListener('load', () => {
+  // Slight delay so CSS is ready
+  setTimeout(() => {
+    if (currentScreen === 'nutrition') {
+      animateBar('calorie-bar-fill', '72%');
+      animateBar('pp-fill', '94%');
+    }
+  }, 400);
+});
+
+// Also trigger on nav click
+document.querySelector('[data-screen="nutrition"]').addEventListener('click', () => {
+  setTimeout(() => {
+    animateBar('calorie-bar-fill', '72%');
+    animateBar('pp-fill', '94%');
+  }, 300);
+});
+
+// ═══════════════════════════════════════════════
+// FINISH SESSION BUTTON
+// ═══════════════════════════════════════════════
+document.addEventListener('click', function(e) {
+  if (e.target.textContent === 'Finish Session' && e.target.tagName === 'BUTTON') {
+    pauseTimer();
+    showToast('💪', 'Session saved! Great work, Marcus.');
+    setTimeout(() => switchScreen('progress'), 1200);
+  }
+});
+
+// ═══════════════════════════════════════════════
+// CONTEXT CHIPS in coach screen
+// ═══════════════════════════════════════════════
+document.querySelectorAll('.ctx-chip').forEach(chip => {
+  chip.addEventListener('click', function() {
+    const input = document.getElementById('coach-chat-input');
+    if (input) {
+      input.value = this.textContent.trim();
+      input.focus();
+      sendCoachMessage();
+    }
+  });
+});
+
+// ═══════════════════════════════════════════════
+// FOOD SEARCH MODAL
+// ═══════════════════════════════════════════════
+const FOOD_DATABASE = [
+  { name: 'Chicken Breast, grilled', per: '100g', kcal: 165, p: 31, c: 0, f: 3.6 },
+  { name: 'Chicken Breast, raw', per: '100g', kcal: 120, p: 23, c: 0, f: 2.6 },
+  { name: 'Greek Yogurt, 2% (Fage)', per: '227g', kcal: 150, p: 20, c: 8, f: 4 },
+  { name: 'Eggs, large, whole', per: '1 egg (50g)', kcal: 70, p: 6, c: 0.4, f: 5 },
+  { name: 'Egg Whites', per: '100g', kcal: 52, p: 11, c: 0.7, f: 0.2 },
+  { name: 'Whey Protein Isolate', per: '1 scoop (30g)', kcal: 120, p: 25, c: 2, f: 1 },
+  { name: 'Casein Protein', per: '1 scoop (34g)', kcal: 130, p: 24, c: 4, f: 1.5 },
+  { name: 'Brown Rice, cooked', per: '195g (1 cup)', kcal: 216, p: 5, c: 45, f: 1.8 },
+  { name: 'White Rice, cooked', per: '186g (1 cup)', kcal: 242, p: 4, c: 53, f: 0.4 },
+  { name: 'Oats, rolled, dry', per: '40g (½ cup)', kcal: 150, p: 5, c: 27, f: 3 },
+  { name: 'Sweet Potato, baked', per: '150g', kcal: 136, p: 3, c: 31, f: 0.2 },
+  { name: 'Broccoli, steamed', per: '150g', kcal: 51, p: 4, c: 10, f: 0.5 },
+  { name: 'Salmon, Atlantic, wild', per: '170g', kcal: 309, p: 44, c: 0, f: 14 },
+  { name: 'Tuna, canned in water', per: '85g (1 can)', kcal: 100, p: 22, c: 0, f: 0.5 },
+  { name: 'Cottage Cheese, 2%', per: '226g (1 cup)', kcal: 180, p: 25, c: 8, f: 5 },
+  { name: 'Banana, medium', per: '1 ea (120g)', kcal: 107, p: 1.3, c: 27, f: 0.4 },
+  { name: 'Peanut Butter, natural', per: '2 tbsp (32g)', kcal: 190, p: 7, c: 7, f: 16 },
+  { name: 'Almonds, raw', per: '28g (1 oz)', kcal: 164, p: 6, c: 6, f: 14 },
+  { name: 'Olive Oil, EVOO', per: '1 tbsp (14g)', kcal: 119, p: 0, c: 0, f: 14 },
+  { name: 'Ground Beef, 93% lean', per: '100g', kcal: 152, p: 21, c: 0, f: 7 },
+  { name: 'Beef Steak, lean', per: '170g (6oz)', kcal: 280, p: 42, c: 0, f: 11 },
+  { name: 'Spinach, raw', per: '30g (1 cup)', kcal: 7, p: 0.9, c: 1.1, f: 0.1 },
+  { name: 'Avocado, fresh', per: '50g (¼ ea)', kcal: 80, p: 1, c: 4, f: 7 },
+  { name: 'Low-Fat Milk, 1%', per: '240ml (1 cup)', kcal: 102, p: 8, c: 12, f: 2.4 },
+  { name: 'Whole Wheat Bread', per: '1 slice (28g)', kcal: 70, p: 4, c: 13, f: 1 },
+  { name: 'Protein Bar (Quest)', per: '1 bar (60g)', kcal: 210, p: 21, c: 22, f: 8 },
+];
+
+let currentFoodSlot = null;
+let foodSearchTimer = null;
+
+function openFoodSearch(slot) {
+  currentFoodSlot = slot || null;
+  const modal = document.getElementById('food-search-modal');
+  const slotLabel = document.getElementById('food-search-slot-label');
+  const input = document.getElementById('food-search-input');
+  const results = document.getElementById('food-search-results');
+  if (!modal) return;
+  if (slotLabel) slotLabel.textContent = slot ? 'Adding to: ' + slot.charAt(0).toUpperCase() + slot.slice(1) : 'Search 900k+ items';
+  if (input) { input.value = ''; input.focus(); }
+  if (results) results.innerHTML = '';
+  renderCommonFoods();
+  modal.classList.add('open');
+}
+function closeFoodSearch() {
+  const modal = document.getElementById('food-search-modal');
+  if (modal) modal.classList.remove('open');
+}
+function closeFoodSearchIfBg(e) {
+  if (e.target === document.getElementById('food-search-modal')) closeFoodSearch();
+}
+
+function renderCommonFoods() {
+  const el = document.getElementById('food-common-list');
+  if (!el) return;
+  const common = FOOD_DATABASE.slice(0, 8);
+  el.innerHTML = common.map(f => foodItemHTML(f)).join('');
+}
+
+function foodItemHTML(f) {
+  return `<div class="food-search-row" onclick='addFoodToLog(${JSON.stringify(f)})'>
+    <div class="fsr-info">
+      <div class="fsr-name">${f.name}</div>
+      <div class="fsr-sub">${f.per} · ${f.p}g protein</div>
+    </div>
+    <div class="fsr-kcal">${f.kcal}<span>kcal</span></div>
+    <div class="fsr-add">+</div>
+  </div>`;
+}
+
+function searchFoods(query) {
+  const results = document.getElementById('food-search-results');
+  const common = document.getElementById('food-search-common');
+  if (!results) return;
+  if (!query.trim()) {
+    results.innerHTML = '';
+    if (common) common.style.display = '';
+    return;
+  }
+  if (common) common.style.display = 'none';
+  const q = query.toLowerCase();
+  const matches = FOOD_DATABASE.filter(f => f.name.toLowerCase().includes(q)).slice(0, 10);
+  if (!matches.length) {
+    results.innerHTML = '<div style="padding:16px;text-align:center;color:var(--textDim);font-size:13px;">No results — try a different search term</div>';
+    return;
+  }
+  results.innerHTML = '<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--textDim);margin-bottom:8px;">Results</div>' +
+    matches.map(f => foodItemHTML(f)).join('');
+}
+
+function addFoodToLog(food) {
+  showToast('✅', food.name + ' added · ' + food.kcal + ' kcal');
+  closeFoodSearch();
+  // Find the slot and append a food-entry row
+  if (currentFoodSlot) {
+    const slots = document.querySelectorAll('.meal-slot');
+    for (const slot of slots) {
+      const title = slot.querySelector('.meal-slot-title');
+      if (title && title.textContent.toLowerCase() === currentFoodSlot.toLowerCase()) {
+        const newEntry = document.createElement('div');
+        newEntry.className = 'food-entry';
+        newEntry.innerHTML = `
+          <div class="food-entry-name">${food.name}</div>
+          <div class="food-entry-qty">${food.per}</div>
+          <div class="food-entry-cals">${food.kcal}</div>
+        `;
+        // Insert before the last child (slot footer or end)
+        slot.appendChild(newEntry);
+        // Update calorie count in header
+        const calsEl = slot.querySelector('.meal-slot-cals');
+        if (calsEl) {
+          const current = parseInt(calsEl.textContent) || 0;
+          calsEl.textContent = (current + food.kcal) + ' kcal';
+        }
+        break;
+      }
+    }
+  }
+}
+
+// Live search as user types
+const foodSearchInput = document.getElementById('food-search-input');
+if (foodSearchInput) {
+  foodSearchInput.addEventListener('input', function() {
+    clearTimeout(foodSearchTimer);
+    foodSearchTimer = setTimeout(() => searchFoods(this.value), 200);
+  });
+}
+
+// ═══════════════════════════════════════════════
+// INIT DISPLAY
+// ═══════════════════════════════════════════════
+updateTimerDisplay();
+</script>
+</body>
+</html>
