@@ -1,15 +1,18 @@
 /**
  * claude-task-done — Notify the boss when Claude Code finishes work.
  *
- * Two modes:
+ * Subcommands:
  *
- *   1. Direct notification (no task queue needed):
- *      node TelegramBot/claude-task-done.js notify "Added login page and fixed CSS bugs"
+ *   notify "Summary of what was done"
+ *     → Send a direct Telegram notification (no task queue needed)
  *
- *   2. Mark a queued task as done + notify:
- *      node TelegramBot/claude-task-done.js done <task_id|latest> "Summary"
+ *   start <task_id|latest>
+ *     → Mark a queued task as in_progress (triggers "started" notification via bot watcher)
  *
- * The bot also watches claude-tasks.json and auto-notifies when tasks complete.
+ *   done <task_id|latest> "Summary of what was done"
+ *     → Mark a queued task as done (triggers "complete" notification via bot watcher)
+ *
+ * The bot watches claude-tasks.json and auto-notifies on status changes.
  */
 
 module.paths.unshift(require('path').resolve(__dirname, '../Skills/node_modules'));
@@ -25,14 +28,52 @@ const OWNER_CHAT_ID = process.env.TELEGRAM_OWNER_CHAT_ID || null;
 
 function loadTasks() {
   try {
-    return JSON.parse(fs.readFileSync(TASK_FILE, 'utf8'));
-  } catch (_) {
+    const raw = fs.readFileSync(TASK_FILE, 'utf8');
+    return JSON.parse(raw);
+  } catch (err) {
+    if (err.code === 'ENOENT') return [];
+    console.error('[claude-tasks] Failed to load tasks:', err.message);
     return [];
   }
 }
 
 function saveTasks(tasks) {
-  fs.writeFileSync(TASK_FILE, JSON.stringify(tasks, null, 2));
+  const tmpFile = TASK_FILE + '.tmp';
+  fs.writeFileSync(tmpFile, JSON.stringify(tasks, null, 2));
+  fs.renameSync(tmpFile, TASK_FILE);
+}
+
+/**
+ * Format a task completion notification message.
+ */
+function formatTaskNotification(task, label) {
+  const lines = [
+    `🤖 CLAUDE CODE — ${label || 'Task Complete'}`,
+    '',
+    `📝 "${task.task}"`,
+  ];
+
+  if (task.summary) {
+    lines.push('', `✅ ${task.summary}`);
+  }
+
+  if (task.created && task.completed) {
+    const elapsed = new Date(task.completed) - new Date(task.created);
+    const mins = Math.round(elapsed / 60000);
+    const display = mins < 60
+      ? `${mins} min`
+      : `${Math.floor(mins / 60)}h ${mins % 60}m`;
+    lines.push('', `⏱️ Completed in ${display}`);
+  }
+
+  if (task.created && !task.completed) {
+    lines.push('', `⏱️ Queued: ${new Date(task.created).toLocaleString()}`);
+  }
+  if (task.completed) {
+    lines.push(`✔️ Done: ${new Date(task.completed).toLocaleString()}`);
+  }
+
+  return lines.join('\n');
 }
 
 /**
@@ -47,7 +88,9 @@ async function resolveOwnerChatId(bot, task) {
       const id = updates[i].message?.chat?.id;
       if (id) return id;
     }
-  } catch (_) {}
+  } catch (err) {
+    console.error('[claude-tasks] Failed to resolve chat ID:', err.message);
+  }
   return null;
 }
 
@@ -87,9 +130,34 @@ async function sendNotification(summary) {
 }
 
 /**
- * Mark a queued task as done and send a Telegram notification.
+ * Mark a queued task as in_progress. The bot watcher sends the notification.
  */
-async function markDone(taskId, summary) {
+function markStarted(taskId) {
+  const tasks = loadTasks();
+
+  let task;
+  if (taskId === 'latest') {
+    task = [...tasks].reverse().find(t => t.status === 'pending');
+  } else {
+    task = tasks.find(t => t.id === taskId);
+  }
+
+  if (!task) {
+    console.error('[claude-task-done] No matching pending task found.');
+    process.exit(1);
+  }
+
+  task.status = 'in_progress';
+  task.started = new Date().toISOString();
+  saveTasks(tasks);
+
+  console.log(`[claude-task-done] Marked task ${task.id} as in_progress.`);
+}
+
+/**
+ * Mark a queued task as done. The bot watcher sends the notification.
+ */
+function markDone(taskId, summary) {
   const tasks = loadTasks();
 
   let task;
@@ -110,39 +178,6 @@ async function markDone(taskId, summary) {
   saveTasks(tasks);
 
   console.log(`[claude-task-done] Marked task ${task.id} as done.`);
-
-  if (!BOT_TOKEN) {
-    console.error('[claude-task-done] No TELEGRAM_BOT_TOKEN — skipping notification.');
-    return;
-  }
-
-  const bot = new Telegraf(BOT_TOKEN);
-  const chatId = await resolveOwnerChatId(bot, task);
-
-  if (!chatId) {
-    console.error('[claude-task-done] No chat ID found — send /start to the bot first.');
-    process.exit(1);
-  }
-
-  const message = [
-    '🤖 CLAUDE CODE — Task Complete',
-    '',
-    `📝 Task: "${task.task}"`,
-    '',
-    `✅ ${task.summary}`,
-    '',
-    `⏱️ Queued: ${new Date(task.created).toLocaleString()}`,
-    `✔️ Done: ${new Date(task.completed).toLocaleString()}`,
-  ].join('\n');
-
-  try {
-    await bot.telegram.sendMessage(chatId, message);
-    console.log('[claude-task-done] Notification sent.');
-  } catch (err) {
-    console.error('[claude-task-done] Failed:', err.message);
-  }
-
-  process.exit(0);
 }
 
 // --- CLI ---
@@ -151,6 +186,7 @@ if (require.main === module) {
   if (args.length < 1) {
     console.log('Usage:');
     console.log('  node claude-task-done.js notify "Summary of what was done"');
+    console.log('  node claude-task-done.js start <task_id|latest>');
     console.log('  node claude-task-done.js done <task_id|latest> "Summary"');
     process.exit(1);
   }
@@ -160,6 +196,9 @@ if (require.main === module) {
   if (subcommand === 'notify') {
     const summary = args.slice(1).join(' ') || 'Task completed.';
     sendNotification(summary);
+  } else if (subcommand === 'start') {
+    const taskId = args[1] || 'latest';
+    markStarted(taskId);
   } else if (subcommand === 'done') {
     const taskId = args[1] || 'latest';
     const summary = args.slice(2).join(' ') || 'Task completed.';
@@ -172,4 +211,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { markDone, sendNotification, loadTasks, saveTasks, TASK_FILE };
+module.exports = { markDone, markStarted, sendNotification, formatTaskNotification, loadTasks, saveTasks, TASK_FILE };

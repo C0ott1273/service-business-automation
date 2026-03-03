@@ -19,7 +19,7 @@ const cron = require('node-cron');
 const { parseCommand, executeCommand } = require('../Skills/inbound-command-handler');
 const { scheduleReviewRequest, processScheduledReviews } = require('../Skills/review-request-trigger');
 const fs = require('fs');
-const { loadTasks, TASK_FILE } = require('./claude-task-done');
+const { loadTasks, saveTasks, formatTaskNotification, TASK_FILE } = require('./claude-task-done');
 const { getTodaysJobs, formatSchedule } = require('../Skills/google-calendar-sync');
 const { buildMorningBriefing } = require('../Skills/morning-briefing');
 const { formatDailyReading } = require('../Skills/daily-bible-reading');
@@ -335,11 +335,7 @@ bot.on('text', async (ctx) => {
   const claudeMatch = text.match(/^claude\s*[:\-]\s*(.+)/i);
   if (claudeMatch) {
     const task = claudeMatch[1].trim();
-    const taskFile = require('path').resolve(__dirname, 'claude-tasks.json');
-    const fs = require('fs');
-
-    let tasks = [];
-    try { tasks = JSON.parse(fs.readFileSync(taskFile, 'utf8')); } catch (_) {}
+    const tasks = loadTasks();
 
     tasks.push({
       id: `task_${Date.now()}`,
@@ -348,7 +344,7 @@ bot.on('text', async (ctx) => {
       created: new Date().toISOString(),
       from_chat: chatId,
     });
-    fs.writeFileSync(taskFile, JSON.stringify(tasks, null, 2));
+    saveTasks(tasks);
 
     ctx.reply(
       `🤖 Task queued for Claude Code:\n\n` +
@@ -455,40 +451,49 @@ cron.schedule('0 20 * * 0', async () => {
 // =====================
 // CLAUDE TASK WATCHER
 // =====================
-// Watch claude-tasks.json for completed tasks and auto-notify the owner.
-// This catches tasks marked done by claude-task-done.js or any external process.
+// Watch claude-tasks.json for status changes and auto-notify the owner.
+// Tracks both "in_progress" (started) and "done" (completed) transitions.
 
-let lastKnownDoneIds = new Set(
-  loadTasks().filter(t => t.status === 'done').map(t => t.id)
+let lastKnownStatuses = new Map(
+  loadTasks().map(t => [t.id, t.status])
 );
 
 fs.watchFile(TASK_FILE, { interval: 5000 }, () => {
   try {
     const tasks = loadTasks();
-    const currentDoneIds = new Set(
-      tasks.filter(t => t.status === 'done').map(t => t.id)
-    );
+    let needsSave = false;
 
-    // Find newly completed tasks
     for (const task of tasks) {
-      if (task.status === 'done' && !lastKnownDoneIds.has(task.id)) {
+      const prev = lastKnownStatuses.get(task.id);
+
+      // Task started — notify "in progress"
+      if (task.status === 'in_progress' && prev !== 'in_progress') {
+        console.log(`[bot] Claude task started: ${task.id}`);
+        notifyOwner(
+          `🤖 CLAUDE CODE — Task Started\n\n` +
+          `📝 "${task.task}"\n\n` +
+          `⏱️ Queued: ${new Date(task.created).toLocaleString()}\n` +
+          `🔄 Claude is working on this now.`
+        );
+      }
+
+      // Task completed — notify "done"
+      if (task.status === 'done' && prev !== 'done') {
         console.log(`[bot] Claude task completed: ${task.id}`);
-        const msg = [
-          '🤖 CLAUDE CODE — Task Complete',
-          '',
-          `📝 Task: "${task.task}"`,
-          '',
-          `✅ ${task.summary || 'Done.'}`,
-          '',
-          task.created ? `⏱️ Queued: ${new Date(task.created).toLocaleString()}` : '',
-          task.completed ? `✔️ Done: ${new Date(task.completed).toLocaleString()}` : '',
-        ].filter(Boolean).join('\n');
-        notifyOwner(msg);
+        notifyOwner(formatTaskNotification(task, 'Task Complete'));
+        task.notified = true;
+        needsSave = true;
       }
     }
 
-    lastKnownDoneIds = currentDoneIds;
-  } catch (_) {}
+    // Persist notified flags
+    if (needsSave) saveTasks(tasks);
+
+    // Update snapshot
+    lastKnownStatuses = new Map(tasks.map(t => [t.id, t.status]));
+  } catch (err) {
+    console.error('[bot] Task watcher error:', err.message);
+  }
 });
 
 // =====================
@@ -504,8 +509,8 @@ bot.launch().then(() => {
   console.log('[bot] Bot is live. Cron jobs active.');
   console.log('[bot] 6AM briefing | Hourly review processor | Friday/Sunday reminders');
 
-  // Send startup notification
-  setTimeout(() => {
+  // Send startup notification + catch up on tasks completed while bot was offline
+  setTimeout(async () => {
     notifyOwner(
       `🟢 Bot is online and ready.\n\n` +
       `Active schedules:\n` +
@@ -515,6 +520,18 @@ bot.launch().then(() => {
       `• Sunday 8PM — Week ahead prep\n\n` +
       `Type /help to see all commands.`
     );
+
+    // Sweep for tasks completed while bot was offline
+    const tasks = loadTasks();
+    let changed = false;
+    for (const task of tasks) {
+      if (task.status === 'done' && !task.notified) {
+        await notifyOwner(formatTaskNotification(task, 'Task Complete (while offline)'));
+        task.notified = true;
+        changed = true;
+      }
+    }
+    if (changed) saveTasks(tasks);
   }, 2000);
 });
 
