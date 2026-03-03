@@ -1,0 +1,14 @@
+{
+  "name": "service-business-automation",
+  "version": "1.0.0",
+  "description": "Telegram CEO assistant + field service automation",
+  "private": true,
+  "scripts": {
+    "start": "node TelegramBot/index.js",
+    "postinstall": "cd Skills && npm install",
+    "test": "cd Skills && npm test"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

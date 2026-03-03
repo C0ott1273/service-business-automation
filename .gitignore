@@ -13,5 +13,8 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Runtime task queue
+TelegramBot/claude-tasks.json
+
 # Claude internal
 .claude/
