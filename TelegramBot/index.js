@@ -18,6 +18,7 @@ const { Telegraf } = require('telegraf');
 const cron = require('node-cron');
 const { parseCommand, executeCommand } = require('../Skills/inbound-command-handler');
 const { scheduleReviewRequest, processScheduledReviews } = require('../Skills/review-request-trigger');
+const { loadTasks } = require('./claude-task-done');
 const { getTodaysJobs, formatSchedule } = require('../Skills/google-calendar-sync');
 const { buildMorningBriefing } = require('../Skills/morning-briefing');
 const { formatDailyReading } = require('../Skills/daily-bible-reading');
@@ -63,15 +64,16 @@ bot.start((ctx) => {
     `Here's what I can do:\n\n` +
     `📋 Business\n` +
     `  "What's my schedule today?"\n` +
-    `  "Job 1001 done"\n` +
-    `  "Send invoice for job 1001"\n\n` +
+    `  "Job xxxx done"\n` +
+    `  "Send invoice for job xxxx"\n\n` +
     `📖 Daily Life\n` +
     `  /bible — today's Bible reading\n` +
     `  /weather — weather forecast\n` +
     `  /briefing — full morning briefing now\n\n` +
     `🤖 Claude Code\n` +
     `  "Claude: build me a landing page"\n` +
-    `  "Claude: fix the bug in the dashboard"\n\n` +
+    `  "Claude update" — check task status\n` +
+    `  /claudestatus — all Claude tasks\n\n` +
     `📊 Weekly\n` +
     `  /weeklyreview — review the week\n` +
     `  /goals — check your goals\n\n` +
@@ -88,9 +90,9 @@ bot.help((ctx) => {
     `SCHEDULE & JOBS\n` +
     `  "What's my schedule today?"\n` +
     `  "Schedule for March 15"\n` +
-    `  "Job 1001 done" → invoice + review\n` +
-    `  "Send invoice for job 1001"\n` +
-    `  "Status on job 1001"\n\n` +
+    `  "Job xxxx done" → invoice + review\n` +
+    `  "Send invoice for job xxxx"\n` +
+    `  "Status on job xxxx"\n\n` +
     `SMS & COMMUNICATION\n` +
     `  "Text 5551234567: message here"\n\n` +
     `BUSINESS INTEL\n` +
@@ -101,9 +103,10 @@ bot.help((ctx) => {
     `  /weather — forecast + work warnings\n` +
     `  /briefing — full morning briefing\n` +
     `  /pray — prayer prompt\n\n` +
-    `CLAUDE CODE (prefix with "Claude:")\n` +
+    `CLAUDE CODE\n` +
     `  "Claude: build a customer intake form"\n` +
-    `  "Claude: update the dashboard"\n\n` +
+    `  "Claude update" — check task progress\n` +
+    `  /claudestatus — all Claude tasks\n\n` +
     `GOALS & REVIEWS\n` +
     `  /goals — view your goals\n` +
     `  /setgoal <goal> — add a new goal\n` +
@@ -227,6 +230,55 @@ bot.command('weeklyreview', async (ctx) => {
   );
 });
 
+// --- /claudestatus ---
+bot.command('claudestatus', (ctx) => {
+  ctx.reply(getClaudeStatusMessage());
+});
+
+function getClaudeStatusMessage() {
+  const tasks = loadTasks();
+  if (tasks.length === 0) {
+    return '🤖 No Claude Code tasks yet.\n\nQueue one with: "Claude: build me a landing page"';
+  }
+
+  const pending = tasks.filter(t => t.status === 'pending');
+  const inProgress = tasks.filter(t => t.status === 'in_progress');
+  const done = tasks.filter(t => t.status === 'done');
+
+  let msg = '🤖 Claude Code Tasks\n\n';
+
+  if (inProgress.length > 0) {
+    msg += '🔄 IN PROGRESS\n';
+    inProgress.forEach(t => {
+      msg += `  • "${t.task}"\n    Queued: ${new Date(t.created).toLocaleString()}\n`;
+    });
+    msg += '\n';
+  }
+
+  if (pending.length > 0) {
+    msg += '⏳ PENDING\n';
+    pending.forEach(t => {
+      msg += `  • "${t.task}"\n    Queued: ${new Date(t.created).toLocaleString()}\n`;
+    });
+    msg += '\n';
+  }
+
+  if (done.length > 0) {
+    // Show only the last 5 completed tasks
+    const recent = done.slice(-5);
+    msg += `✅ COMPLETED (last ${recent.length})\n`;
+    recent.forEach(t => {
+      msg += `  • "${t.task}"\n`;
+      if (t.summary) msg += `    ${t.summary}\n`;
+      if (t.completed) msg += `    Done: ${new Date(t.completed).toLocaleString()}\n`;
+    });
+    msg += '\n';
+  }
+
+  msg += `Total: ${done.length} done, ${inProgress.length} in progress, ${pending.length} pending`;
+  return msg;
+}
+
 // =====================
 // NATURAL LANGUAGE HANDLER
 // =====================
@@ -269,6 +321,14 @@ bot.on('text', async (ctx) => {
     return;
   }
 
+  // --- Claude Code status check ---
+  // "Claude update", "Claude status", "what did Claude do", etc.
+  const claudeStatusMatch = text.match(/^claude\s*(?:update|status|progress|report|tasks?|what(?:'s| is| did))/i);
+  if (claudeStatusMatch) {
+    ctx.reply(getClaudeStatusMessage());
+    return;
+  }
+
   // --- Claude Code bridge ---
   // Messages starting with "Claude:" get queued as tasks for Claude Code
   const claudeMatch = text.match(/^claude\s*[:\-]\s*(.+)/i);
@@ -303,9 +363,10 @@ bot.on('text', async (ctx) => {
   if (parsed.intent === 'unknown') {
     ctx.reply(
       `I didn't catch that. Try:\n\n` +
-      `Business: "Job 1001 done", "What's my schedule?"\n` +
+      `Business: "Job xxxx done", "What's my schedule?"\n` +
       `Life: /bible, /weather, /briefing, /pray\n` +
-      `Claude: "Claude: build me a landing page"\n\n` +
+      `Claude: "Claude: build me a landing page"\n` +
+      `Updates: "Claude update"\n\n` +
       `/help for all commands.`
     );
     return;

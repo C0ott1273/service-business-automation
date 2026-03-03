@@ -9,8 +9,8 @@ Mark a job complete and send the invoice to the customer via QuickBooks.
 ```json
 {
   "success": true,
-  "message": "Invoice for Job #1001 sent to John Smith (john@example.com). Amount: $350.00",
-  "job": { "invoice_number": "1001", "customer_name": "John Smith", "amount": 350.00 }
+  "message": "Invoice for Job #xxxx sent to John Smith (john@example.com). Amount: $350.00",
+  "job": { "invoice_number": "xxxx", "customer_name": "John Smith", "amount": 350.00 }
 }
 ```
 
@@ -22,7 +22,7 @@ Same as quickbooks-job-lookup — see that README for setup.
 const { sendInvoiceByJobNumber, sendInvoice } = require('./index');
 
 // By job number (most common — used by Telegram bot)
-const result = await sendInvoiceByJobNumber('1001');
+const result = await sendInvoiceByJobNumber('xxxx');
 
 // By invoice ID (direct)
 const result2 = await sendInvoice('inv_123', 'customer@email.com');
@@ -30,7 +30,7 @@ const result2 = await sendInvoice('inv_123', 'customer@email.com');
 
 ### CLI
 ```bash
-node Skills/quickbooks-invoice-sender/index.js 1001
+node Skills/quickbooks-invoice-sender/index.js xxxx
 ```
 
 ## Behavior

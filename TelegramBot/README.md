@@ -11,13 +11,15 @@ Text the bot natural language commands from your phone and it executes tasks, re
 | Say This | What Happens |
 |----------|-------------|
 | "What's my schedule today?" | Pulls Google Calendar, replies with today's jobs |
-| "Job 1001 done" | Looks up job in QuickBooks, sends invoice, schedules review request |
-| "Send invoice for job 1001" | Sends invoice via QuickBooks |
+| "Job xxxx done" | Looks up job in QuickBooks, sends invoice, schedules review request |
+| "Send invoice for job xxxx" | Sends invoice via QuickBooks |
 | "How much did we spend on ads?" | Pulls expense data |
 | "Where can we cut costs?" | Analyzes expenses |
 | "Text 5551234567: message" | Sends SMS via Twilio |
 | "Start building MyApp" | Requires CONFIRM before executing |
-| "Status on job 500" | Looks up job details |
+| "Status on job xxxx" | Looks up job details |
+| "Claude update" | Check Claude Code task progress |
+| /claudestatus | View all Claude Code tasks |
 
 ### Slash Commands
 | Command | Description |

@@ -226,7 +226,7 @@ async function executeCommand(parsed) {
     }
 
     default:
-      return `I didn't understand that command. Try:\n- "Job 1001 done"\n- "What's my schedule today?"\n- "Send invoice for job 1001"\n- "Text 5551234567: Your estimate is confirmed"`;
+      return `I didn't understand that command. Try:\n- "Job xxxx done"\n- "What's my schedule today?"\n- "Send invoice for job xxxx"\n- "Text 5551234567: Your estimate is confirmed"`;
   }
 }
 
@@ -238,7 +238,7 @@ if (require.main === module) {
   if (!command) {
     console.log('Usage: node index.js <natural language command>');
     console.log('Examples:');
-    console.log('  node index.js "Job 1001 done"');
+    console.log('  node index.js "Job xxxx done"');
     console.log('  node index.js "What\'s my schedule today?"');
     process.exit(1);
   }

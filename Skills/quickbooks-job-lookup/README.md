@@ -10,7 +10,7 @@ Search QuickBooks for a job by number. Returns invoice and service details.
 {
   "success": true,
   "job": {
-    "invoice_number": "1001",
+    "invoice_number": "xxxx",
     "invoice_id": "123",
     "customer_name": "John Smith",
     "customer_id": "456",
@@ -47,7 +47,7 @@ QUICKBOOKS_SANDBOX=true
 ```js
 const { lookupJob, formatJobDetails } = require('./index');
 
-const result = await lookupJob('1001');
+const result = await lookupJob('xxxx');
 if (result.success) {
   console.log(formatJobDetails(result.job));
 }
@@ -55,7 +55,7 @@ if (result.success) {
 
 ### CLI
 ```bash
-node Skills/quickbooks-job-lookup/index.js 1001
+node Skills/quickbooks-job-lookup/index.js xxxx
 ```
 
 ## Testing

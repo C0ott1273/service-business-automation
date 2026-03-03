@@ -21,7 +21,7 @@ Google Ad → Website Form → Email
 → twilio-sms-sender → Auto-text lead to schedule estimate
 → google-calendar-sync → Job booked on calendar
 → Dashboard → Today's jobs visible
-→ Telegram Bot → "Job 1001 done"
+→ Telegram Bot → "Job xxxx done"
 → inbound-command-handler → Parse intent
 → quickbooks-job-lookup → Find job + invoice
 → quickbooks-invoice-sender → Send invoice to customer
@@ -36,7 +36,7 @@ and manages the business.
 
 ### Example Commands
 - "What's my schedule today?" → pulls Google Calendar, replies with today's jobs
-- "Job 1001 done" → looks up job in QuickBooks, sends invoice, schedules review request
+- "Job xxxx done" → looks up job in QuickBooks, sends invoice, schedules review request
 - "How much did we spend on ads this month?" → pulls QuickBooks data and analyzes
 - "Where can we cut costs?" → analyzes expenses and suggests optimizations
 - "Start building [app name]" → initiates a new Claude Code project
@@ -97,7 +97,7 @@ Purpose: Send a review request SMS 2-3 days after job completion.
 
 ### 7. inbound-command-handler
 Purpose: Parse natural language commands and route them to the correct skill.
-- Trigger examples: "job 1001 done", "what's my schedule", "how much did we spend on ads"
+- Trigger examples: "job xxxx done", "what's my schedule", "how much did we spend on ads"
 - Flow: Parse intent → route to skill → return confirmation to Telegram
 - Save to: /Skills/inbound-command-handler/
 
