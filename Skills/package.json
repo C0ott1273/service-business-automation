@@ -1,0 +1,29 @@
+{
+  "name": "service-business-automation",
+  "version": "1.0.0",
+  "description": "Automated field service business system with Telegram bot CEO assistant",
+  "private": true,
+  "scripts": {
+    "email-parser": "node email-parser/index.js",
+    "sms-sender": "node twilio-sms-sender/index.js",
+    "lead-responder": "node lead-auto-responder.js",
+    "test:email-parser": "node email-parser/test.js",
+    "test:sms-sender": "node twilio-sms-sender/test.js",
+    "test:calendar": "node google-calendar-sync/test.js",
+    "dashboard": "node dashboard/server.js",
+    "bot": "node ../TelegramBot/index.js",
+    "test": "node email-parser/test.js && node twilio-sms-sender/test.js && node google-calendar-sync/test.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "imap": "^0.8.19",
+    "mailparser": "^3.7.1",
+    "node-quickbooks": "^2.0.39",
+    "telegraf": "^4.16.3",
+    "twilio": "^5.4.3"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

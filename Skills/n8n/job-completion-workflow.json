@@ -1,0 +1,102 @@
+{
+  "name": "Job Completion — Invoice + Review Request",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "job-complete"
+      },
+      "id": "webhook-trigger",
+      "name": "Job Complete Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://quickbooks.api.intuit.com/v3/company/{{$env.QUICKBOOKS_REALM_ID}}/query",
+        "qs": {
+          "query": "=SELECT * FROM Invoice WHERE DocNumber = '{{$json.body.jobNumber}}'"
+        },
+        "headerParameters": {
+          "parameter": [
+            { "name": "Authorization", "value": "=Bearer {{$env.QUICKBOOKS_ACCESS_TOKEN}}" },
+            { "name": "Accept", "value": "application/json" }
+          ]
+        }
+      },
+      "id": "qb-lookup",
+      "name": "QuickBooks Lookup",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [470, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://quickbooks.api.intuit.com/v3/company/{{$env.QUICKBOOKS_REALM_ID}}/invoice/{{$json.QueryResponse.Invoice[0].Id}}/send",
+        "method": "POST",
+        "headerParameters": {
+          "parameter": [
+            { "name": "Authorization", "value": "=Bearer {{$env.QUICKBOOKS_ACCESS_TOKEN}}" },
+            { "name": "Content-Type", "value": "application/octet-stream" }
+          ]
+        }
+      },
+      "id": "send-invoice",
+      "name": "Send Invoice",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [690, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const invoice = $input.first().json;\nconst sendDate = new Date();\nsendDate.setDate(sendDate.getDate() + 2);\nsendDate.setHours(10, 0, 0, 0);\n\nreturn [{\n  json: {\n    customer_name: invoice.CustomerRef?.name || 'Customer',\n    phone: invoice.BillEmail?.Address || '',\n    scheduled_for: sendDate.toISOString(),\n    review_link: $env.REVIEW_LINK || 'https://g.page/r/your-review-link'\n  }\n}];"
+      },
+      "id": "prep-review",
+      "name": "Prepare Review Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [910, 300]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "={{$json.scheduled_for}}" }]
+        }
+      },
+      "id": "wait-node",
+      "name": "Wait 2 Days",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [1130, 300]
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "from": "={{$env.TWILIO_PHONE_NUMBER}}",
+        "to": "={{$json.phone}}",
+        "message": "=Hi {{$json.customer_name}}! Thank you for choosing us. We'd really appreciate a quick review: {{$json.review_link}}"
+      },
+      "id": "send-review-sms",
+      "name": "Send Review SMS",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [1350, 300],
+      "credentials": {
+        "twilioApi": {
+          "id": "REPLACE_WITH_TWILIO_CREDENTIAL_ID",
+          "name": "Twilio"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Job Complete Webhook": { "main": [[{ "node": "QuickBooks Lookup", "type": "main", "index": 0 }]] },
+    "QuickBooks Lookup": { "main": [[{ "node": "Send Invoice", "type": "main", "index": 0 }]] },
+    "Send Invoice": { "main": [[{ "node": "Prepare Review Request", "type": "main", "index": 0 }]] },
+    "Prepare Review Request": { "main": [[{ "node": "Wait 2 Days", "type": "main", "index": 0 }]] },
+    "Wait 2 Days": { "main": [[{ "node": "Send Review SMS", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "meta": { "description": "Phase 3+4: Job complete webhook → QuickBooks lookup → send invoice → wait 2 days → send review request SMS." }
+}

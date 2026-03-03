@@ -1,0 +1,83 @@
+{
+  "name": "Lead Capture — Email → Parse → SMS",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "minutes", "minutesInterval": 5 }]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Check Email Every 5 Min",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "mailbox": "INBOX",
+        "options": {
+          "unseen": true
+        }
+      },
+      "id": "imap-read",
+      "name": "Read Unseen Emails",
+      "type": "n8n-nodes-base.imap",
+      "typeVersion": 2,
+      "position": [470, 300],
+      "credentials": {
+        "imap": {
+          "id": "REPLACE_WITH_IMAP_CREDENTIAL_ID",
+          "name": "Email IMAP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  const body = item.json.text || item.json.html || '';\n  \n  // Extract name\n  const nameMatch = body.match(/(?:name|full\\s*name|customer)\\s*[:\\-]\\s*(.+)/i);\n  const name = nameMatch ? nameMatch[1].trim().split('\\n')[0].trim() : (item.json.from?.text || 'Unknown');\n  \n  // Extract phone\n  const phoneMatch = body.match(/(?:phone|tel|mobile|cell|number)\\s*[:\\-]\\s*([\\d\\s\\-().+]+)/i);\n  let phone = phoneMatch ? phoneMatch[1].trim() : '';\n  if (!phone) {\n    const bodyPhone = body.match(/(\\+?1?\\s*[-.](\\s*\\(?\\d{3}\\)?\\s*[-.]?\\s*\\d{3}\\s*[-.]?\\s*\\d{4})/);\n    phone = bodyPhone ? bodyPhone[1] : '';\n  }\n  phone = phone.replace(/[^\\d+]/g, '');\n  \n  // Extract email\n  const emailMatch = body.match(/(?:email|e-mail)\\s*[:\\-]\\s*([\\w.+-]+@[\\w.-]+\\.\\w+)/i);\n  const email = emailMatch ? emailMatch[1].trim() : (item.json.from?.address || '');\n  \n  // Extract message\n  const msgMatch = body.match(/(?:message|comments?|details?)\\s*[:\\-]\\s*([\\s\\S]+?)(?:\\n\\s*\\n|$)/i);\n  const message = msgMatch ? msgMatch[1].trim().substring(0, 500) : body.substring(0, 500).trim();\n  \n  if (phone) {\n    results.push({ json: { name, phone, email, message, timestamp: new Date().toISOString() } });\n  }\n}\n\nreturn results;"
+      },
+      "id": "parse-lead",
+      "name": "Parse Lead Info",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [690, 300]
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "from": "={{$env.TWILIO_PHONE_NUMBER}}",
+        "to": "=+1{{$json.phone}}",
+        "message": "=Hi {{$json.name}}! Thanks for reaching out. We'd love to schedule a free estimate for you. What day and time works best? Reply here or call us anytime."
+      },
+      "id": "send-sms",
+      "name": "Send Welcome SMS",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [910, 300],
+      "credentials": {
+        "twilioApi": {
+          "id": "REPLACE_WITH_TWILIO_CREDENTIAL_ID",
+          "name": "Twilio"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Check Email Every 5 Min": {
+      "main": [[{ "node": "Read Unseen Emails", "type": "main", "index": 0 }]]
+    },
+    "Read Unseen Emails": {
+      "main": [[{ "node": "Parse Lead Info", "type": "main", "index": 0 }]]
+    },
+    "Parse Lead Info": {
+      "main": [[{ "node": "Send Welcome SMS", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "description": "Phase 1: Monitors inbox every 5 minutes for new form submissions, extracts lead info, and auto-sends a welcome SMS via Twilio."
+  }
+}

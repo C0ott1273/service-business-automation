@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+    .header { background: #1e293b; padding: 20px 24px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; }
+    .header h1 { font-size: 22px; font-weight: 700; }
+    .header .date { color: #94a3b8; font-size: 14px; }
+    .container { max-width: 900px; margin: 0 auto; padding: 24px; }
+    .section { margin-bottom: 32px; }
+    .section-title { font-size: 16px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+    .card { background: #1e293b; border-radius: 12px; padding: 16px 20px; margin-bottom: 10px; border: 1px solid #334155; transition: border-color 0.2s; }
+    .card:hover { border-color: #3b82f6; }
+    .job-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .job-title { font-size: 16px; font-weight: 600; }
+    .job-time { color: #60a5fa; font-size: 14px; font-weight: 500; }
+    .job-details { display: flex; gap: 20px; color: #94a3b8; font-size: 13px; flex-wrap: wrap; }
+    .job-details span { display: flex; align-items: center; gap: 4px; }
+    .btn { padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; }
+    .btn-done { background: #22c55e; color: #fff; }
+    .btn-done:hover { background: #16a34a; }
+    .btn-done.completed { background: #334155; color: #64748b; cursor: default; }
+    .lead-card { display: flex; justify-content: space-between; align-items: center; }
+    .lead-info .lead-name { font-weight: 600; }
+    .lead-info .lead-contact { color: #94a3b8; font-size: 13px; margin-top: 2px; }
+    .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+    .status-new { background: #3b82f620; color: #60a5fa; }
+    .status-texted { background: #22c55e20; color: #4ade80; }
+    .status-scheduled { background: #f59e0b20; color: #fbbf24; }
+    .empty { text-align: center; color: #64748b; padding: 40px; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 24px; }
+    .stat-card { background: #1e293b; border-radius: 12px; padding: 16px; border: 1px solid #334155; text-align: center; }
+    .stat-value { font-size: 28px; font-weight: 700; color: #3b82f6; }
+    .stat-label { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+    .refresh-btn { background: #334155; color: #e2e8f0; padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; }
+    .refresh-btn:hover { background: #475569; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Job Dashboard</h1>
+    <div>
+      <span class="date" id="today-date"></span>
+      <button class="refresh-btn" onclick="loadDashboard()" style="margin-left: 12px;">Refresh</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="stats" id="stats"></div>
+
+    <div class="section">
+      <div class="section-title">Today's Jobs</div>
+      <div id="jobs-list"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Recent Leads</div>
+      <div id="leads-list"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = window.location.origin;
+
+    function formatTime(iso) {
+      if (!iso) return 'TBD';
+      return new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    }
+
+    function renderStats(jobs, leads) {
+      const totalJobs = jobs.length;
+      const completedJobs = jobs.filter(j => j.completed).length;
+      const pendingLeads = leads.filter(l => l.status === 'new').length;
+      document.getElementById('stats').innerHTML = `
+        <div class="stat-card"><div class="stat-value">${totalJobs}</div><div class="stat-label">Jobs Today</div></div>
+        <div class="stat-card"><div class="stat-value">${completedJobs}</div><div class="stat-label">Completed</div></div>
+        <div class="stat-card"><div class="stat-value">${totalJobs - completedJobs}</div><div class="stat-label">Remaining</div></div>
+        <div class="stat-card"><div class="stat-value">${pendingLeads}</div><div class="stat-label">New Leads</div></div>
+      `;
+    }
+
+    function renderJobs(jobs) {
+      const el = document.getElementById('jobs-list');
+      if (!jobs.length) {
+        el.innerHTML = '<div class="empty">No jobs scheduled for today.</div>';
+        return;
+      }
+      el.innerHTML = jobs.map((job, i) => `
+        <div class="card">
+          <div class="job-header">
+            <span class="job-title">${job.title}</span>
+            <span class="job-time">${formatTime(job.start)} - ${formatTime(job.end)}</span>
+          </div>
+          <div class="job-details">
+            ${job.location ? `<span>&#128205; ${job.location}</span>` : ''}
+            ${job.notes ? `<span>&#128221; ${job.notes.substring(0, 80)}</span>` : ''}
+          </div>
+          <div style="margin-top: 10px; text-align: right;">
+            <button class="btn btn-done ${job.completed ? 'completed' : ''}"
+              onclick="markComplete('${job.id}')" ${job.completed ? 'disabled' : ''}>
+              ${job.completed ? 'Completed' : 'Mark Done'}
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderLeads(leads) {
+      const el = document.getElementById('leads-list');
+      if (!leads.length) {
+        el.innerHTML = '<div class="empty">No recent leads.</div>';
+        return;
+      }
+      el.innerHTML = leads.map(lead => `
+        <div class="card lead-card">
+          <div class="lead-info">
+            <div class="lead-name">${lead.name}</div>
+            <div class="lead-contact">${lead.phone || lead.email} &middot; ${new Date(lead.timestamp).toLocaleDateString()}</div>
+          </div>
+          <span class="status-badge status-${lead.status}">${lead.status}</span>
+        </div>
+      `).join('');
+    }
+
+    async function loadDashboard() {
+      try {
+        const [jobsRes, leadsRes] = await Promise.all([
+          fetch(API_BASE + '/api/jobs').then(r => r.json()),
+          fetch(API_BASE + '/api/leads').then(r => r.json()),
+        ]);
+        renderStats(jobsRes.events || [], leadsRes.leads || []);
+        renderJobs(jobsRes.events || []);
+        renderLeads(leadsRes.leads || []);
+      } catch (err) {
+        // Show demo data if server is not connected
+        const demoJobs = [
+          { id: '1', title: 'Gutter Cleaning - Smith', start: new Date().toISOString(), end: new Date().toISOString(), location: '123 Oak St', notes: 'Two-story, bring extension ladder', completed: false },
+          { id: '2', title: 'Pressure Wash - Johnson', start: new Date().toISOString(), end: new Date().toISOString(), location: '456 Elm Ave', notes: 'Driveway + walkway', completed: true },
+        ];
+        const demoLeads = [
+          { name: 'Sarah Miller', phone: '555-987-6543', email: 'sarah@example.com', timestamp: new Date().toISOString(), status: 'new' },
+          { name: 'Mike Brown', phone: '555-321-0000', email: 'mike@example.com', timestamp: new Date(Date.now() - 86400000).toISOString(), status: 'texted' },
+        ];
+        renderStats(demoJobs, demoLeads);
+        renderJobs(demoJobs);
+        renderLeads(demoLeads);
+      }
+    }
+
+    async function markComplete(jobId) {
+      try {
+        await fetch(API_BASE + '/api/jobs/' + jobId + '/complete', { method: 'POST' });
+        loadDashboard();
+      } catch (err) {
+        // Demo mode: toggle button visually
+        const btn = event.target;
+        btn.textContent = 'Completed';
+        btn.classList.add('completed');
+        btn.disabled = true;
+      }
+    }
+
+    document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-US', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+
+    loadDashboard();
+  </script>
+</body>
+</html>
