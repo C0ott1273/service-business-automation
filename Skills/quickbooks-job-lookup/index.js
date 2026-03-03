@@ -113,7 +113,112 @@ function formatJobDetails(job) {
   ].filter(Boolean).join('\n');
 }
 
-module.exports = { lookupJob, formatJobDetails };
+/**
+ * Search QuickBooks invoices/estimates by customer name.
+ * @param {string} customerName - Full or partial customer name
+ * @returns {Promise<{success, jobs?, error?}>}
+ */
+async function lookupByCustomer(customerName) {
+  if (!customerName) {
+    return { success: false, error: 'Customer name is required' };
+  }
+
+  const qbo = getQBClient();
+  if (!qbo) {
+    return { success: false, error: 'Missing QuickBooks credentials in .env' };
+  }
+
+  return new Promise((resolve) => {
+    // Query invoices where CustomerRef name contains the search term
+    const query = `SELECT * FROM Invoice WHERE CustomerRef LIKE '%${customerName.replace(/'/g, "\\'")}%' ORDERBY TxnDate DESC MAXRESULTS 5`;
+
+    qbo.query(query, (err, data) => {
+      if (err) {
+        resolve({ success: false, error: err.Fault?.Error?.[0]?.Detail || err.message || 'QuickBooks API error' });
+        return;
+      }
+
+      const items = data?.QueryResponse?.Invoice || [];
+      if (items.length === 0) {
+        resolve({ success: false, error: `No invoices found for customer "${customerName}"` });
+        return;
+      }
+
+      const jobs = items.map((invoice) => ({
+        invoice_number: invoice.DocNumber,
+        invoice_id: invoice.Id,
+        customer_name: invoice.CustomerRef?.name || 'Unknown',
+        amount: invoice.TotalAmt || 0,
+        balance: invoice.Balance || 0,
+        status: invoice.Balance === 0 ? 'paid' : (invoice.EmailStatus === 'EmailSent' ? 'sent' : 'pending'),
+        email: invoice.BillEmail?.Address || '',
+      }));
+
+      resolve({ success: true, jobs, count: jobs.length });
+    });
+  });
+}
+
+/**
+ * Search QuickBooks estimates by customer name or number.
+ * @param {string} search - Estimate number, customer name, or address
+ * @returns {Promise<{success, estimates?, error?}>}
+ */
+async function lookupEstimate(search) {
+  if (!search) {
+    return { success: false, error: 'Search term is required' };
+  }
+
+  const qbo = getQBClient();
+  if (!qbo) {
+    return { success: false, error: 'Missing QuickBooks credentials in .env' };
+  }
+
+  return new Promise((resolve) => {
+    // Try by DocNumber first
+    const isNumber = /^\d+$/.test(search.trim());
+    const query = isNumber
+      ? `SELECT * FROM Estimate WHERE DocNumber = '${search.trim()}'`
+      : `SELECT * FROM Estimate WHERE CustomerRef LIKE '%${search.replace(/'/g, "\\'")}%' ORDERBY TxnDate DESC MAXRESULTS 5`;
+
+    qbo.query(query, (err, data) => {
+      if (err) {
+        resolve({ success: false, error: err.Fault?.Error?.[0]?.Detail || err.message || 'QuickBooks API error' });
+        return;
+      }
+
+      const items = data?.QueryResponse?.Estimate || [];
+      if (items.length === 0) {
+        resolve({ success: false, error: `No estimates found for "${search}"` });
+        return;
+      }
+
+      const estimates = items.map((est) => ({
+        estimate_number: est.DocNumber,
+        estimate_id: est.Id,
+        customer_name: est.CustomerRef?.name || 'Unknown',
+        amount: est.TotalAmt || 0,
+        status: est.TxnStatus || 'Pending',
+        email: est.BillEmail?.Address || '',
+        expiry: est.ExpirationDate || '',
+      }));
+
+      resolve({ success: true, estimates, count: estimates.length });
+    });
+  });
+}
+
+/**
+ * Format multiple job results for display.
+ */
+function formatJobList(jobs) {
+  if (!jobs || jobs.length === 0) return 'No results.';
+  return jobs.map((j, i) =>
+    `${i + 1}. #${j.invoice_number} — ${j.customer_name} | $${j.amount.toFixed(2)} (${j.status})`
+  ).join('\n');
+}
+
+module.exports = { lookupJob, lookupByCustomer, lookupEstimate, formatJobDetails, formatJobList };
 
 // --- CLI mode ---
 if (require.main === module) {

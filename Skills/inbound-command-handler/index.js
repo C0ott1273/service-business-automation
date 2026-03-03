@@ -24,10 +24,27 @@ const INTENTS = [
   {
     name: 'send_invoice',
     patterns: [
-      /send\s*(?:the\s*)?invoice\s*(?:for\s*)?(?:job\s*)?#?\s*(\d+)/i,
-      /invoice\s*(?:job\s*)?#?\s*(\d+)/i,
+      /send\s*(?:the\s*)?invoice\s*(?:for\s*)?(?:job\s*|estimate\s*)?#?\s*(\d+)/i,
+      /invoice\s*(?:job\s*|estimate\s*)?#?\s*(\d+)/i,
     ],
     extract: (match) => ({ jobNumber: match[1] }),
+    requiresConfirm: false,
+  },
+  {
+    name: 'send_invoice_by_name',
+    patterns: [
+      /send\s*(?:the\s*)?(?:invoice|estimate)\s*(?:for|to)\s+(.+)/i,
+      /(?:invoice|estimate)\s+(?:for|to)\s+(.+)/i,
+    ],
+    extract: (match) => ({ search: match[1].trim() }),
+    requiresConfirm: false,
+  },
+  {
+    name: 'lookup_customer',
+    patterns: [
+      /(?:look\s*up|find|search|pull\s*up)\s+(?:customer|client|invoice|estimate|job)?\s*(?:for\s+)?(.+)/i,
+    ],
+    extract: (match) => ({ search: match[1].trim() }),
     requiresConfirm: false,
   },
   {
@@ -155,6 +172,33 @@ async function executeCommand(parsed) {
       const { sendInvoiceByJobNumber } = require('../quickbooks-invoice-sender');
       const result = await sendInvoiceByJobNumber(parsed.params.jobNumber);
       return result.success ? result.message : `Error: ${result.error}`;
+    }
+
+    case 'send_invoice_by_name': {
+      const { lookupByCustomer, formatJobList } = require('../quickbooks-job-lookup');
+      const { sendInvoiceByJobNumber } = require('../quickbooks-invoice-sender');
+      const lookup = await lookupByCustomer(parsed.params.search);
+      if (!lookup.success) return `Error: ${lookup.error}`;
+      if (lookup.count === 1) {
+        const result = await sendInvoiceByJobNumber(lookup.jobs[0].invoice_number);
+        return result.success ? result.message : `Error: ${result.error}`;
+      }
+      return `Found ${lookup.count} invoices for "${parsed.params.search}":\n\n${formatJobList(lookup.jobs)}\n\nSay "send invoice #<number>" to send a specific one.`;
+    }
+
+    case 'lookup_customer': {
+      const { lookupByCustomer, lookupEstimate, formatJobList } = require('../quickbooks-job-lookup');
+      // Try invoices first, then estimates
+      const invoices = await lookupByCustomer(parsed.params.search);
+      const estimates = await lookupEstimate(parsed.params.search);
+      let response = '';
+      if (invoices.success && invoices.count > 0) {
+        response += `Invoices:\n${formatJobList(invoices.jobs)}\n\n`;
+      }
+      if (estimates.success && estimates.count > 0) {
+        response += `Estimates:\n${estimates.estimates.map((e, i) => `${i + 1}. #${e.estimate_number} — ${e.customer_name} | $${e.amount.toFixed(2)} (${e.status})`).join('\n')}`;
+      }
+      return response || `No invoices or estimates found for "${parsed.params.search}"`;
     }
 
     case 'send_sms': {

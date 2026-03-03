@@ -12,17 +12,20 @@
     "test:calendar": "node google-calendar-sync/test.js",
     "dashboard": "node dashboard/server.js",
     "bot": "node ../TelegramBot/index.js",
-    "test": "node email-parser/test.js && node twilio-sms-sender/test.js && node google-calendar-sync/test.js"
+    "test:commands": "node inbound-command-handler/test.js",
+    "test:reviews": "node review-request-trigger/test.js",
+    "test:jobs": "node quickbooks-job-lookup/test.js",
+    "test": "node email-parser/test.js && node twilio-sms-sender/test.js && node google-calendar-sync/test.js && node quickbooks-job-lookup/test.js && node inbound-command-handler/test.js && node review-request-trigger/test.js"
   },
   "dependencies": {
     "dotenv": "^16.4.7",
     "imap": "^0.8.19",
     "mailparser": "^3.7.1",
+    "node-cron": "^3.0.3",
     "node-quickbooks": "^2.0.39",
     "telegraf": "^4.16.3",
     "twilio": "^5.4.3"
   },
-  "devDependencies": {},
   "engines": {
     "node": ">=18.0.0"
   }
