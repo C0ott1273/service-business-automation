@@ -1,13 +1,15 @@
 /**
- * claude-task-done — Run this when Claude Code finishes a task.
+ * claude-task-done — Notify the boss when Claude Code finishes work.
  *
- * Usage:
- *   node TelegramBot/claude-task-done.js <task_id> "Summary of what was done"
- *   node TelegramBot/claude-task-done.js latest "Summary of what was done"
+ * Two modes:
  *
- * What it does:
- *   1. Marks the task as "done" in claude-tasks.json
- *   2. Sends the owner a Telegram notification with the summary
+ *   1. Direct notification (no task queue needed):
+ *      node TelegramBot/claude-task-done.js notify "Added login page and fixed CSS bugs"
+ *
+ *   2. Mark a queued task as done + notify:
+ *      node TelegramBot/claude-task-done.js done <task_id|latest> "Summary"
+ *
+ * The bot also watches claude-tasks.json and auto-notifies when tasks complete.
  */
 
 module.paths.unshift(require('path').resolve(__dirname, '../Skills/node_modules'));
@@ -33,10 +35,63 @@ function saveTasks(tasks) {
   fs.writeFileSync(TASK_FILE, JSON.stringify(tasks, null, 2));
 }
 
+/**
+ * Resolve the owner's chat ID from env, task data, or Telegram getUpdates.
+ */
+async function resolveOwnerChatId(bot, task) {
+  if (OWNER_CHAT_ID) return OWNER_CHAT_ID;
+  if (task && task.from_chat) return task.from_chat;
+  try {
+    const updates = await bot.telegram.getUpdates(0, 100, 0);
+    for (let i = updates.length - 1; i >= 0; i--) {
+      const id = updates[i].message?.chat?.id;
+      if (id) return id;
+    }
+  } catch (_) {}
+  return null;
+}
+
+/**
+ * Send a direct Telegram notification — no task queue required.
+ */
+async function sendNotification(summary) {
+  if (!BOT_TOKEN) {
+    console.error('[claude-notify] No TELEGRAM_BOT_TOKEN — skipping.');
+    return;
+  }
+
+  const bot = new Telegraf(BOT_TOKEN);
+  const chatId = await resolveOwnerChatId(bot);
+
+  if (!chatId) {
+    console.error('[claude-notify] No chat ID found — send /start to the bot first.');
+    process.exit(1);
+  }
+
+  const message = [
+    '🤖 CLAUDE CODE — Task Complete',
+    '',
+    `✅ ${summary}`,
+    '',
+    `✔️ ${new Date().toLocaleString()}`,
+  ].join('\n');
+
+  try {
+    await bot.telegram.sendMessage(chatId, message);
+    console.log('[claude-notify] Notification sent.');
+  } catch (err) {
+    console.error('[claude-notify] Failed:', err.message);
+  }
+
+  process.exit(0);
+}
+
+/**
+ * Mark a queued task as done and send a Telegram notification.
+ */
 async function markDone(taskId, summary) {
   const tasks = loadTasks();
 
-  // Find the task — "latest" grabs the most recent pending one
   let task;
   if (taskId === 'latest') {
     task = [...tasks].reverse().find(t => t.status === 'pending' || t.status === 'in_progress');
@@ -56,30 +111,13 @@ async function markDone(taskId, summary) {
 
   console.log(`[claude-task-done] Marked task ${task.id} as done.`);
 
-  // Send Telegram notification
   if (!BOT_TOKEN) {
     console.error('[claude-task-done] No TELEGRAM_BOT_TOKEN — skipping notification.');
     return;
   }
 
   const bot = new Telegraf(BOT_TOKEN);
-  let chatId = OWNER_CHAT_ID;
-
-  // Fall back to the chat that requested the task
-  if (!chatId && task.from_chat) {
-    chatId = task.from_chat;
-  }
-
-  // Fall back to most recent chat from getUpdates
-  if (!chatId) {
-    try {
-      const updates = await bot.telegram.getUpdates(0, 100, 0);
-      for (let i = updates.length - 1; i >= 0; i--) {
-        const id = updates[i].message?.chat?.id;
-        if (id) { chatId = id; break; }
-      }
-    } catch (_) {}
-  }
+  const chatId = await resolveOwnerChatId(bot, task);
 
   if (!chatId) {
     console.error('[claude-task-done] No chat ID found — send /start to the bot first.');
@@ -101,7 +139,7 @@ async function markDone(taskId, summary) {
     await bot.telegram.sendMessage(chatId, message);
     console.log('[claude-task-done] Notification sent.');
   } catch (err) {
-    console.error('[claude-task-done] Failed to send notification:', err.message);
+    console.error('[claude-task-done] Failed:', err.message);
   }
 
   process.exit(0);
@@ -111,12 +149,27 @@ async function markDone(taskId, summary) {
 if (require.main === module) {
   const args = process.argv.slice(2);
   if (args.length < 1) {
-    console.log('Usage: node claude-task-done.js <task_id|latest> "Summary of what was done"');
+    console.log('Usage:');
+    console.log('  node claude-task-done.js notify "Summary of what was done"');
+    console.log('  node claude-task-done.js done <task_id|latest> "Summary"');
     process.exit(1);
   }
-  const taskId = args[0];
-  const summary = args.slice(1).join(' ') || 'Task completed.';
-  markDone(taskId, summary);
+
+  const subcommand = args[0];
+
+  if (subcommand === 'notify') {
+    const summary = args.slice(1).join(' ') || 'Task completed.';
+    sendNotification(summary);
+  } else if (subcommand === 'done') {
+    const taskId = args[1] || 'latest';
+    const summary = args.slice(2).join(' ') || 'Task completed.';
+    markDone(taskId, summary);
+  } else {
+    // Backwards-compatible: treat first arg as task ID
+    const taskId = args[0];
+    const summary = args.slice(1).join(' ') || 'Task completed.';
+    markDone(taskId, summary);
+  }
 }
 
-module.exports = { markDone, loadTasks };
+module.exports = { markDone, sendNotification, loadTasks, saveTasks, TASK_FILE };

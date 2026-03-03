@@ -18,7 +18,8 @@ const { Telegraf } = require('telegraf');
 const cron = require('node-cron');
 const { parseCommand, executeCommand } = require('../Skills/inbound-command-handler');
 const { scheduleReviewRequest, processScheduledReviews } = require('../Skills/review-request-trigger');
-const { loadTasks } = require('./claude-task-done');
+const fs = require('fs');
+const { loadTasks, TASK_FILE } = require('./claude-task-done');
 const { getTodaysJobs, formatSchedule } = require('../Skills/google-calendar-sync');
 const { buildMorningBriefing } = require('../Skills/morning-briefing');
 const { formatDailyReading } = require('../Skills/daily-bible-reading');
@@ -450,6 +451,45 @@ cron.schedule('0 20 * * 0', async () => {
     `Use /setgoal to add your goals. Have a restful Sunday! 🙏`
   );
 }, { timezone: 'America/New_York' });
+
+// =====================
+// CLAUDE TASK WATCHER
+// =====================
+// Watch claude-tasks.json for completed tasks and auto-notify the owner.
+// This catches tasks marked done by claude-task-done.js or any external process.
+
+let lastKnownDoneIds = new Set(
+  loadTasks().filter(t => t.status === 'done').map(t => t.id)
+);
+
+fs.watchFile(TASK_FILE, { interval: 5000 }, () => {
+  try {
+    const tasks = loadTasks();
+    const currentDoneIds = new Set(
+      tasks.filter(t => t.status === 'done').map(t => t.id)
+    );
+
+    // Find newly completed tasks
+    for (const task of tasks) {
+      if (task.status === 'done' && !lastKnownDoneIds.has(task.id)) {
+        console.log(`[bot] Claude task completed: ${task.id}`);
+        const msg = [
+          '🤖 CLAUDE CODE — Task Complete',
+          '',
+          `📝 Task: "${task.task}"`,
+          '',
+          `✅ ${task.summary || 'Done.'}`,
+          '',
+          task.created ? `⏱️ Queued: ${new Date(task.created).toLocaleString()}` : '',
+          task.completed ? `✔️ Done: ${new Date(task.completed).toLocaleString()}` : '',
+        ].filter(Boolean).join('\n');
+        notifyOwner(msg);
+      }
+    }
+
+    lastKnownDoneIds = currentDoneIds;
+  } catch (_) {}
+});
 
 // =====================
 // ERROR & LAUNCH
