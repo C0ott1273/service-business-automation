@@ -10,7 +10,8 @@
  * - Weekly review and goal tracking
  */
 
-// Resolve node_modules from Skills/ where dependencies are installed
+// Resolve node_modules from Skills/ and project root where dependencies may be installed
+module.paths.unshift(require('path').resolve(__dirname, '../node_modules'));
 module.paths.unshift(require('path').resolve(__dirname, '../Skills/node_modules'));
 
 require('dotenv').config({ path: require('path').resolve(__dirname, '../Skills/.env') });
