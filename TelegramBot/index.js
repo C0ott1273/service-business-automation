@@ -25,6 +25,7 @@ const { getTodaysJobs, formatSchedule } = require('../Skills/google-calendar-syn
 const { buildMorningBriefing } = require('../Skills/morning-briefing');
 const { formatDailyReading } = require('../Skills/daily-bible-reading');
 const { formatWeatherBriefing } = require('../Skills/weather-forecast');
+const { askClaude, clearHistory } = require('../Skills/claude-assistant');
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const OWNER_CHAT_ID = process.env.TELEGRAM_OWNER_CHAT_ID || null;
@@ -72,9 +73,10 @@ bot.start((ctx) => {
     `  /bible — today's Bible reading\n` +
     `  /weather — weather forecast\n` +
     `  /briefing — full morning briefing now\n\n` +
-    `🤖 Claude Code\n` +
-    `  "Claude: build me a landing page"\n` +
-    `  "Claude: fix the bug in the dashboard"\n\n` +
+    `🤖 Claude AI\n` +
+    `  "Claude: draft a follow-up email"\n` +
+    `  "Claude: marketing ideas for spring"\n` +
+    `  "Claude: clear" — reset conversation\n\n` +
     `📊 Weekly\n` +
     `  /weeklyreview — review the week\n` +
     `  /goals — check your goals\n\n` +
@@ -104,9 +106,10 @@ bot.help((ctx) => {
     `  /weather — forecast + work warnings\n` +
     `  /briefing — full morning briefing\n` +
     `  /pray — prayer prompt\n\n` +
-    `CLAUDE CODE (prefix with "Claude:")\n` +
-    `  "Claude: build a customer intake form"\n` +
-    `  "Claude: update the dashboard"\n\n` +
+    `CLAUDE AI (prefix with "Claude:")\n` +
+    `  "Claude: draft a follow-up email for job 1001"\n` +
+    `  "Claude: marketing ideas for spring"\n` +
+    `  "Claude: clear" — reset conversation\n\n` +
     `GOALS & REVIEWS\n` +
     `  /goals — view your goals\n` +
     `  /setgoal <goal> — add a new goal\n` +
@@ -272,31 +275,28 @@ bot.on('text', async (ctx) => {
     return;
   }
 
-  // --- Claude Code bridge ---
-  // Messages starting with "Claude:" get queued as tasks for Claude Code
+  // --- Claude AI bridge ---
+  // Messages starting with "Claude:" are sent to the Claude API
   const claudeMatch = text.match(/^claude\s*[:\-]\s*(.+)/i);
   if (claudeMatch) {
     const task = claudeMatch[1].trim();
-    const taskFile = require('path').resolve(__dirname, 'claude-tasks.json');
-    const fs = require('fs');
 
-    let tasks = [];
-    try { tasks = JSON.parse(fs.readFileSync(taskFile, 'utf8')); } catch (_) {}
+    // Handle "clear" to reset conversation
+    if (task.toLowerCase() === 'clear' || task.toLowerCase() === 'reset') {
+      clearHistory(chatId);
+      ctx.reply('🤖 Claude conversation history cleared.');
+      return;
+    }
 
-    tasks.push({
-      id: `task_${Date.now()}`,
-      task,
-      status: 'pending',
-      created: new Date().toISOString(),
-      from_chat: chatId,
-    });
-    fs.writeFileSync(taskFile, JSON.stringify(tasks, null, 2));
+    ctx.reply('🤖 Thinking...');
 
-    ctx.reply(
-      `🤖 Task queued for Claude Code:\n\n` +
-      `"${task}"\n\n` +
-      `I'll update you when it's started and when it's done.`
-    );
+    const result = await askClaude(task, chatId);
+
+    if (result.success) {
+      ctx.reply(result.response);
+    } else {
+      ctx.reply(`⚠️ ${result.response}`);
+    }
     return;
   }
 
