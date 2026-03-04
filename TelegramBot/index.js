@@ -25,7 +25,7 @@ const { getTodaysJobs, formatSchedule } = require('../Skills/google-calendar-syn
 const { buildMorningBriefing } = require('../Skills/morning-briefing');
 const { formatDailyReading } = require('../Skills/daily-bible-reading');
 const { formatWeatherBriefing } = require('../Skills/weather-forecast');
-const { askClaude, clearHistory } = require('../Skills/claude-assistant');
+const { triggerClaudeCode, askClaude, clearHistory } = require('../Skills/claude-assistant');
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const OWNER_CHAT_ID = process.env.TELEGRAM_OWNER_CHAT_ID || null;
@@ -73,10 +73,11 @@ bot.start((ctx) => {
     `  /bible — today's Bible reading\n` +
     `  /weather — weather forecast\n` +
     `  /briefing — full morning briefing now\n\n` +
-    `🤖 Claude AI\n` +
-    `  "Claude: draft a follow-up email"\n` +
-    `  "Claude: marketing ideas for spring"\n` +
-    `  "Claude: clear" — reset conversation\n\n` +
+    `🤖 Claude Code\n` +
+    `  "Claude: build me a landing page"\n` +
+    `  "Claude: fix the dashboard bug"\n` +
+    `  "Claude chat: marketing ideas" — quick AI chat\n` +
+    `  "Claude: clear" — reset chat history\n\n` +
     `📊 Weekly\n` +
     `  /weeklyreview — review the week\n` +
     `  /goals — check your goals\n\n` +
@@ -106,10 +107,11 @@ bot.help((ctx) => {
     `  /weather — forecast + work warnings\n` +
     `  /briefing — full morning briefing\n` +
     `  /pray — prayer prompt\n\n` +
-    `CLAUDE AI (prefix with "Claude:")\n` +
-    `  "Claude: draft a follow-up email for job 1001"\n` +
-    `  "Claude: marketing ideas for spring"\n` +
-    `  "Claude: clear" — reset conversation\n\n` +
+    `CLAUDE CODE (prefix with "Claude:")\n` +
+    `  "Claude: build a customer intake form" — runs Claude Code\n` +
+    `  "Claude: fix the invoice sender bug" — writes code + commits\n` +
+    `  "Claude chat: draft a follow-up email" — quick AI chat\n` +
+    `  "Claude: clear" — reset chat history\n\n` +
     `GOALS & REVIEWS\n` +
     `  /goals — view your goals\n` +
     `  /setgoal <goal> — add a new goal\n` +
@@ -275,28 +277,32 @@ bot.on('text', async (ctx) => {
     return;
   }
 
-  // --- Claude AI bridge ---
-  // Messages starting with "Claude:" are sent to the Claude API
+  // --- Claude Code bridge ---
+  // "Claude: <task>" triggers Claude Code via GitHub Actions (writes code, commits, pushes)
+  // "Claude chat: <question>" uses Claude API directly for quick answers
   const claudeMatch = text.match(/^claude\s*[:\-]\s*(.+)/i);
   if (claudeMatch) {
-    const task = claudeMatch[1].trim();
+    const input = claudeMatch[1].trim();
 
-    // Handle "clear" to reset conversation
-    if (task.toLowerCase() === 'clear' || task.toLowerCase() === 'reset') {
+    // Handle "clear" to reset chat history
+    if (input.toLowerCase() === 'clear' || input.toLowerCase() === 'reset') {
       clearHistory(chatId);
       ctx.reply('🤖 Claude conversation history cleared.');
       return;
     }
 
-    ctx.reply('🤖 Thinking...');
-
-    const result = await askClaude(task, chatId);
-
-    if (result.success) {
-      ctx.reply(result.response);
-    } else {
-      ctx.reply(`⚠️ ${result.response}`);
+    // "Claude chat: ..." → direct AI chat (no code changes)
+    const chatMatch = input.match(/^chat\s*[:\-]\s*(.+)/i);
+    if (chatMatch) {
+      ctx.reply('🤖 Thinking...');
+      const result = await askClaude(chatMatch[1].trim(), chatId);
+      ctx.reply(result.success ? result.response : `⚠️ ${result.response}`);
+      return;
     }
+
+    // Default: trigger Claude Code via GitHub Actions
+    const result = await triggerClaudeCode(input, chatId);
+    ctx.reply(result.success ? result.message : `⚠️ ${result.message}`);
     return;
   }
 
