@@ -14,7 +14,9 @@
 module.paths.unshift(require('path').resolve(__dirname, '../node_modules'));
 module.paths.unshift(require('path').resolve(__dirname, '../Skills/node_modules'));
 
+// Load .env file locally; on Railway, env vars are injected directly
 require('dotenv').config({ path: require('path').resolve(__dirname, '../Skills/.env') });
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 const { Telegraf } = require('telegraf');
 const cron = require('node-cron');
 const { parseCommand, executeCommand } = require('../Skills/inbound-command-handler');
@@ -28,7 +30,7 @@ const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const OWNER_CHAT_ID = process.env.TELEGRAM_OWNER_CHAT_ID || null;
 
 if (!BOT_TOKEN) {
-  console.error('[bot] Missing TELEGRAM_BOT_TOKEN in .env');
+  console.error('[bot] Missing TELEGRAM_BOT_TOKEN — set it in Railway Variables or .env file');
   process.exit(1);
 }
 
