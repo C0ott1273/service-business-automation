@@ -24,7 +24,8 @@
     "node-cron": "^3.0.3",
     "node-quickbooks": "^2.0.39",
     "telegraf": "^4.16.3",
-    "twilio": "^5.4.3"
+    "twilio": "^5.4.3",
+    "@anthropic-ai/sdk": "^0.39.0"
   },
   "engines": {
     "node": ">=18.0.0"

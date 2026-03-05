@@ -1,0 +1,108 @@
+name: Claude Code Task
+
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: 'Task for Claude Code to execute'
+        required: true
+        type: string
+      chat_id:
+        description: 'Telegram chat ID to send results back to'
+        required: true
+        type: string
+      task_id:
+        description: 'Unique task ID for tracking'
+        required: true
+        type: string
+
+jobs:
+  run-claude-code:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: service-automation
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: Skills
+
+      - name: Notify Telegram — task started
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d chat_id="${{ inputs.chat_id }}" \
+            -d text="🤖 Claude Code is working on your task:
+
+          \"${{ inputs.task }}\"
+
+          Task ID: ${{ inputs.task_id }}
+          I'll message you when it's done."
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+
+      - name: Run Claude Code
+        id: claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            You are working on a field-service business automation system. The CEO has requested this task via Telegram:
+
+            "${{ inputs.task }}"
+
+            Important rules:
+            - Make changes directly in the codebase
+            - Commit your changes with a clear message
+            - Keep changes focused on what was requested
+            - If the task is unclear, do your best interpretation
+
+      - name: Push changes
+        run: |
+          git config user.name "Claude Code Bot"
+          git config user.email "claude-bot@users.noreply.github.com"
+          git push origin service-automation
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notify Telegram — task complete
+        if: success()
+        run: |
+          # Get the last commit message as summary
+          SUMMARY=$(git log -1 --pretty=format:"%s" 2>/dev/null || echo "Task completed")
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d chat_id="${{ inputs.chat_id }}" \
+            -d text="✅ Claude Code finished your task!
+
+          Task: \"${{ inputs.task }}\"
+          Result: ${SUMMARY}
+
+          Changes have been pushed to the service-automation branch. Railway will auto-deploy."
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+
+      - name: Notify Telegram — task failed
+        if: failure()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d chat_id="${{ inputs.chat_id }}" \
+            -d text="❌ Claude Code failed on your task:
+
+          \"${{ inputs.task }}\"
+
+          Check the GitHub Actions log for details:
+          https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}

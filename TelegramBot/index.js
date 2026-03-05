@@ -14,7 +14,9 @@
 module.paths.unshift(require('path').resolve(__dirname, '../node_modules'));
 module.paths.unshift(require('path').resolve(__dirname, '../Skills/node_modules'));
 
+// Load .env file locally; on Railway, env vars are injected directly
 require('dotenv').config({ path: require('path').resolve(__dirname, '../Skills/.env') });
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 const { Telegraf } = require('telegraf');
 const cron = require('node-cron');
 const { parseCommand, executeCommand } = require('../Skills/inbound-command-handler');
@@ -23,12 +25,13 @@ const { getTodaysJobs, formatSchedule } = require('../Skills/google-calendar-syn
 const { buildMorningBriefing } = require('../Skills/morning-briefing');
 const { formatDailyReading } = require('../Skills/daily-bible-reading');
 const { formatWeatherBriefing } = require('../Skills/weather-forecast');
+const { triggerClaudeCode, askClaude, clearHistory } = require('../Skills/claude-assistant');
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const OWNER_CHAT_ID = process.env.TELEGRAM_OWNER_CHAT_ID || null;
 
 if (!BOT_TOKEN) {
-  console.error('[bot] Missing TELEGRAM_BOT_TOKEN in .env');
+  console.error('[bot] Missing TELEGRAM_BOT_TOKEN — set it in Railway Variables or .env file');
   process.exit(1);
 }
 
@@ -72,7 +75,9 @@ bot.start((ctx) => {
     `  /briefing — full morning briefing now\n\n` +
     `🤖 Claude Code\n` +
     `  "Claude: build me a landing page"\n` +
-    `  "Claude: fix the bug in the dashboard"\n\n` +
+    `  "Claude: fix the dashboard bug"\n` +
+    `  "Claude chat: marketing ideas" — quick AI chat\n` +
+    `  "Claude: clear" — reset chat history\n\n` +
     `📊 Weekly\n` +
     `  /weeklyreview — review the week\n` +
     `  /goals — check your goals\n\n` +
@@ -103,8 +108,10 @@ bot.help((ctx) => {
     `  /briefing — full morning briefing\n` +
     `  /pray — prayer prompt\n\n` +
     `CLAUDE CODE (prefix with "Claude:")\n` +
-    `  "Claude: build a customer intake form"\n` +
-    `  "Claude: update the dashboard"\n\n` +
+    `  "Claude: build a customer intake form" — runs Claude Code\n` +
+    `  "Claude: fix the invoice sender bug" — writes code + commits\n` +
+    `  "Claude chat: draft a follow-up email" — quick AI chat\n` +
+    `  "Claude: clear" — reset chat history\n\n` +
     `GOALS & REVIEWS\n` +
     `  /goals — view your goals\n` +
     `  /setgoal <goal> — add a new goal\n` +
@@ -271,30 +278,31 @@ bot.on('text', async (ctx) => {
   }
 
   // --- Claude Code bridge ---
-  // Messages starting with "Claude:" get queued as tasks for Claude Code
+  // "Claude: <task>" triggers Claude Code via GitHub Actions (writes code, commits, pushes)
+  // "Claude chat: <question>" uses Claude API directly for quick answers
   const claudeMatch = text.match(/^claude\s*[:\-]\s*(.+)/i);
   if (claudeMatch) {
-    const task = claudeMatch[1].trim();
-    const taskFile = require('path').resolve(__dirname, 'claude-tasks.json');
-    const fs = require('fs');
+    const input = claudeMatch[1].trim();
 
-    let tasks = [];
-    try { tasks = JSON.parse(fs.readFileSync(taskFile, 'utf8')); } catch (_) {}
+    // Handle "clear" to reset chat history
+    if (input.toLowerCase() === 'clear' || input.toLowerCase() === 'reset') {
+      clearHistory(chatId);
+      ctx.reply('🤖 Claude conversation history cleared.');
+      return;
+    }
 
-    tasks.push({
-      id: `task_${Date.now()}`,
-      task,
-      status: 'pending',
-      created: new Date().toISOString(),
-      from_chat: chatId,
-    });
-    fs.writeFileSync(taskFile, JSON.stringify(tasks, null, 2));
+    // "Claude chat: ..." → direct AI chat (no code changes)
+    const chatMatch = input.match(/^chat\s*[:\-]\s*(.+)/i);
+    if (chatMatch) {
+      ctx.reply('🤖 Thinking...');
+      const result = await askClaude(chatMatch[1].trim(), chatId);
+      ctx.reply(result.success ? result.response : `⚠️ ${result.response}`);
+      return;
+    }
 
-    ctx.reply(
-      `🤖 Task queued for Claude Code:\n\n` +
-      `"${task}"\n\n` +
-      `I'll update you when it's started and when it's done.`
-    );
+    // Default: trigger Claude Code via GitHub Actions
+    const result = await triggerClaudeCode(input, chatId);
+    ctx.reply(result.success ? result.message : `⚠️ ${result.message}`);
     return;
   }
 
