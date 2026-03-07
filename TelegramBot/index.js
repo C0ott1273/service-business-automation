@@ -35,8 +35,12 @@ const { checkMissedCalls } = require('../Skills/missed-call-detector');
 const { sendSMS } = require('../Skills/twilio-sms-sender');
 const smsTemplates = require('../protect-a-child-pool-fence/sms-templates');
 
+const fs = require('fs');
+const pathMod = require('path');
+
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const OWNER_CHAT_ID = process.env.TELEGRAM_OWNER_CHAT_ID || null;
+const CHAT_ID_FILE = pathMod.resolve(__dirname, 'owner-chat-id.txt');
 
 if (!BOT_TOKEN) {
   console.error('[bot] Missing TELEGRAM_BOT_TOKEN — set it in Railway Variables or .env file');
@@ -52,7 +56,16 @@ const bot = new Telegraf(BOT_TOKEN);
 const pendingConfirm = new Map();      // chatId -> parsed command awaiting CONFIRM
 const pendingActions = new Map();      // chatId -> array of { type, data, timestamp }
 const conversationState = new Map();   // chatId -> { step, data } for multi-step flows
-let ownerChatId = OWNER_CHAT_ID;
+
+// Persist owner chat ID across restarts
+function loadOwnerChatId() {
+  if (OWNER_CHAT_ID) return OWNER_CHAT_ID;
+  try { return fs.readFileSync(CHAT_ID_FILE, 'utf8').trim() || null; } catch (_) { return null; }
+}
+function saveOwnerChatId(id) {
+  try { fs.writeFileSync(CHAT_ID_FILE, String(id)); } catch (_) {}
+}
+let ownerChatId = loadOwnerChatId();
 
 // --- Helper: send message to owner ---
 async function notifyOwner(message) {
@@ -106,7 +119,8 @@ async function promptNextAction(chatId) {
 bot.start((ctx) => {
   if (!ownerChatId) {
     ownerChatId = ctx.chat.id;
-    console.log(`[bot] Owner chat ID set: ${ownerChatId}`);
+    saveOwnerChatId(ownerChatId);
+    console.log(`[bot] Owner chat ID set and saved: ${ownerChatId}`);
   }
 
   ctx.reply(
@@ -329,6 +343,7 @@ bot.on('text', async (ctx) => {
 
   if (!ownerChatId) {
     ownerChatId = chatId;
+    saveOwnerChatId(ownerChatId);
   }
 
   // --- Handle YES/NO for pending lead/missed-call actions ---
@@ -708,23 +723,32 @@ bot.catch((err) => {
 });
 
 console.log('[bot] Starting Telegram CEO Assistant v2...');
-bot.launch().then(() => {
-  console.log('[bot] Bot is live. All cron jobs active.');
 
-  setTimeout(() => {
-    notifyOwner(
-      `Bot is online and ready.\n\n` +
-      `Active schedules:\n` +
-      `- 7:00 AM — Morning briefing\n` +
-      `- 5:00 PM — Evening summary\n` +
-      `- Every 4h — Lead check\n` +
-      `- Every 15m (7AM-7PM) — Missed call check\n` +
-      `- Hourly — Review request processor\n` +
-      `- Friday 5PM — Weekly review\n` +
-      `- Sunday 8PM — Week prep\n\n` +
-      `Type /help to see all commands.`
-    );
-  }, 2000);
+// Telegraf's launch() never resolves (infinite polling loop).
+// Use the onLaunch callback for post-startup logic.
+bot.launch(
+  { dropPendingUpdates: true },
+  () => {
+    console.log('[bot] Bot is live. All cron jobs active.');
+
+    setTimeout(() => {
+      notifyOwner(
+        `Bot is online and ready.\n\n` +
+        `Active schedules:\n` +
+        `- 7:00 AM — Morning briefing\n` +
+        `- 5:00 PM — Evening summary\n` +
+        `- Every 4h — Lead check\n` +
+        `- Every 15m (7AM-7PM) — Missed call check\n` +
+        `- Hourly — Review request processor\n` +
+        `- Friday 5PM — Weekly review\n` +
+        `- Sunday 8PM — Week prep\n\n` +
+        `Type /help to see all commands.`
+      );
+    }, 2000);
+  }
+).catch((err) => {
+  console.error('[bot] Fatal error:', err.message);
+  process.exit(1);
 });
 
 process.once('SIGINT', () => bot.stop('SIGINT'));
