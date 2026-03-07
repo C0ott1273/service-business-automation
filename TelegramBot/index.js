@@ -34,6 +34,13 @@ const { checkForNewLeads, markLeadProcessed } = require('../Skills/lead-monitor'
 const { checkMissedCalls } = require('../Skills/missed-call-detector');
 const { sendSMS } = require('../Skills/twilio-sms-sender');
 const smsTemplates = require('../protect-a-child-pool-fence/sms-templates');
+const { formatMarketingSummary, generateGoogleAds, generateSocialAds, generateWeeklyContent, generateGBPPost, generatePartnerOutreach, generateRentalOutreach } = require('../Skills/marketing-agent');
+const { formatPipeline } = require('../Skills/pipeline-tracker');
+const { getDripStats, processDripQueue } = require('../Skills/lead-drip-sequence');
+const { calculateMaterials, formatEstimate: formatMaterialEstimate } = require('../Skills/material-calculator');
+const { formatReferralStats } = require('../Skills/referral-tracker');
+const { formatUpcomingBookings } = require('../Skills/booking-integration');
+const { formatCompetitorReport } = require('../Skills/competitor-monitor');
 
 const fs = require('fs');
 const pathMod = require('path');
@@ -138,6 +145,15 @@ bot.start((ctx) => {
     `Claude Code\n` +
     `  "Claude: fix the dashboard bug"\n` +
     `  "Claude: build a landing page"\n\n` +
+    `Marketing & Growth\n` +
+    `  /marketing — strategy overview\n` +
+    `  /ads [city] — generate ad copy\n` +
+    `  /referrals — referral program\n` +
+    `  /competitors — competitor watch\n\n` +
+    `Operations\n` +
+    `  /pipeline — sales funnel\n` +
+    `  /materials <ft> — job estimator\n` +
+    `  /bookings — upcoming estimates\n\n` +
     `Goals & Reviews\n` +
     `  /weeklyreview — review the week\n` +
     `  /goals — check your goals\n\n` +
@@ -180,6 +196,20 @@ bot.help((ctx) => {
     `  /pray — prayer prompt\n\n` +
     `CLAUDE CODE\n` +
     `  "Claude: <task>" — runs Claude Code via GitHub Actions\n\n` +
+    `MARKETING & GROWTH\n` +
+    `  /marketing — marketing strategy summary\n` +
+    `  /ads [city] — generate Google + social ads\n` +
+    `  /content — weekly social media calendar\n` +
+    `  /gbp — Google Business Profile post\n` +
+    `  /outreach — pool builder partnership email\n` +
+    `  /outreach rental — rental property outreach\n` +
+    `  /referrals — referral program stats\n` +
+    `  /competitors — competitor analysis\n\n` +
+    `OPERATIONS\n` +
+    `  /pipeline — sales pipeline overview\n` +
+    `  /drip — lead drip sequence stats\n` +
+    `  /materials <ft> [gates] — materials estimate\n` +
+    `  /bookings — upcoming estimate appointments\n\n` +
     `GOALS & REVIEWS\n` +
     `  /goals — view your goals\n` +
     `  /setgoal <goal> — add a new goal\n` +
@@ -256,20 +286,23 @@ bot.command('status', async (ctx) => {
   ctx.reply(
     `System Status: All systems go\n\n` +
     `Today's jobs: ${jobCount}\n` +
-    `Skills loaded: 16\n` +
+    `Skills loaded: 23\n` +
     `  email-parser, twilio-sms-sender, google-calendar-sync\n` +
     `  quickbooks-job-lookup, quickbooks-invoice-sender\n` +
     `  quickbooks-customer-creator, quickbooks-estimate-manager\n` +
     `  review-request-trigger, inbound-command-handler\n` +
     `  morning-briefing, evening-summary, daily-bible-reading\n` +
     `  weather-forecast, claude-assistant\n` +
-    `  lead-monitor, missed-call-detector\n\n` +
+    `  lead-monitor, missed-call-detector\n` +
+    `  marketing-agent, pipeline-tracker, lead-drip-sequence\n` +
+    `  material-calculator, referral-tracker\n` +
+    `  booking-integration, competitor-monitor\n\n` +
     `Active schedules:\n` +
     `  7AM — Morning briefing\n` +
     `  5PM — Evening summary\n` +
     `  Every 4h — Lead check\n` +
     `  Every 15m (7AM-7PM) — Missed call check\n` +
-    `  Hourly — Review request processor\n` +
+    `  Hourly — Review requests + drip sequences\n` +
     `  Friday 5PM — Weekly review reminder\n` +
     `  Sunday 8PM — Week ahead prep\n\n` +
     `Owner chat: ${ownerChatId ? 'Connected' : 'Send /start to connect'}`
@@ -331,6 +364,102 @@ bot.command('weeklyreview', async (ctx) => {
     `5. What can you improve next week?\n\n` +
     `Take 10 minutes to answer these. Your future self will thank you.`
   );
+});
+
+// --- /marketing ---
+bot.command('marketing', (ctx) => {
+  ctx.reply(formatMarketingSummary());
+});
+
+// --- /ads [city] ---
+bot.command('ads', (ctx) => {
+  const city = ctx.message.text.replace('/ads', '').trim() || 'Orlando';
+  const google = generateGoogleAds(city);
+  const social = generateSocialAds();
+  let msg = `Google Ads — ${city}\n\n`;
+  google.forEach((ad, i) => {
+    msg += `Ad ${i + 1}:\n  ${ad.headline}\n  ${ad.description}\n\n`;
+  });
+  msg += `Social Ads\n\n`;
+  social.forEach((ad) => {
+    msg += `${ad.type}:\n  ${ad.headline}\n  ${ad.body.substring(0, 100)}...\n\n`;
+  });
+  ctx.reply(msg);
+});
+
+// --- /content ---
+bot.command('content', (ctx) => {
+  const content = generateWeeklyContent();
+  let msg = `Weekly Content Calendar\n\n`;
+  content.forEach((day) => {
+    msg += `${day.day}: ${day.platform}\n  ${day.topic}\n  ${day.caption.substring(0, 80)}...\n\n`;
+  });
+  ctx.reply(msg);
+});
+
+// --- /gbp ---
+bot.command('gbp', (ctx) => {
+  const post = generateGBPPost();
+  ctx.reply(`Google Business Post\n\n${post.title}\n\n${post.body}\n\nCTA: ${post.cta}`);
+});
+
+// --- /outreach ---
+bot.command('outreach', (ctx) => {
+  const type = ctx.message.text.replace('/outreach', '').trim().toLowerCase();
+  if (type === 'rental' || type === 'property') {
+    const msg = generateRentalOutreach();
+    ctx.reply(`Rental Property Outreach\n\nSubject: ${msg.subject}\n\n${msg.body}`);
+  } else {
+    const msg = generatePartnerOutreach();
+    ctx.reply(`Pool Builder Outreach\n\nSubject: ${msg.subject}\n\n${msg.body}`);
+  }
+});
+
+// --- /pipeline ---
+bot.command('pipeline', (ctx) => {
+  ctx.reply(formatPipeline());
+});
+
+// --- /drip ---
+bot.command('drip', (ctx) => {
+  const stats = getDripStats();
+  ctx.reply(
+    `Lead Drip Stats\n\n` +
+    `Active sequences: ${stats.active}\n` +
+    `Completed: ${stats.completed}\n` +
+    `Cancelled: ${stats.cancelled}\n` +
+    `Messages sent: ${stats.messagesSent}`
+  );
+});
+
+// --- /materials [footage] [gates] ---
+bot.command('materials', (ctx) => {
+  const args = ctx.message.text.replace('/materials', '').trim().split(/\s+/);
+  const footage = parseInt(args[0]) || 0;
+  const gates = parseInt(args[1]) || 1;
+  if (!footage) {
+    ctx.reply('Usage: /materials <footage> [gates]\nExample: /materials 80 2');
+    return;
+  }
+  const result = calculateMaterials({ footage, gates });
+  ctx.reply(formatMaterialEstimate(result));
+});
+
+// --- /referrals ---
+bot.command('referrals', (ctx) => {
+  ctx.reply(formatReferralStats());
+});
+
+// --- /bookings ---
+bot.command('bookings', (ctx) => {
+  ctx.reply(formatUpcomingBookings());
+});
+
+// --- /competitors ---
+bot.command('competitors', async (ctx) => {
+  ctx.reply('Checking competitors...');
+  const report = await formatCompetitorReport();
+  ctx.reply(report);
 });
 
 // =====================
@@ -683,12 +812,21 @@ cron.schedule('*/15 7-19 * * 1-6', async () => {
   }
 }, { timezone: 'America/New_York' });
 
-// Every hour — Process scheduled review requests
+// Every hour — Process scheduled review requests + drip sequences
 cron.schedule('0 * * * *', async () => {
   const result = await processScheduledReviews();
   if (result.processed > 0) {
     console.log(`[bot] Processed ${result.processed} review request(s)`);
     await notifyOwner(`Sent ${result.processed} review request(s) to customers.`);
+  }
+
+  try {
+    const dripResult = await processDripQueue();
+    if (dripResult.sent > 0) {
+      console.log(`[bot] Sent ${dripResult.sent} drip message(s)`);
+    }
+  } catch (err) {
+    console.error('[bot] Drip queue error:', err.message);
   }
 });
 
