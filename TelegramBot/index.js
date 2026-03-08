@@ -41,6 +41,7 @@ const { calculateMaterials, formatEstimate: formatMaterialEstimate } = require('
 const { formatReferralStats } = require('../Skills/referral-tracker');
 const { formatUpcomingBookings } = require('../Skills/booking-integration');
 const { formatCompetitorReport } = require('../Skills/competitor-monitor');
+const { PREFIX: RC_PREFIX, buildMainMenu, buildMarketingMenu, buildOpsMenu } = require('../Skills/remote-control');
 
 const fs = require('fs');
 const pathMod = require('path');
@@ -158,6 +159,7 @@ bot.start((ctx) => {
     `  /weeklyreview — review the week\n` +
     `  /goals — check your goals\n\n` +
     `System\n` +
+    `  /remote — control panel (tap buttons)\n` +
     `  /status — system health\n` +
     `  /help — all commands\n\n` +
     `Schedules:\n` +
@@ -215,6 +217,7 @@ bot.help((ctx) => {
     `  /setgoal <goal> — add a new goal\n` +
     `  /weeklyreview — weekly business review\n\n` +
     `SYSTEM\n` +
+    `  /remote — interactive control panel\n` +
     `  /status — health check\n` +
     `  /summary — evening summary now\n` +
     `  /checkleads — check leads now\n` +
@@ -286,7 +289,7 @@ bot.command('status', async (ctx) => {
   ctx.reply(
     `System Status: All systems go\n\n` +
     `Today's jobs: ${jobCount}\n` +
-    `Skills loaded: 23\n` +
+    `Skills loaded: 24\n` +
     `  email-parser, twilio-sms-sender, google-calendar-sync\n` +
     `  quickbooks-job-lookup, quickbooks-invoice-sender\n` +
     `  quickbooks-customer-creator, quickbooks-estimate-manager\n` +
@@ -296,7 +299,8 @@ bot.command('status', async (ctx) => {
     `  lead-monitor, missed-call-detector\n` +
     `  marketing-agent, pipeline-tracker, lead-drip-sequence\n` +
     `  material-calculator, referral-tracker\n` +
-    `  booking-integration, competitor-monitor\n\n` +
+    `  booking-integration, competitor-monitor\n` +
+    `  remote-control\n\n` +
     `Active schedules:\n` +
     `  7AM — Morning briefing\n` +
     `  5PM — Evening summary\n` +
@@ -460,6 +464,181 @@ bot.command('competitors', async (ctx) => {
   ctx.reply('Checking competitors...');
   const report = await formatCompetitorReport();
   ctx.reply(report);
+});
+
+// --- /remote — Interactive control panel ---
+bot.command('remote', (ctx) => {
+  ctx.reply('Remote Control Panel', buildMainMenu());
+});
+
+// --- Remote control callback handler ---
+bot.action(new RegExp(`^${RC_PREFIX}(.+)$`), async (ctx) => {
+  const action = ctx.match[1];
+  await ctx.answerCbQuery();
+
+  try {
+    switch (action) {
+      // --- Navigation ---
+      case 'main':
+        await ctx.editMessageText('Remote Control Panel', buildMainMenu());
+        return;
+      case 'marketing_menu':
+        await ctx.editMessageText('Marketing & Growth', buildMarketingMenu());
+        return;
+      case 'ops_menu':
+        await ctx.editMessageText('Operations', buildOpsMenu());
+        return;
+
+      // --- Schedule & Jobs ---
+      case 'schedule':
+      case 'jobs_today': {
+        const result = await getTodaysJobs();
+        if (result.success) {
+          const schedule = formatSchedule(result.events);
+          await ctx.reply(schedule || 'No jobs scheduled today.');
+        } else {
+          await ctx.reply('Could not fetch schedule.');
+        }
+        break;
+      }
+
+      // --- Leads & Calls ---
+      case 'check_leads': {
+        await ctx.reply('Checking for new leads...');
+        const leads = await checkForNewLeads();
+        if (leads.length === 0) {
+          await ctx.reply('No new leads found.');
+        } else {
+          for (const lead of leads) {
+            queueAction(ctx.chat.id, { type: 'lead_response', data: lead, timestamp: Date.now() });
+          }
+          await promptNextAction(ctx.chat.id);
+        }
+        break;
+      }
+      case 'missed_calls': {
+        await ctx.reply('Checking missed calls...');
+        const missed = await checkMissedCalls();
+        if (missed.length === 0) {
+          await ctx.reply('No missed calls.');
+        } else {
+          for (const call of missed) {
+            queueAction(ctx.chat.id, { type: 'missed_call', data: call, timestamp: Date.now() });
+          }
+          await promptNextAction(ctx.chat.id);
+        }
+        break;
+      }
+
+      // --- System & Reports ---
+      case 'pipeline':
+        await ctx.reply(formatPipeline());
+        break;
+      case 'status': {
+        const calRes = await getTodaysJobs();
+        const cnt = calRes.success ? calRes.count : 'N/A';
+        await ctx.reply(
+          `System Status: All systems go\n\n` +
+          `Today's jobs: ${cnt}\n` +
+          `Owner chat: ${ownerChatId ? 'Connected' : 'Not set'}`
+        );
+        break;
+      }
+      case 'weather':
+        await ctx.reply(await formatWeatherBriefing());
+        break;
+      case 'bible':
+        await ctx.reply(formatDailyReading());
+        break;
+      case 'briefing': {
+        await ctx.reply('Compiling briefing...');
+        const briefing = await buildMorningBriefing();
+        await ctx.reply(briefing);
+        break;
+      }
+      case 'summary': {
+        await ctx.reply('Compiling evening summary...');
+        const summary = await buildEveningSummary();
+        await ctx.reply(summary);
+        break;
+      }
+
+      // --- Marketing ---
+      case 'marketing':
+        await ctx.reply(formatMarketingSummary());
+        break;
+      case 'content': {
+        const content = generateWeeklyContent();
+        let msg = 'Weekly Content Calendar\n\n';
+        content.forEach((day) => {
+          msg += `${day.day}: ${day.platform}\n  ${day.topic}\n  ${day.caption.substring(0, 80)}...\n\n`;
+        });
+        await ctx.reply(msg);
+        break;
+      }
+      case 'gbp': {
+        const post = generateGBPPost();
+        await ctx.reply(`Google Business Post\n\n${post.title}\n\n${post.body}\n\nCTA: ${post.cta}`);
+        break;
+      }
+      case 'outreach': {
+        const outreachMsg = generatePartnerOutreach();
+        await ctx.reply(`Pool Builder Outreach\n\nSubject: ${outreachMsg.subject}\n\n${outreachMsg.body}`);
+        break;
+      }
+      case 'competitors': {
+        await ctx.reply('Checking competitors...');
+        const report = await formatCompetitorReport();
+        await ctx.reply(report);
+        break;
+      }
+      case 'referrals':
+        await ctx.reply(formatReferralStats());
+        break;
+
+      // --- Operations ---
+      case 'drip': {
+        const stats = getDripStats();
+        await ctx.reply(
+          `Lead Drip Stats\n\n` +
+          `Active sequences: ${stats.active}\n` +
+          `Completed: ${stats.completed}\n` +
+          `Cancelled: ${stats.cancelled}\n` +
+          `Messages sent: ${stats.messagesSent}`
+        );
+        break;
+      }
+      case 'bookings':
+        await ctx.reply(formatUpcomingBookings());
+        break;
+      case 'goals': {
+        if (goals.length === 0) {
+          await ctx.reply('No goals set yet. Use /setgoal <goal> to add one.');
+        } else {
+          const list = goals.map((g, i) =>
+            `${g.done ? '[done]' : '[ ]'} ${i + 1}. ${g.text}`
+          ).join('\n');
+          await ctx.reply(`Your Goals\n\n${list}\n\nMark done: /goaldone <number>`);
+        }
+        break;
+      }
+      case 'pray': {
+        const prayers = [
+          'Lord, bless my work today. Give me wisdom with every customer, patience with every challenge, and gratitude for every opportunity. Amen.',
+          'Father, I commit this day to You. Guide my hands, my words, and my decisions. Let every fence I install protect a family. Amen.',
+          'God, grant me strength for today\'s work. Help me serve my customers with excellence and integrity. Keep us safe on every job site. Amen.',
+        ];
+        const idx = new Date().getDate() % prayers.length;
+        await ctx.reply(prayers[idx]);
+        break;
+      }
+
+      default:
+        await ctx.reply('Unknown action.');
+    }
+  } catch (err) {
+    await ctx.reply(`Error: ${err.message}`);
+  }
 });
 
 // =====================
