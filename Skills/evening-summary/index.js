@@ -10,6 +10,8 @@
 
 const { getTodaysJobs, getEvents, formatSchedule } = require('../google-calendar-sync');
 const { getScheduledReviews } = require('../review-request-trigger');
+const { getPipelineStats } = require('../pipeline-tracker');
+const { getDripStats } = require('../lead-drip-sequence');
 
 // Daily tracking (resets at midnight or on first call of new day)
 let trackingDate = new Date().toDateString();
@@ -111,6 +113,20 @@ async function buildEveningSummary() {
     }
   } catch (e) {
     // Review tracking not available
+  }
+
+  // Pipeline & drip stats
+  try {
+    const pipeStats = getPipelineStats(30);
+    const dripStats = getDripStats();
+    sections.push(
+      `Pipeline (30 days):\n` +
+      `  Leads: ${pipeStats.totalLeads} | Active: ${pipeStats.activeDeals} | Lost: ${pipeStats.lostDeals}\n` +
+      `  Close rate: ${pipeStats.closeRate} | Revenue: $${pipeStats.closedRevenue.toLocaleString()}\n` +
+      `  Drip sequences: ${dripStats.active} active, ${dripStats.completed} completed`
+    );
+  } catch (e) {
+    // Pipeline tracking not available
   }
 
   // Tomorrow's preview

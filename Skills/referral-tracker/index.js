@@ -193,6 +193,68 @@ function formatReferralStats() {
   return msg;
 }
 
+// --- Scheduled referral invite queue (survives restarts via JSON) ---
+const INVITE_FILE = path.resolve(__dirname, 'pending-invites.json');
+
+function loadInvites() {
+  try { return JSON.parse(fs.readFileSync(INVITE_FILE, 'utf8')); } catch (_) { return []; }
+}
+
+function saveInvites(invites) {
+  fs.writeFileSync(INVITE_FILE, JSON.stringify(invites, null, 2));
+}
+
+/**
+ * Schedule a referral invite SMS to be sent 5 days after job completion.
+ */
+function scheduleReferralInvite(customer) {
+  const invites = loadInvites();
+  const existing = invites.find((i) => i.phone === customer.phone && i.status === 'pending');
+  if (existing) return { success: false, message: 'Invite already scheduled.' };
+
+  invites.push({
+    id: `inv_${Date.now()}`,
+    name: customer.name,
+    phone: customer.phone,
+    code: customer.code,
+    sendAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+    status: 'pending',
+    createdAt: new Date().toISOString(),
+  });
+  saveInvites(invites);
+  return { success: true, message: `Referral invite scheduled for ${customer.name} in 5 days.` };
+}
+
+/**
+ * Process scheduled invites. Call on hourly cron.
+ * Returns { sent, errors } count.
+ */
+async function processScheduledInvites() {
+  const invites = loadInvites();
+  const now = new Date();
+  let sent = 0;
+
+  for (const invite of invites) {
+    if (invite.status !== 'pending') continue;
+    if (new Date(invite.sendAt) > now) continue;
+
+    try {
+      const { sendSMS } = require('../twilio-sms-sender');
+      const msg = getReferralInviteSMS({ name: invite.name, code: invite.code });
+      const result = await sendSMS(invite.phone, msg);
+      invite.status = result.success ? 'sent' : 'failed';
+      invite.sentAt = now.toISOString();
+      sent++;
+    } catch (err) {
+      invite.status = 'failed';
+      invite.error = err.message;
+    }
+  }
+
+  saveInvites(invites);
+  return { sent };
+}
+
 module.exports = {
   registerCustomer,
   recordReferral,
@@ -201,5 +263,7 @@ module.exports = {
   getReferralStats,
   getReferralInviteSMS,
   formatReferralStats,
+  scheduleReferralInvite,
+  processScheduledInvites,
   REWARD_AMOUNT,
 };

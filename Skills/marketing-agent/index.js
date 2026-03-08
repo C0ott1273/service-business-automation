@@ -428,6 +428,29 @@ function formatMarketingSummary() {
   );
 }
 
+/**
+ * Generate retargeting ad copy — reminder, urgency, and social proof variants.
+ */
+function generateRetargetingAds(city = 'Palm Beach County') {
+  return [
+    {
+      type: 'reminder',
+      headline: `Still Thinking About Pool Safety in ${city}?`,
+      description: `Your pool fence estimate is waiting. Florida law requires a barrier around all residential pools. Get compliant — schedule your free estimate today.`,
+    },
+    {
+      type: 'urgency',
+      headline: `Don't Wait — Pool Season Is Here, ${city}`,
+      description: `Every day without a fence is a risk. We install in as little as 1 day. Limited spots this month — book your free estimate now.`,
+    },
+    {
+      type: 'social_proof',
+      headline: `Trusted by ${city} Families for Pool Safety`,
+      description: `Hundreds of families in ${city} trust Protect A Child pool fencing. See why — 5-star rated, lifetime warranty, same-day estimates. Get yours free today.`,
+    },
+  ];
+}
+
 module.exports = {
   PRODUCT_KNOWLEDGE,
   AUDIENCES,
@@ -437,6 +460,7 @@ module.exports = {
   generateGBPPost,
   generatePartnerOutreach,
   generateRentalOutreach,
+  generateRetargetingAds,
   getMarketingStrategy,
   formatMarketingSummary,
 };

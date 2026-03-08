@@ -34,13 +34,16 @@ const { checkForNewLeads, markLeadProcessed } = require('../Skills/lead-monitor'
 const { checkMissedCalls } = require('../Skills/missed-call-detector');
 const { sendSMS } = require('../Skills/twilio-sms-sender');
 const smsTemplates = require('../protect-a-child-pool-fence/sms-templates');
-const { formatMarketingSummary, generateGoogleAds, generateSocialAds, generateWeeklyContent, generateGBPPost, generatePartnerOutreach, generateRentalOutreach } = require('../Skills/marketing-agent');
-const { formatPipeline } = require('../Skills/pipeline-tracker');
-const { getDripStats, processDripQueue } = require('../Skills/lead-drip-sequence');
+const { formatMarketingSummary, generateGoogleAds, generateSocialAds, generateWeeklyContent, generateGBPPost, generatePartnerOutreach, generateRentalOutreach, generateRetargetingAds } = require('../Skills/marketing-agent');
+const { formatPipeline, addLead: addToPipeline, findDeal, advanceDeal, getPipelineStats, getLeadsBySource, updateDealSource } = require('../Skills/pipeline-tracker');
+const { getDripStats, processDripQueue, addToDrip } = require('../Skills/lead-drip-sequence');
 const { calculateMaterials, formatEstimate: formatMaterialEstimate } = require('../Skills/material-calculator');
 const { formatReferralStats } = require('../Skills/referral-tracker');
-const { formatUpcomingBookings } = require('../Skills/booking-integration');
+const { formatUpcomingBookings, getBookingUrl } = require('../Skills/booking-integration');
 const { formatCompetitorReport } = require('../Skills/competitor-monitor');
+const { saveLandingPage, generateBatch } = require('../Skills/landing-page-generator');
+const { addExpense, addRevenue, formatPnL } = require('../Skills/weekly-pnl');
+const { addPartner, findPartner, formatPartnerList } = require('../Skills/partner-tracker');
 
 const fs = require('fs');
 const pathMod = require('path');
@@ -199,17 +202,32 @@ bot.help((ctx) => {
     `MARKETING & GROWTH\n` +
     `  /marketing — marketing strategy summary\n` +
     `  /ads [city] — generate Google + social ads\n` +
+    `  /adcopy [city] — Google Ads copy only\n` +
     `  /content — weekly social media calendar\n` +
     `  /gbp — Google Business Profile post\n` +
-    `  /outreach — pool builder partnership email\n` +
-    `  /outreach rental — rental property outreach\n` +
+    `  /gbppost [type] — GBP post (general/safety/rental/seasonal)\n` +
+    `  /outreach <name> — personalized partner outreach\n` +
     `  /referrals — referral program stats\n` +
-    `  /competitors — competitor analysis\n\n` +
+    `  /retarget [city] — retargeting ad copy\n` +
+    `  /competitors — competitor analysis\n` +
+    `  /competitors add <name> — track a competitor\n` +
+    `  /competitors check — refresh competitor data\n\n` +
     `OPERATIONS\n` +
     `  /pipeline — sales pipeline overview\n` +
     `  /drip — lead drip sequence stats\n` +
+    `  /weeklystats — weekly performance summary\n` +
+    `  /roi — ROI by lead source channel\n` +
+    `  /leadsource <name> <source> — tag lead source\n` +
     `  /materials <ft> [gates] — materials estimate\n` +
-    `  /bookings — upcoming estimate appointments\n\n` +
+    `  /bookings — upcoming estimate appointments\n` +
+    `  /landingpage <city> — generate SEO landing page\n` +
+    `  /landingpages — batch generate all PBC cities\n` +
+    `  /partners — list referral partners\n` +
+    `  /partners add <name> <type> — add partner\n\n` +
+    `FINANCE\n` +
+    `  /expense <amount> <category> [note] — log expense\n` +
+    `  /revenue <amount> [source] [note] — log revenue\n` +
+    `  /pnl [days] — profit & loss report\n\n` +
     `GOALS & REVIEWS\n` +
     `  /goals — view your goals\n` +
     `  /setgoal <goal> — add a new goal\n` +
@@ -285,25 +303,22 @@ bot.command('status', async (ctx) => {
 
   ctx.reply(
     `System Status: All systems go\n\n` +
+    `Territory: Palm Beach County, FL\n` +
     `Today's jobs: ${jobCount}\n` +
-    `Skills loaded: 23\n` +
-    `  email-parser, twilio-sms-sender, google-calendar-sync\n` +
-    `  quickbooks-job-lookup, quickbooks-invoice-sender\n` +
-    `  quickbooks-customer-creator, quickbooks-estimate-manager\n` +
-    `  review-request-trigger, inbound-command-handler\n` +
-    `  morning-briefing, evening-summary, daily-bible-reading\n` +
-    `  weather-forecast, claude-assistant\n` +
-    `  lead-monitor, missed-call-detector\n` +
-    `  marketing-agent, pipeline-tracker, lead-drip-sequence\n` +
-    `  material-calculator, referral-tracker\n` +
-    `  booking-integration, competitor-monitor\n\n` +
+    `Skills loaded: 25\n\n` +
+    `Core: email-parser, twilio-sms, calendar, claude-assistant\n` +
+    `QuickBooks: job-lookup, invoices, customers, estimates\n` +
+    `Automation: lead-monitor, missed-calls, drip-sequence, reviews\n` +
+    `Growth: marketing-agent, pipeline, landing-pages, competitor-monitor\n` +
+    `Business: materials, referrals, bookings, bible, weather\n\n` +
     `Active schedules:\n` +
     `  7AM — Morning briefing\n` +
     `  5PM — Evening summary\n` +
     `  Every 4h — Lead check\n` +
     `  Every 15m (7AM-7PM) — Missed call check\n` +
     `  Hourly — Review requests + drip sequences\n` +
-    `  Friday 5PM — Weekly review reminder\n` +
+    `  Monday 8AM — Competitor report\n` +
+    `  Friday 5PM — Weekly review + stats\n` +
     `  Sunday 8PM — Week ahead prep\n\n` +
     `Owner chat: ${ownerChatId ? 'Connected' : 'Send /start to connect'}`
   );
@@ -455,11 +470,288 @@ bot.command('bookings', (ctx) => {
   ctx.reply(formatUpcomingBookings());
 });
 
-// --- /competitors ---
+// --- /competitors [add|addid|check] ---
 bot.command('competitors', async (ctx) => {
-  ctx.reply('Checking competitors...');
-  const report = await formatCompetitorReport();
-  ctx.reply(report);
+  const args = ctx.message.text.replace('/competitors', '').trim();
+  const { addCompetitor, checkCompetitors } = require('../Skills/competitor-monitor');
+
+  if (args.toLowerCase().startsWith('add ') && !args.toLowerCase().startsWith('addid ')) {
+    const name = args.replace(/^add\s+/i, '').trim();
+    ctx.reply(
+      `To track "${name}", I need their Google Place ID.\n\n` +
+      `Find them on Google Maps → click the business → copy the Place ID from the URL.\n\n` +
+      `Then send: /competitors addid ${name} | PLACE_ID_HERE`
+    );
+    return;
+  }
+
+  if (args.toLowerCase().startsWith('addid ')) {
+    const parts = args.replace(/^addid\s+/i, '').split('|').map((s) => s.trim());
+    if (parts.length < 2) {
+      ctx.reply('Usage: /competitors addid Company Name | PLACE_ID');
+      return;
+    }
+    const result = addCompetitor(parts[0], parts[1]);
+    ctx.reply(result.message);
+    return;
+  }
+
+  if (args.toLowerCase() === 'check') {
+    ctx.reply('Checking competitors...');
+    const result = await checkCompetitors();
+    if (result.changes && result.changes.length > 0) {
+      const changes = result.changes
+        .map((c) => `  ${c.name}: +${c.newReviews} reviews (${c.rating} stars, ${c.totalReviews} total)`)
+        .join('\n');
+      ctx.reply(`Competitor Changes:\n\n${changes}`);
+    } else {
+      ctx.reply('No changes detected since last check.');
+    }
+    return;
+  }
+
+  ctx.reply(formatCompetitorReport());
+});
+
+// --- /weeklystats ---
+bot.command('weeklystats', (ctx) => {
+  const pipeStats = getPipelineStats(7);
+  const dripStats = getDripStats();
+  const { getReferralStats } = require('../Skills/referral-tracker');
+  const refStats = getReferralStats();
+
+  ctx.reply(
+    `Weekly Stats (Last 7 Days)\n\n` +
+    `Pipeline:\n` +
+    `  Leads: ${pipeStats.totalLeads}\n` +
+    `  Active deals: ${pipeStats.activeDeals}\n` +
+    `  Close rate: ${pipeStats.closeRate}\n` +
+    `  Revenue: $${pipeStats.closedRevenue.toLocaleString()}\n\n` +
+    `Drip Sequences:\n` +
+    `  Active: ${dripStats.active}\n` +
+    `  Completed: ${dripStats.completed}\n` +
+    `  Cancelled: ${dripStats.cancelled}\n\n` +
+    `Referral Program:\n` +
+    `  Registered: ${refStats.totalCustomersRegistered}\n` +
+    `  Referrals: ${refStats.totalReferrals}\n` +
+    `  Revenue from referrals: $${refStats.revenueFromReferrals.toLocaleString()}\n` +
+    `  Pending rewards: $${refStats.pendingRewards}`
+  );
+});
+
+// --- /landingpage <city> ---
+bot.command('landingpage', (ctx) => {
+  const city = ctx.message.text.replace('/landingpage', '').trim();
+  if (!city) {
+    ctx.reply('Usage: /landingpage <city>\nExample: /landingpage Boca Raton');
+    return;
+  }
+  try {
+    const result = saveLandingPage({ city, state: 'FL' });
+    ctx.reply(
+      result.success
+        ? `Landing page created: pool-fence-${result.slug}.html\n\nKeywords: ${result.keywords.slice(0, 3).join(', ')}\n\nFile saved to Skills/landing-page-generator/pages/`
+        : `Error: ${result.message}`
+    );
+  } catch (err) {
+    ctx.reply(`Error generating page: ${err.message}`);
+  }
+});
+
+// --- /landingpages (batch generate Palm Beach County) ---
+bot.command('landingpages', (ctx) => {
+  const PALM_BEACH_CITIES = [
+    'West Palm Beach', 'Boca Raton', 'Delray Beach', 'Boynton Beach',
+    'Palm Beach Gardens', 'Jupiter', 'Wellington', 'Royal Palm Beach',
+    'Lake Worth', 'Greenacres', 'Lantana', 'Riviera Beach',
+    'Loxahatchee', 'Tequesta', 'Juno Beach', 'North Palm Beach',
+    'Palm Beach', 'Lake Park', 'Pahokee', 'Belle Glade',
+    'Palm Springs', 'Atlantis', 'Hypoluxo', 'Ocean Ridge',
+  ];
+  ctx.reply(`Generating ${PALM_BEACH_CITIES.length} landing pages...`);
+  try {
+    const result = generateBatch(PALM_BEACH_CITIES, 'FL');
+    ctx.reply(
+      `Generated ${result.count} landing pages:\n\n` +
+      result.pages.map((p) => `  pool-fence-${p}.html`).join('\n') +
+      `\n\nSaved to Skills/landing-page-generator/pages/`
+    );
+  } catch (err) {
+    ctx.reply(`Error: ${err.message}`);
+  }
+});
+
+// --- /adcopy <city> ---
+bot.command('adcopy', (ctx) => {
+  const city = ctx.message.text.replace('/adcopy', '').trim() || 'Palm Beach County';
+  const google = generateGoogleAds(city);
+  let msg = `Google Ads — ${city}\n\n`;
+  google.forEach((ad, i) => {
+    msg += `Ad ${i + 1}:\n  ${ad.headline}\n  ${ad.description}\n\n`;
+  });
+  msg += `Copy and paste these into your Google Ads account.`;
+  ctx.reply(msg);
+});
+
+// --- /gbppost [type] ---
+bot.command('gbppost', (ctx) => {
+  const type = ctx.message.text.replace('/gbppost', '').trim().toLowerCase() || 'general';
+  const post = generateGBPPost(type);
+  ctx.reply(
+    `Google Business Post (${type})\n\n` +
+    `${post.title}\n\n${post.body}\n\n` +
+    `CTA: ${post.cta}\n\n` +
+    `Copy and paste this into your Google Business Profile.`
+  );
+});
+
+// --- /retarget <city> ---
+bot.command('retarget', (ctx) => {
+  const city = ctx.message.text.replace('/retarget', '').trim() || 'Palm Beach County';
+  const ads = generateRetargetingAds(city);
+  let msg = `Retargeting Ads — ${city}\n\n`;
+  ads.forEach((ad) => {
+    msg += `[${ad.type.toUpperCase()}]\n  ${ad.headline}\n  ${ad.description}\n\n`;
+  });
+  msg += 'Use these for Google/Facebook retargeting campaigns.';
+  ctx.reply(msg);
+});
+
+// --- /leadsource <name> <source> ---
+bot.command('leadsource', (ctx) => {
+  const args = ctx.message.text.replace('/leadsource', '').trim();
+  const parts = args.split(/\s+/);
+  if (parts.length < 2) {
+    ctx.reply('Usage: /leadsource <name> <source>\nSources: email, phone, referral, google_ads, facebook, website, partner');
+    return;
+  }
+  const source = parts.pop();
+  const name = parts.join(' ');
+  const validSources = ['email', 'phone', 'referral', 'google_ads', 'facebook', 'website', 'partner'];
+  if (!validSources.includes(source)) {
+    ctx.reply(`Invalid source "${source}". Valid: ${validSources.join(', ')}`);
+    return;
+  }
+  const deals = findDeal(name);
+  if (deals.length === 0) {
+    ctx.reply(`No deal found for "${name}".`);
+    return;
+  }
+  const result = updateDealSource(deals[0].id, source);
+  ctx.reply(result.success
+    ? `Updated ${deals[0].name} source to "${source}".`
+    : `Error: ${result.error}`);
+});
+
+// --- /roi ---
+bot.command('roi', (ctx) => {
+  const sources = getLeadsBySource(30);
+  const keys = Object.keys(sources);
+  if (keys.length === 0) {
+    ctx.reply('No lead data in the last 30 days.');
+    return;
+  }
+  let msg = 'ROI by Channel (30 days)\n\n';
+  keys.sort((a, b) => sources[b].revenue - sources[a].revenue);
+  for (const src of keys) {
+    const s = sources[src];
+    msg += `${src}:\n  Leads: ${s.total} | Closed: ${s.closed} | Lost: ${s.lost}\n  Close rate: ${s.closeRate} | Revenue: $${s.revenue.toLocaleString()}\n\n`;
+  }
+  msg += 'Tag lead sources with /leadsource <name> <source>';
+  ctx.reply(msg);
+});
+
+// --- /expense <amount> <category> [note] ---
+bot.command('expense', (ctx) => {
+  const args = ctx.message.text.replace('/expense', '').trim();
+  const parts = args.split(/\s+/);
+  if (parts.length < 2) {
+    ctx.reply('Usage: /expense <amount> <category> [note]\nCategories: google_ads, facebook_ads, materials, labor, gas, tools, insurance, phone, marketing, software, other');
+    return;
+  }
+  const amount = parseFloat(parts[0]);
+  if (isNaN(amount) || amount <= 0) {
+    ctx.reply('Amount must be a positive number.');
+    return;
+  }
+  const category = parts[1];
+  const note = parts.slice(2).join(' ');
+  const result = addExpense(amount, category, note);
+  ctx.reply(result.success ? result.message : `Error: ${result.error}`);
+});
+
+// --- /revenue <amount> [source] [note] ---
+bot.command('revenue', (ctx) => {
+  const args = ctx.message.text.replace('/revenue', '').trim();
+  const parts = args.split(/\s+/);
+  if (parts.length < 1 || !parts[0]) {
+    ctx.reply('Usage: /revenue <amount> [source] [note]');
+    return;
+  }
+  const amount = parseFloat(parts[0]);
+  if (isNaN(amount) || amount <= 0) {
+    ctx.reply('Amount must be a positive number.');
+    return;
+  }
+  const source = parts[1] || 'job';
+  const note = parts.slice(2).join(' ');
+  const result = addRevenue(amount, source, note);
+  ctx.reply(result.success ? result.message : `Error: ${result.error}`);
+});
+
+// --- /pnl [days] ---
+bot.command('pnl', (ctx) => {
+  const days = parseInt(ctx.message.text.replace('/pnl', '').trim()) || 7;
+  ctx.reply(formatPnL(days));
+});
+
+// --- /partners [add <name> <type>] ---
+bot.command('partners', (ctx) => {
+  const args = ctx.message.text.replace('/partners', '').trim();
+  if (!args) {
+    ctx.reply(formatPartnerList());
+    return;
+  }
+
+  const parts = args.split(/\s+/);
+  const sub = parts[0].toLowerCase();
+
+  if (sub === 'add') {
+    if (parts.length < 3) {
+      ctx.reply('Usage: /partners add <name> <type>\nTypes: pool_builder, realtor, inspector, property_manager, contractor, other');
+      return;
+    }
+    const type = parts[parts.length - 1];
+    const name = parts.slice(1, -1).join(' ');
+    const result = addPartner(name, type);
+    ctx.reply(result.success ? result.message : `Error: ${result.error}`);
+  } else {
+    ctx.reply('Usage: /partners — list all\n/partners add <name> <type> — add partner');
+  }
+});
+
+// --- /outreach <name> ---
+bot.command('outreach', (ctx) => {
+  const name = ctx.message.text.replace('/outreach', '').trim();
+  if (!name) {
+    ctx.reply('Usage: /outreach <partner name>');
+    return;
+  }
+  const matches = findPartner(name);
+  if (matches.length === 0) {
+    ctx.reply(`No partner found matching "${name}". Add with /partners add <name> <type>`);
+    return;
+  }
+  const partner = matches[0];
+  let outreach;
+  if (partner.type === 'pool_builder' || partner.type === 'contractor') {
+    outreach = generatePartnerOutreach(partner.name, partner.name);
+  } else if (partner.type === 'property_manager') {
+    outreach = generateRentalOutreach(partner.name);
+  } else {
+    outreach = generatePartnerOutreach(partner.name, partner.name);
+  }
+  ctx.reply(`Outreach for ${partner.name} (${partner.type}):\n\n${outreach}`);
 });
 
 // =====================
@@ -485,11 +777,22 @@ bot.on('text', async (ctx) => {
         if (action.type === 'lead_response') {
           const lead = action.data;
           if (lead.phone) {
-            const msg = smsTemplates.leadResponse(lead.name);
+            // Build SMS with booking link if available
+            let msg = smsTemplates.leadResponse(lead.name);
+            const booking = getBookingUrl();
+            if (booking && booking.url && booking.url !== '#contact') {
+              msg += `\n\nBook directly here: ${booking.url}`;
+            }
             const result = await sendSMS(lead.phone, msg);
             ctx.reply(result.success ? `Text sent to ${lead.name} (${lead.phone})!` : `SMS failed: ${result.error}`);
           } else {
             ctx.reply(`No phone number for ${lead.name}. Follow up via email: ${lead.email}`);
+          }
+          // Auto-add to sales pipeline
+          addToPipeline({ name: lead.name, phone: lead.phone, email: lead.email, source: 'email' });
+          // Auto-add to drip sequence for follow-up on Day 1, 3, 7
+          if (lead.phone) {
+            addToDrip({ name: lead.name, phone: lead.phone, email: lead.email, source: 'email' });
           }
           markLeadProcessed(lead);
         } else if (action.type === 'missed_call') {
@@ -733,12 +1036,43 @@ bot.on('text', async (ctx) => {
         trackJobCompleted(parsed.params.jobNumber, lookup.job.customer_name);
         trackInvoiceSent(lookup.job.invoice_number, lookup.job.customer_name, lookup.job.amount);
 
+        // Schedule review request (FIXED: was passing email as phone)
         const reviewResult = scheduleReviewRequest({
           customer_name: lookup.job.customer_name,
-          phone: lookup.job.email,
+          phone: lookup.job.phone || lookup.job.customer_phone,
           completion_date: new Date().toISOString(),
         });
-        ctx.reply(response + '\n\n' + (reviewResult.message || ''));
+
+        // Auto-advance pipeline deal to 'installed'
+        const deals = findDeal(lookup.job.customer_name);
+        if (deals.length > 0) {
+          advanceDeal(deals[0].id, 'installed');
+        }
+
+        // Register customer in referral program
+        const { registerCustomer, getReferralInviteSMS } = require('../Skills/referral-tracker');
+        const regResult = registerCustomer({
+          name: lookup.job.customer_name,
+          phone: lookup.job.phone || lookup.job.customer_phone,
+          email: lookup.job.email,
+        });
+
+        // Schedule referral invite SMS via the referral tracker
+        if (regResult.success && regResult.customer && (lookup.job.phone || lookup.job.customer_phone)) {
+          const { scheduleReferralInvite } = require('../Skills/referral-tracker');
+          if (typeof scheduleReferralInvite === 'function') {
+            scheduleReferralInvite(regResult.customer);
+          }
+        }
+
+        let replyMsg = response + '\n\n' + (reviewResult.message || '');
+        if (deals.length > 0) {
+          replyMsg += '\nPipeline updated to: installed';
+        }
+        if (regResult.success) {
+          replyMsg += `\nReferral program: ${lookup.job.customer_name} registered (code: ${regResult.customer ? regResult.customer.referralCode : 'N/A'})`;
+        }
+        ctx.reply(replyMsg);
         return;
       }
     }
@@ -773,6 +1107,28 @@ cron.schedule('0 17 * * *', async () => {
   console.log('[bot] Sending 5PM evening summary...');
   const summary = await buildEveningSummary();
   await notifyOwner(summary);
+}, { timezone: 'America/New_York' });
+
+// Monday 8:00 AM — Weekly Competitor Report
+cron.schedule('0 8 * * 1', async () => {
+  console.log('[bot] Sending Monday competitor report...');
+  try {
+    const { checkCompetitors } = require('../Skills/competitor-monitor');
+    const result = await checkCompetitors();
+    let msg = 'Weekly Competitor Report\n\n';
+    if (result.changes && result.changes.length > 0) {
+      msg += 'Changes this week:\n';
+      result.changes.forEach((c) => {
+        msg += `  ${c.name}: +${c.newReviews} reviews (now ${c.rating} stars)\n`;
+      });
+    } else {
+      msg += 'No changes detected.\n';
+    }
+    msg += '\n' + formatCompetitorReport();
+    await notifyOwner(msg);
+  } catch (err) {
+    console.error('[bot] Competitor report error:', err.message);
+  }
 }, { timezone: 'America/New_York' });
 
 // Every 4 hours — Check for new leads
@@ -828,6 +1184,18 @@ cron.schedule('0 * * * *', async () => {
   } catch (err) {
     console.error('[bot] Drip queue error:', err.message);
   }
+
+  // Process scheduled referral invites (5-day delay after job completion)
+  try {
+    const { processScheduledInvites } = require('../Skills/referral-tracker');
+    const inviteResult = await processScheduledInvites();
+    if (inviteResult.sent > 0) {
+      console.log(`[bot] Sent ${inviteResult.sent} referral invite(s)`);
+      await notifyOwner(`Sent ${inviteResult.sent} referral invite(s) to past customers.`);
+    }
+  } catch (err) {
+    console.error('[bot] Referral invite error:', err.message);
+  }
 });
 
 // Friday 5PM — Weekly review reminder
@@ -837,6 +1205,12 @@ cron.schedule('0 17 * * 5', async () => {
     `Time for your weekly review. Take 10 minutes to reflect on the week.\n\n` +
     `Type /weeklyreview to get started.`
   );
+}, { timezone: 'America/New_York' });
+
+// Friday 4PM — Weekly P&L report
+cron.schedule('0 16 * * 5', async () => {
+  const report = formatPnL(7);
+  await notifyOwner(`Weekly P&L Report\n\n${report}\n\nLog expenses: /expense <amount> <category>\nLog revenue: /revenue <amount> [source]`);
 }, { timezone: 'America/New_York' });
 
 // Sunday 8PM — Week ahead prep

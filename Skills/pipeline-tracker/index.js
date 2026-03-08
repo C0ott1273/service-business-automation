@@ -153,6 +153,52 @@ function getPipelineStats(daysBack = 30) {
 }
 
 /**
+ * Update a deal's lead source.
+ */
+function updateDealSource(dealId, source) {
+  const data = loadPipeline();
+  const deal = data.deals.find((d) => d.id === dealId);
+  if (!deal) return { success: false, error: 'Deal not found' };
+
+  deal.source = source;
+  deal.updatedAt = new Date().toISOString();
+  savePipeline(data);
+  return { success: true, deal };
+}
+
+/**
+ * Get leads grouped by source with conversion stats.
+ */
+function getLeadsBySource(daysBack = 30) {
+  const data = loadPipeline();
+  const cutoff = new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000);
+  const recent = data.deals.filter((d) => new Date(d.createdAt) >= cutoff);
+
+  const sources = {};
+  for (const deal of recent) {
+    const src = deal.source || 'unknown';
+    if (!sources[src]) {
+      sources[src] = { total: 0, closed: 0, lost: 0, revenue: 0 };
+    }
+    sources[src].total++;
+    if (deal.lost) {
+      sources[src].lost++;
+    } else if (deal.stage === 'installed' || deal.stage === 'review_sent') {
+      sources[src].closed++;
+      sources[src].revenue += deal.estimatedValue || 0;
+    }
+  }
+
+  // Add close rate to each source
+  for (const src of Object.keys(sources)) {
+    const s = sources[src];
+    s.closeRate = s.total > 0 ? ((s.closed / s.total) * 100).toFixed(1) + '%' : '0.0%';
+  }
+
+  return sources;
+}
+
+/**
  * Format pipeline for Telegram display.
  */
 function formatPipeline() {
@@ -182,6 +228,8 @@ module.exports = {
   loseDeal,
   findDeal,
   getPipelineStats,
+  getLeadsBySource,
+  updateDealSource,
   formatPipeline,
   STAGES,
 };
