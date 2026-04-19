@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Crumb app icon">
+  <rect width="512" height="512" fill="#FF3B1F"/>
+  <rect x="32" y="32" width="448" height="448" fill="none" stroke="#0A0A0A" stroke-width="24"/>
+  <g transform="translate(256 300)" font-family="Archivo Black, Helvetica, sans-serif" font-weight="900" text-anchor="middle">
+    <text font-size="260" fill="#F4EFE6" letter-spacing="-10">C</text>
+  </g>
+  <circle cx="384" cy="128" r="28" fill="#E8C547" stroke="#0A0A0A" stroke-width="12"/>
+  <rect x="64" y="400" width="120" height="32" fill="#0A0A0A"/>
+  <text x="124" y="424" font-family="JetBrains Mono, Courier New, monospace" font-size="22" font-weight="700" fill="#F4EFE6" text-anchor="middle">DEALS</text>
+</svg>

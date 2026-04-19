@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#FF3B1F" />
+  <title>CRUMB — LOCAL FOOD DEALS</title>
+  <meta name="description" content="Brutalist food-deal discovery for your neighborhood. Sorted by distance, filtered by hunger." />
+
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&family=Archivo+Black&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Marquee ticker -->
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker__track">
+      <span>★ DEALS ★ DEALS ★ DEALS ★ CHEAP EATS ★ HAPPY HOUR ★ BUY LOW EAT HIGH ★ DEALS ★ DEALS ★ DEALS ★ CHEAP EATS ★ HAPPY HOUR ★ BUY LOW EAT HIGH ★</span>
+      <span>★ DEALS ★ DEALS ★ DEALS ★ CHEAP EATS ★ HAPPY HOUR ★ BUY LOW EAT HIGH ★ DEALS ★ DEALS ★ DEALS ★ CHEAP EATS ★ HAPPY HOUR ★ BUY LOW EAT HIGH ★</span>
+    </div>
+  </div>
+
+  <!-- Masthead -->
+  <header class="masthead">
+    <div class="mast__left">
+      <div class="issue">VOL.01 &nbsp;·&nbsp; <span id="today-date">—</span></div>
+      <h1 class="wordmark">CRUMB<span class="wordmark__dot">.</span></h1>
+      <p class="tagline">A field guide to every deal within a bite of you.</p>
+    </div>
+    <div class="mast__right">
+      <button id="install-btn" class="btn btn--primary" hidden>
+        <span>⬇</span> INSTALL APP
+      </button>
+      <div class="location-pill" id="location-pill">
+        <span class="loc-dot"></span>
+        <span id="location-label">LOCATING…</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Controls -->
+  <section class="controls">
+    <div class="control-row">
+      <div class="chips" id="cuisine-chips" role="tablist" aria-label="Cuisine filter">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+
+    <div class="control-row control-row--split">
+      <div class="toggles">
+        <label class="toggle">
+          <input type="checkbox" id="filter-open-now" />
+          <span>OPEN NOW</span>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="filter-under-10" />
+          <span>UNDER $10</span>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="filter-happy-hour" />
+          <span>HAPPY HOUR</span>
+        </label>
+      </div>
+
+      <div class="slider-box">
+        <label for="distance-slider">
+          WITHIN <span id="distance-value" class="num">10</span> MI
+        </label>
+        <input id="distance-slider" type="range" min="0.5" max="25" step="0.5" value="10" />
+      </div>
+
+      <div class="sort-box">
+        <label for="sort-select">SORT</label>
+        <select id="sort-select">
+          <option value="distance">DISTANCE</option>
+          <option value="discount">% OFF</option>
+          <option value="price">PRICE</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats strip -->
+  <section class="stats" aria-label="Stats">
+    <div class="stat"><div class="stat__num" id="stat-count">—</div><div class="stat__label">DEALS SHOWING</div></div>
+    <div class="stat"><div class="stat__num" id="stat-saved">—</div><div class="stat__label">AVG SAVINGS</div></div>
+    <div class="stat"><div class="stat__num" id="stat-nearest">—</div><div class="stat__label">NEAREST (MI)</div></div>
+    <div class="stat"><div class="stat__num" id="stat-cuisines">—</div><div class="stat__label">CUISINES</div></div>
+  </section>
+
+  <!-- Grid -->
+  <main class="grid" id="grid">
+    <!-- cards rendered by JS -->
+  </main>
+
+  <div class="empty" id="empty" hidden>
+    <div class="empty__num">00</div>
+    <div class="empty__msg">NO DEALS MATCH.<br/>WIDEN THE NET.</div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="foot">
+    <div class="foot__left">
+      CRUMB &nbsp;/&nbsp; A FIELD GUIDE TO DEALS<br/>
+      MOCK DATA · TAMPA &amp; ST. PETE
+    </div>
+    <div class="foot__right">
+      <span class="foot__badge">INSTALLABLE</span>
+      <span class="foot__badge">OFFLINE READY</span>
+      <span class="foot__badge">NO ACCOUNTS</span>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
